@@ -25,6 +25,15 @@ const userSchema = new Schema({
     index: true,
     trim: true
   },
+  roleId: {
+    type: Schema.ObjectId,
+    ref: 'Role',
+    required: true
+  },
+  otp: {
+    type: String,
+    default: ''
+  },
   role: {
     type: String,
     enum: roles,
@@ -33,6 +42,10 @@ const userSchema = new Schema({
   picture: {
     type: String,
     trim: true
+  },
+  status: {
+    type: Boolean,
+    default: true
   }
 }, {
   timestamps: true
@@ -66,7 +79,7 @@ userSchema.pre('save', function (next) {
 userSchema.methods = {
   view (full) {
     const view = {}
-    let fields = ['id', 'name', 'picture']
+    let fields = ['id', 'name', 'role', 'roleId', 'picture', 'status']
 
     if (full) {
       fields = [...fields, 'email', 'createdAt']

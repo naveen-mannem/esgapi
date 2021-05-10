@@ -19,6 +19,19 @@ export const password = () => (req, res, next) =>
     })
   })(req, res, next)
 
+export const otp = () => (req, res, next) =>
+  passport.authenticate('otp', { session: false }, (err, user, info) => {
+    if (err && err.param) {
+      return res.status(400).json(err)
+    } else if (err || !user) {
+      return res.status(401).end()
+    }
+    req.logIn(user, { session: false }, (err) => {
+      if (err) return res.status(401).end()
+      next()
+    })
+  })(req, res, next)  
+
 export const master = () =>
   passport.authenticate('master', { session: false })
 
@@ -49,6 +62,24 @@ passport.use('password', new BasicStrategy((email, password, done) => {
       done(null, user)
       return null
     }).catch(done)
+  })
+}))
+
+passport.use('otp', new BasicStrategy((email, otp, done) => {
+  const userSchema = new Schema({ email: schema.tree.email, otp: schema.tree.otp })
+
+  userSchema.validate({ email, otp }, (err) => {
+    if (err) done(err)
+  })
+
+  User.findOne({ email, otp }).then((user) => {
+    if (!user) {
+      done(true)
+      return null
+    }
+    done(null, user);
+    //console.log(user.authenticateOtp(email, otp));
+    // return user.authenticateOtp(email, otp) ? done(null, user):done(null, null);
   })
 }))
 

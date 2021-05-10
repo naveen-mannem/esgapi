@@ -1,5 +1,6 @@
 import { success, notFound } from '../../services/response/'
 import { sendMail } from '../../services/sendgrid'
+import nodemailer from 'nodemailer'
 import { PasswordReset } from '.'
 import { User } from '../user'
 
@@ -19,9 +20,26 @@ export const create = ({ bodymen: { body: { email, link } } }, res, next) =>
         If you didn't make this request then you can safely ignore this email. :)<br><br>
         &mdash; esgapi Team
       `
-      return sendMail({ toEmail: email, subject: 'esgapi - Password Reset', content })
+      var transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+          user: 'testmailer09876@gmail.com',
+          pass: 'ijsfupqcuttlpcez'
+        }
+      });
+      
+      return transporter.sendMail({
+        from: 'testmailer09876@gmail.com',
+        to: email,
+        subject: 'esgapi - Password Reset',
+        text: content.toString()
+      });
+      // return sendMail({ toEmail: email, subject: 'esgapi - Password Reset', content })
     })
-    .then(([response]) => response ? res.status(response.statusCode).end() : null)
+    .then((response) => {
+      console.log('response', response);
+      response ? res.json(response).end() : null 
+    })
     .catch(next)
 
 export const show = ({ params: { token } }, res, next) =>
