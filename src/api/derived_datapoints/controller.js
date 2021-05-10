@@ -11,6 +11,8 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
   DerivedDatapoints.count(query)
     .then(count => DerivedDatapoints.find(query, select, cursor)
       .populate('createdBy')
+      .populate('companyId')
+      .populate('datapointId')
       .then((derivedDatapoints) => ({
         count,
         rows: derivedDatapoints.map((derivedDatapoints) => derivedDatapoints.view())
@@ -22,6 +24,8 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
 export const show = ({ params }, res, next) =>
   DerivedDatapoints.findById(params.id)
     .populate('createdBy')
+    .populate('companyId')
+    .populate('datapointId')
     .then(notFound(res))
     .then((derivedDatapoints) => derivedDatapoints ? derivedDatapoints.view() : null)
     .then(success(res))
@@ -30,6 +34,8 @@ export const show = ({ params }, res, next) =>
 export const update = ({ user, bodymen: { body }, params }, res, next) =>
   DerivedDatapoints.findById(params.id)
     .populate('createdBy')
+    .populate('companyId')
+    .populate('datapointId')
     .then(notFound(res))
     .then(authorOrAdmin(res, user, 'createdBy'))
     .then((derivedDatapoints) => derivedDatapoints ? Object.assign(derivedDatapoints, body).save() : null)

@@ -1,8 +1,10 @@
 import mongoose, { Schema } from 'mongoose'
 
 const referenceSchema = new Schema({
-  standalonId: {
-    type: String
+  standaloneId: {
+    type: Schema.ObjectId,
+    ref: 'StandaloneDatapoints',
+    required: true
   },
   sourceName: {
     type: String
@@ -35,13 +37,8 @@ const referenceSchema = new Schema({
     type: String
   },
   status: {
-    type: String
-  },
-  createdAt: {
-    type: String
-  },
-  updatedAt: {
-    type: String
+    type: Boolean,
+    default: true
   }
 }, {
   timestamps: true,
@@ -56,7 +53,7 @@ referenceSchema.methods = {
     const view = {
       // simple view
       id: this.id,
-      standalonId: this.standalonId,
+      standaloneId: this.standaloneId ? this.standaloneId.view(full) : null,
       sourceName: this.sourceName,
       url: this.url,
       pageNumber: this.pageNumber,
@@ -68,8 +65,6 @@ referenceSchema.methods = {
       createdBy: this.createdBy,
       activeStatus: this.activeStatus,
       status: this.status,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }

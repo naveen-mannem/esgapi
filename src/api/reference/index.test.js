@@ -14,10 +14,10 @@ beforeEach(async () => {
 test('POST /reference 201 (master)', async () => {
   const { status, body } = await request(app())
     .post(`${apiRoot}`)
-    .send({ access_token: masterKey, standalonId: 'test', sourceName: 'test', url: 'test', pageNumber: 'test', publicationDate: 'test', textSnippet: 'test', screenshotInPNG: 'test', screenshotType: 'test', filePath: 'test', createdBy: 'test', activeStatus: 'test', status: 'test', createdAt: 'test', updatedAt: 'test' })
+    .send({ access_token: masterKey, standaloneId: 'test', sourceName: 'test', url: 'test', pageNumber: 'test', publicationDate: 'test', textSnippet: 'test', screenshotInPNG: 'test', screenshotType: 'test', filePath: 'test', createdBy: 'test', activeStatus: 'test', status: 'test', createdAt: 'test', updatedAt: 'test' })
   expect(status).toBe(201)
   expect(typeof body).toEqual('object')
-  expect(body.standalonId).toEqual('test')
+  expect(body.standaloneId).toEqual('test')
   expect(body.sourceName).toEqual('test')
   expect(body.url).toEqual('test')
   expect(body.pageNumber).toEqual('test')
@@ -79,11 +79,11 @@ test('GET /reference/:id 404 (master)', async () => {
 test('PUT /reference/:id 200 (master)', async () => {
   const { status, body } = await request(app())
     .put(`${apiRoot}/${reference.id}`)
-    .send({ access_token: masterKey, standalonId: 'test', sourceName: 'test', url: 'test', pageNumber: 'test', publicationDate: 'test', textSnippet: 'test', screenshotInPNG: 'test', screenshotType: 'test', filePath: 'test', createdBy: 'test', activeStatus: 'test', status: 'test', createdAt: 'test', updatedAt: 'test' })
+    .send({ access_token: masterKey, standaloneId: 'test', sourceName: 'test', url: 'test', pageNumber: 'test', publicationDate: 'test', textSnippet: 'test', screenshotInPNG: 'test', screenshotType: 'test', filePath: 'test', createdBy: 'test', activeStatus: 'test', status: 'test', createdAt: 'test', updatedAt: 'test' })
   expect(status).toBe(200)
   expect(typeof body).toEqual('object')
   expect(body.id).toEqual(reference.id)
-  expect(body.standalonId).toEqual('test')
+  expect(body.standaloneId).toEqual('test')
   expect(body.sourceName).toEqual('test')
   expect(body.url).toEqual('test')
   expect(body.pageNumber).toEqual('test')
@@ -108,7 +108,7 @@ test('PUT /reference/:id 401', async () => {
 test('PUT /reference/:id 404 (master)', async () => {
   const { status } = await request(app())
     .put(apiRoot + '/123456789098765432123456')
-    .send({ access_token: masterKey, standalonId: 'test', sourceName: 'test', url: 'test', pageNumber: 'test', publicationDate: 'test', textSnippet: 'test', screenshotInPNG: 'test', screenshotType: 'test', filePath: 'test', createdBy: 'test', activeStatus: 'test', status: 'test', createdAt: 'test', updatedAt: 'test' })
+    .send({ access_token: masterKey, standaloneId: 'test', sourceName: 'test', url: 'test', pageNumber: 'test', publicationDate: 'test', textSnippet: 'test', screenshotInPNG: 'test', screenshotType: 'test', filePath: 'test', createdBy: 'test', activeStatus: 'test', status: 'test', createdAt: 'test', updatedAt: 'test' })
   expect(status).toBe(404)
 })
 

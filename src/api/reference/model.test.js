@@ -3,7 +3,7 @@ import { Reference } from '.'
 let reference
 
 beforeEach(async () => {
-  reference = await Reference.create({ standalonId: 'test', sourceName: 'test', url: 'test', pageNumber: 'test', publicationDate: 'test', textSnippet: 'test', screenshotInPNG: 'test', screenshotType: 'test', filePath: 'test', createdBy: 'test', activeStatus: 'test', status: 'test', createdAt: 'test', updatedAt: 'test' })
+  reference = await Reference.create({ standaloneId: 'test', sourceName: 'test', url: 'test', pageNumber: 'test', publicationDate: 'test', textSnippet: 'test', screenshotInPNG: 'test', screenshotType: 'test', filePath: 'test', createdBy: 'test', activeStatus: 'test', status: 'test', createdAt: 'test', updatedAt: 'test' })
 })
 
 describe('view', () => {
@@ -11,7 +11,7 @@ describe('view', () => {
     const view = reference.view()
     expect(typeof view).toBe('object')
     expect(view.id).toBe(reference.id)
-    expect(view.standalonId).toBe(reference.standalonId)
+    expect(view.standaloneId).toBe(reference.standaloneId)
     expect(view.sourceName).toBe(reference.sourceName)
     expect(view.url).toBe(reference.url)
     expect(view.pageNumber).toBe(reference.pageNumber)
@@ -33,7 +33,7 @@ describe('view', () => {
     const view = reference.view(true)
     expect(typeof view).toBe('object')
     expect(view.id).toBe(reference.id)
-    expect(view.standalonId).toBe(reference.standalonId)
+    expect(view.standaloneId).toBe(reference.standaloneId)
     expect(view.sourceName).toBe(reference.sourceName)
     expect(view.url).toBe(reference.url)
     expect(view.pageNumber).toBe(reference.pageNumber)
