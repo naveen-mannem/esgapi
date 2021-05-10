@@ -16,6 +16,7 @@ import rules from './rules'
 import validations from './validations'
 import standaloneDatapoints from './standalone_datapoints'
 import derivedDatapoints from './derived_datapoints'
+import role from './role'
 
 const router = new Router()
 
@@ -59,5 +60,6 @@ router.use('/rules', rules)
 router.use('/validations', validations)
 router.use('/standalone_datapoints', standaloneDatapoints)
 router.use('/derived_datapoints', derivedDatapoints)
+router.use('/role', role)
 
 export default router

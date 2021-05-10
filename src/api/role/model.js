@@ -10,16 +10,8 @@ const roleSchema = new Schema({
     required:true
   },
   status: {
-    type: String,
+    type: Boolean,
     default:true
-  },
-  createdBy: {
-    type: String
-  },
-  createdAt: {
-    type: Date,
-    default:Date.now
-
   }
 }, {
   timestamps: true,
@@ -37,8 +29,6 @@ roleSchema.methods = {
       roleName: this.roleName,
       roleCode: this.roleCode,
       status: this.status,
-      createdBy: this.createdBy,
-      createdAt: this.createdAt,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }
