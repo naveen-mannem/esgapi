@@ -1,102 +1,98 @@
 import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
-import { master } from '../../services/passport'
+import { token } from '../../services/passport'
 import { create, index, show, update, destroy } from './controller'
 import { schema } from './model'
 export Error, { schema } from './model'
 
 const router = new Router()
-const { errorTypeName, errorBucket, errorDefinition, status, createdAt, updatedAt } = schema.tree
+const { errorType, errorBucket, errorDefenition, status } = schema.tree
 
 /**
- * @api {post} /error Create error
+ * @api {post} /errors Create error
  * @apiName CreateError
  * @apiGroup Error
- * @apiPermission master
- * @apiParam {String} access_token master access token.
- * @apiParam errorTypeName Error's errorTypeName.
+ * @apiPermission user
+ * @apiParam {String} access_token user access token.
+ * @apiParam errorType Error's errorType.
  * @apiParam errorBucket Error's errorBucket.
- * @apiParam errorDefinition Error's errorDefinition.
+ * @apiParam errorDefenition Error's errorDefenition.
  * @apiParam status Error's status.
- * @apiParam createdAt Error's createdAt.
- * @apiParam updatedAt Error's updatedAt.
  * @apiSuccess {Object} error Error's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Error not found.
- * @apiError 401 master access only.
+ * @apiError 401 user access only.
  */
 router.post('/',
-  master(),
-  body({ errorTypeName, errorBucket, errorDefinition, status, createdAt, updatedAt }),
+  token({ required: true }),
+  body({ errorType, errorBucket, errorDefenition}),
   create)
 
 /**
- * @api {get} /error Retrieve errors
+ * @api {get} /errors Retrieve errors
  * @apiName RetrieveErrors
  * @apiGroup Error
- * @apiPermission master
- * @apiParam {String} access_token master access token.
+ * @apiPermission user
+ * @apiParam {String} access_token user access token.
  * @apiUse listParams
  * @apiSuccess {Number} count Total amount of errors.
  * @apiSuccess {Object[]} rows List of errors.
  * @apiError {Object} 400 Some parameters may contain invalid values.
- * @apiError 401 master access only.
+ * @apiError 401 user access only.
  */
 router.get('/',
-  master(),
+  token({ required: true }),
   query(),
   index)
 
 /**
- * @api {get} /error/:id Retrieve error
+ * @api {get} /errors/:id Retrieve error
  * @apiName RetrieveError
  * @apiGroup Error
- * @apiPermission master
- * @apiParam {String} access_token master access token.
+ * @apiPermission user
+ * @apiParam {String} access_token user access token.
  * @apiSuccess {Object} error Error's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Error not found.
- * @apiError 401 master access only.
+ * @apiError 401 user access only.
  */
 router.get('/:id',
-  master(),
+  token({ required: true }),
   show)
 
 /**
- * @api {put} /error/:id Update error
+ * @api {put} /errors/:id Update error
  * @apiName UpdateError
  * @apiGroup Error
- * @apiPermission master
- * @apiParam {String} access_token master access token.
- * @apiParam errorTypeName Error's errorTypeName.
+ * @apiPermission user
+ * @apiParam {String} access_token user access token.
+ * @apiParam errorType Error's errorType.
  * @apiParam errorBucket Error's errorBucket.
- * @apiParam errorDefinition Error's errorDefinition.
+ * @apiParam errorDefenition Error's errorDefenition.
  * @apiParam status Error's status.
- * @apiParam createdAt Error's createdAt.
- * @apiParam updatedAt Error's updatedAt.
  * @apiSuccess {Object} error Error's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Error not found.
- * @apiError 401 master access only.
+ * @apiError 401 user access only.
  */
 router.put('/:id',
-  master(),
-  body({ errorTypeName, errorBucket, errorDefinition, status, createdAt, updatedAt }),
+  token({ required: true }),
+  body({ errorType, errorBucket, errorDefenition, status }),
   update)
 
 /**
- * @api {delete} /error/:id Delete error
+ * @api {delete} /errors/:id Delete error
  * @apiName DeleteError
  * @apiGroup Error
- * @apiPermission master
- * @apiParam {String} access_token master access token.
+ * @apiPermission user
+ * @apiParam {String} access_token user access token.
  * @apiSuccess (Success 204) 204 No Content.
  * @apiError 404 Error not found.
- * @apiError 401 master access only.
+ * @apiError 401 user access only.
  */
 router.delete('/:id',
-  master(),
+  token({ required: true }),
   destroy)
 
 export default router
