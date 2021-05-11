@@ -1,26 +1,25 @@
 import mongoose, { Schema } from 'mongoose'
 
-const boardMatrixDatapointsSchema = new Schema({
-  dpCodeId: {
+const groupSchema = new Schema({
+  createdBy: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  groupName: {
     type: String
   },
-  boardMemberId: {
+  groupAdmin: {
     type: String
   },
-  year: {
-    type: String
-  },
-  response: {
-    type: String
+  batchId: {
+    type: Schema.ObjectId,
+    ref: 'Batches',
+    required: true
   },
   status: {
-    type: String
-  },
-  createdAt: {
-    type: String
-  },
-  updatedAt: {
-    type: String
+    type: Boolean,
+    default: true
   }
 }, {
   timestamps: true,
@@ -30,18 +29,16 @@ const boardMatrixDatapointsSchema = new Schema({
   }
 })
 
-boardMatrixDatapointsSchema.methods = {
+groupSchema.methods = {
   view (full) {
     const view = {
       // simple view
       id: this.id,
-      dpCodeId: this.dpCodeId,
-      boardMemberId: this.boardMemberId,
-      year: this.year,
-      response: this.response,
+      createdBy: this.createdBy ? this.createdBy.view(full) : null,
+      groupName: this.groupName,
+      groupAdmin: this.groupAdmin,
+      batchId: this.batchId ? this.batchId.view(full) : null,
       status: this.status,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }
@@ -53,7 +50,7 @@ boardMatrixDatapointsSchema.methods = {
   }
 }
 
-const model = mongoose.model('BoardMatrixDatapoints', boardMatrixDatapointsSchema)
+const model = mongoose.model('Group', groupSchema)
 
 export const schema = model.schema
 export default model

@@ -1,30 +1,30 @@
 import mongoose, { Schema } from 'mongoose'
 
-const taskSlaLogSchema = new Schema({
+const boardMembersMatrixDataPointsSchema = new Schema({
   createdBy: {
     type: Schema.ObjectId,
     ref: 'User',
     required: true
   },
-  taskId: {
+  dpCodeId: {
    type: Schema.ObjectId,
-    ref: 'TaskAssigment',
+    ref: 'DataPoints',
     required: true
   },
-  currentDate: {
+  boardMemberId: {
+   type: Schema.ObjectId,
+    ref: 'BoardMembers',
+    required: true
+  },
+  year: {
     type: String
   },
-  preferedDate: {
-    type: String
-  },
-  loggedBy: {
-    type: String
-  },
-  taskStatus: {
+  response: {
     type: String
   },
   status: {
-    type: String
+    type: Boolean,
+    default:true
   }
 }, {
   timestamps: true,
@@ -34,17 +34,16 @@ const taskSlaLogSchema = new Schema({
   }
 })
 
-taskSlaLogSchema.methods = {
+boardMembersMatrixDataPointsSchema.methods = {
   view (full) {
     const view = {
       // simple view
       id: this.id,
       createdBy: this.createdBy ? this.createdBy.view(full) : null,
-      taskId: this.taskId ? this.taskId.view(full) : null ,
-      currentDate: this.currentDate,
-      preferedDate: this.preferedDate,
-      loggedBy: this.loggedBy,
-      taskStatus: this.taskStatus,
+      dpCodeId: this.dpCodeId ? this.dpCodeId.view(full) : null,
+      boardMemberId: this.boardMemberId.view(full) ? this.boardMemberId.view(full) : null,
+      year: this.year,
+      response: this.response,
       status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
@@ -57,7 +56,7 @@ taskSlaLogSchema.methods = {
   }
 }
 
-const model = mongoose.model('TaskSlaLog', taskSlaLogSchema)
+const model = mongoose.model('BoardMembersMatrixDataPoints', boardMembersMatrixDataPointsSchema)
 
 export const schema = model.schema
 export default model

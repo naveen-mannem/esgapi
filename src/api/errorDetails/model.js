@@ -1,11 +1,20 @@
 import mongoose, { Schema } from 'mongoose'
 
 const errorDetailsSchema = new Schema({
+  createdBy: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
   errorTypeId: {
-    type: String
+    type: Schema.ObjectId,
+    ref: 'Error',
+    required: true
   },
   taskId: {
-    type: String
+    type: Schema.ObjectId,
+    ref: 'TaskAssignment',
+    required: true
   },
   loggedBy: {
     type: String
@@ -19,17 +28,14 @@ const errorDetailsSchema = new Schema({
   errorStatus: {
     type: String
   },
-  standAlonId: {
-    type: String
+  standaloneId: {
+    type: Schema.ObjectId,
+    ref: 'StandaloneDatapoints',
+    required: true
   },
   status: {
-    type: String
-  },
-  createdAt: {
-    type: String
-  },
-  updatedAt: {
-    type: String
+    type: Boolean,
+    default:true
   }
 }, {
   timestamps: true,
@@ -44,16 +50,15 @@ errorDetailsSchema.methods = {
     const view = {
       // simple view
       id: this.id,
-      errorTypeId: this.errorTypeId,
-      taskId: this.taskId,
+      createdBy: this.createdBy ? this.createdBy.view(full) : null,
+      errorTypeId: this.errorTypeId ? this.errorTypeId.view(full) : null,
+      taskId: this.taskId ? this.taskId.view(full) : null,
       loggedBy: this.loggedBy,
       comments: this.comments,
       errorLoggedDate: this.errorLoggedDate,
       errorStatus: this.errorStatus,
-      standAlonId: this.standAlonId,
+      standaloneId: this.standaloneId ? this.standaloneId.view(full) : null,
       status: this.status,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }

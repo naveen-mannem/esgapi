@@ -4,40 +4,38 @@ import { middleware as body } from 'bodymen'
 import { token } from '../../services/passport'
 import { create, index, show, update, destroy } from './controller'
 import { schema } from './model'
-export Error, { schema } from './model'
+export Batches, { schema } from './model'
 
 const router = new Router()
-const { errorType, errorBucket, errorDefenition, status } = schema.tree
+const { batchName, batchSLA, status } = schema.tree
 
 /**
- * @api {post} /errors Create error
- * @apiName CreateError
- * @apiGroup Error
+ * @api {post} /batches Create batches
+ * @apiName CreateBatches
+ * @apiGroup Batches
  * @apiPermission user
  * @apiParam {String} access_token user access token.
- * @apiParam errorType Error's errorType.
- * @apiParam errorBucket Error's errorBucket.
- * @apiParam errorDefenition Error's errorDefenition.
- * @apiParam status Error's status.
- * @apiSuccess {Object} error Error's data.
+ * @apiParam batchName Batches's batchName.
+ * @apiParam batchSLA Batches's batchSLA.
+ * @apiSuccess {Object} batches Batches's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
- * @apiError 404 Error not found.
+ * @apiError 404 Batches not found.
  * @apiError 401 user access only.
  */
 router.post('/',
   token({ required: true }),
-  body({ errorType, errorBucket, errorDefenition}),
+  body({ batchName, batchSLA }),
   create)
 
 /**
- * @api {get} /errors Retrieve errors
- * @apiName RetrieveErrors
- * @apiGroup Error
+ * @api {get} /batches Retrieve batches
+ * @apiName RetrieveBatches
+ * @apiGroup Batches
  * @apiPermission user
  * @apiParam {String} access_token user access token.
  * @apiUse listParams
- * @apiSuccess {Number} count Total amount of errors.
- * @apiSuccess {Object[]} rows List of errors.
+ * @apiSuccess {Number} count Total amount of batches.
+ * @apiSuccess {Object[]} rows List of batches.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 401 user access only.
  */
@@ -47,14 +45,14 @@ router.get('/',
   index)
 
 /**
- * @api {get} /errors/:id Retrieve error
- * @apiName RetrieveError
- * @apiGroup Error
+ * @api {get} /batches/:id Retrieve batches
+ * @apiName RetrieveBatches
+ * @apiGroup Batches
  * @apiPermission user
  * @apiParam {String} access_token user access token.
- * @apiSuccess {Object} error Error's data.
+ * @apiSuccess {Object} batches Batches's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
- * @apiError 404 Error not found.
+ * @apiError 404 Batches not found.
  * @apiError 401 user access only.
  */
 router.get('/:id',
@@ -62,33 +60,32 @@ router.get('/:id',
   show)
 
 /**
- * @api {put} /errors/:id Update error
- * @apiName UpdateError
- * @apiGroup Error
+ * @api {put} /batches/:id Update batches
+ * @apiName UpdateBatches
+ * @apiGroup Batches
  * @apiPermission user
  * @apiParam {String} access_token user access token.
- * @apiParam errorType Error's errorType.
- * @apiParam errorBucket Error's errorBucket.
- * @apiParam errorDefenition Error's errorDefenition.
- * @apiParam status Error's status.
- * @apiSuccess {Object} error Error's data.
+ * @apiParam batchName Batches's batchName.
+ * @apiParam batchSLA Batches's batchSLA.
+ * @apiParam status Batches's status.
+ * @apiSuccess {Object} batches Batches's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
- * @apiError 404 Error not found.
+ * @apiError 404 Batches not found.
  * @apiError 401 user access only.
  */
 router.put('/:id',
   token({ required: true }),
-  body({ errorType, errorBucket, errorDefenition, status }),
+  body({ batchName, batchSLA, status }),
   update)
 
 /**
- * @api {delete} /errors/:id Delete error
- * @apiName DeleteError
- * @apiGroup Error
+ * @api {delete} /batches/:id Delete batches
+ * @apiName DeleteBatches
+ * @apiGroup Batches
  * @apiPermission user
  * @apiParam {String} access_token user access token.
  * @apiSuccess (Success 204) 204 No Content.
- * @apiError 404 Error not found.
+ * @apiError 404 Batches not found.
  * @apiError 401 user access only.
  */
 router.delete('/:id',

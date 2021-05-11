@@ -3,41 +3,41 @@ import { apiRoot } from '../../config'
 import { signSync } from '../../services/jwt'
 import express from '../../services/express'
 import { User } from '../user'
-import routes, { KmpMatrixDataPoints } from '.'
+import routes, { BoardMembersMatrixDataPoints } from '.'
 
 const app = () => express(apiRoot, routes)
 
-let userSession, anotherSession, kmpMatrixDataPoints
+let userSession, anotherSession, boardMembersMatrixDataPoints
 
 beforeEach(async () => {
   const user = await User.create({ email: 'a@a.com', password: '123456' })
   const anotherUser = await User.create({ email: 'b@b.com', password: '123456' })
   userSession = signSync(user.id)
   anotherSession = signSync(anotherUser.id)
-  kmpMatrixDataPoints = await KmpMatrixDataPoints.create({ createdBy: user })
+  boardMembersMatrixDataPoints = await BoardMembersMatrixDataPoints.create({ createdBy: user })
 })
 
-test('POST /kmpMatrixDataPoints 201 (user)', async () => {
+test('POST /boardMembersMatrixDataPoints 201 (user)', async () => {
   const { status, body } = await request(app())
     .post(`${apiRoot}`)
-    .send({ access_token: userSession, kmpId: 'test', dpCodeId: 'test', response: 'test', year: 'test', status: 'test' })
+    .send({ access_token: userSession, dpCodeId: 'test', boardMemberId: 'test', year: 'test', response: 'test', status: 'test' })
   expect(status).toBe(201)
   expect(typeof body).toEqual('object')
-  expect(body.kmpId).toEqual('test')
   expect(body.dpCodeId).toEqual('test')
-  expect(body.response).toEqual('test')
+  expect(body.boardMemberId).toEqual('test')
   expect(body.year).toEqual('test')
+  expect(body.response).toEqual('test')
   expect(body.status).toEqual('test')
   expect(typeof body.createdBy).toEqual('object')
 })
 
-test('POST /kmpMatrixDataPoints 401', async () => {
+test('POST /boardMembersMatrixDataPoints 401', async () => {
   const { status } = await request(app())
     .post(`${apiRoot}`)
   expect(status).toBe(401)
 })
 
-test('GET /kmpMatrixDataPoints 200 (user)', async () => {
+test('GET /boardMembersMatrixDataPoints 200 (user)', async () => {
   const { status, body } = await request(app())
     .get(`${apiRoot}`)
     .query({ access_token: userSession })
@@ -47,91 +47,91 @@ test('GET /kmpMatrixDataPoints 200 (user)', async () => {
   expect(typeof body.rows[0].createdBy).toEqual('object')
 })
 
-test('GET /kmpMatrixDataPoints 401', async () => {
+test('GET /boardMembersMatrixDataPoints 401', async () => {
   const { status } = await request(app())
     .get(`${apiRoot}`)
   expect(status).toBe(401)
 })
 
-test('GET /kmpMatrixDataPoints/:id 200 (user)', async () => {
+test('GET /boardMembersMatrixDataPoints/:id 200 (user)', async () => {
   const { status, body } = await request(app())
-    .get(`${apiRoot}/${kmpMatrixDataPoints.id}`)
+    .get(`${apiRoot}/${boardMembersMatrixDataPoints.id}`)
     .query({ access_token: userSession })
   expect(status).toBe(200)
   expect(typeof body).toEqual('object')
-  expect(body.id).toEqual(kmpMatrixDataPoints.id)
+  expect(body.id).toEqual(boardMembersMatrixDataPoints.id)
   expect(typeof body.createdBy).toEqual('object')
 })
 
-test('GET /kmpMatrixDataPoints/:id 401', async () => {
+test('GET /boardMembersMatrixDataPoints/:id 401', async () => {
   const { status } = await request(app())
-    .get(`${apiRoot}/${kmpMatrixDataPoints.id}`)
+    .get(`${apiRoot}/${boardMembersMatrixDataPoints.id}`)
   expect(status).toBe(401)
 })
 
-test('GET /kmpMatrixDataPoints/:id 404 (user)', async () => {
+test('GET /boardMembersMatrixDataPoints/:id 404 (user)', async () => {
   const { status } = await request(app())
     .get(apiRoot + '/123456789098765432123456')
     .query({ access_token: userSession })
   expect(status).toBe(404)
 })
 
-test('PUT /kmpMatrixDataPoints/:id 200 (user)', async () => {
+test('PUT /boardMembersMatrixDataPoints/:id 200 (user)', async () => {
   const { status, body } = await request(app())
-    .put(`${apiRoot}/${kmpMatrixDataPoints.id}`)
-    .send({ access_token: userSession, kmpId: 'test', dpCodeId: 'test', response: 'test', year: 'test', status: 'test' })
+    .put(`${apiRoot}/${boardMembersMatrixDataPoints.id}`)
+    .send({ access_token: userSession, dpCodeId: 'test', boardMemberId: 'test', year: 'test', response: 'test', status: 'test' })
   expect(status).toBe(200)
   expect(typeof body).toEqual('object')
-  expect(body.id).toEqual(kmpMatrixDataPoints.id)
-  expect(body.kmpId).toEqual('test')
+  expect(body.id).toEqual(boardMembersMatrixDataPoints.id)
   expect(body.dpCodeId).toEqual('test')
-  expect(body.response).toEqual('test')
+  expect(body.boardMemberId).toEqual('test')
   expect(body.year).toEqual('test')
+  expect(body.response).toEqual('test')
   expect(body.status).toEqual('test')
   expect(typeof body.createdBy).toEqual('object')
 })
 
-test('PUT /kmpMatrixDataPoints/:id 401 (user) - another user', async () => {
+test('PUT /boardMembersMatrixDataPoints/:id 401 (user) - another user', async () => {
   const { status } = await request(app())
-    .put(`${apiRoot}/${kmpMatrixDataPoints.id}`)
-    .send({ access_token: anotherSession, kmpId: 'test', dpCodeId: 'test', response: 'test', year: 'test', status: 'test' })
+    .put(`${apiRoot}/${boardMembersMatrixDataPoints.id}`)
+    .send({ access_token: anotherSession, dpCodeId: 'test', boardMemberId: 'test', year: 'test', response: 'test', status: 'test' })
   expect(status).toBe(401)
 })
 
-test('PUT /kmpMatrixDataPoints/:id 401', async () => {
+test('PUT /boardMembersMatrixDataPoints/:id 401', async () => {
   const { status } = await request(app())
-    .put(`${apiRoot}/${kmpMatrixDataPoints.id}`)
+    .put(`${apiRoot}/${boardMembersMatrixDataPoints.id}`)
   expect(status).toBe(401)
 })
 
-test('PUT /kmpMatrixDataPoints/:id 404 (user)', async () => {
+test('PUT /boardMembersMatrixDataPoints/:id 404 (user)', async () => {
   const { status } = await request(app())
     .put(apiRoot + '/123456789098765432123456')
-    .send({ access_token: anotherSession, kmpId: 'test', dpCodeId: 'test', response: 'test', year: 'test', status: 'test' })
+    .send({ access_token: anotherSession, dpCodeId: 'test', boardMemberId: 'test', year: 'test', response: 'test', status: 'test' })
   expect(status).toBe(404)
 })
 
-test('DELETE /kmpMatrixDataPoints/:id 204 (user)', async () => {
+test('DELETE /boardMembersMatrixDataPoints/:id 204 (user)', async () => {
   const { status } = await request(app())
-    .delete(`${apiRoot}/${kmpMatrixDataPoints.id}`)
+    .delete(`${apiRoot}/${boardMembersMatrixDataPoints.id}`)
     .query({ access_token: userSession })
   expect(status).toBe(204)
 })
 
-test('DELETE /kmpMatrixDataPoints/:id 401 (user) - another user', async () => {
+test('DELETE /boardMembersMatrixDataPoints/:id 401 (user) - another user', async () => {
   const { status } = await request(app())
-    .delete(`${apiRoot}/${kmpMatrixDataPoints.id}`)
+    .delete(`${apiRoot}/${boardMembersMatrixDataPoints.id}`)
     .send({ access_token: anotherSession })
   expect(status).toBe(401)
 })
 
-test('DELETE /kmpMatrixDataPoints/:id 401', async () => {
+test('DELETE /boardMembersMatrixDataPoints/:id 401', async () => {
   const { status } = await request(app())
-    .delete(`${apiRoot}/${kmpMatrixDataPoints.id}`)
+    .delete(`${apiRoot}/${boardMembersMatrixDataPoints.id}`)
   expect(status).toBe(401)
 })
 
-test('DELETE /kmpMatrixDataPoints/:id 404 (user)', async () => {
+test('DELETE /boardMembersMatrixDataPoints/:id 404 (user)', async () => {
   const { status } = await request(app())
     .delete(apiRoot + '/123456789098765432123456')
     .query({ access_token: anotherSession })

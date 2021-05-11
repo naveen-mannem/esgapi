@@ -1,9 +1,11 @@
 import { Error } from '.'
+import { User } from '../user'
 
-let error
+let user, error
 
 beforeEach(async () => {
-  error = await Error.create({ errorTypeName: 'test', errorBucket: 'test', errorDefinition: 'test', status: 'test', createdAt: 'test', updatedAt: 'test' })
+  user = await User.create({ email: 'a@a.com', password: '123456' })
+  error = await Error.create({ createdBy: user, errorType: 'test', errorBucket: 'test', errorDefenition: 'test', status: 'test' })
 })
 
 describe('view', () => {
@@ -11,12 +13,12 @@ describe('view', () => {
     const view = error.view()
     expect(typeof view).toBe('object')
     expect(view.id).toBe(error.id)
-    expect(view.errorTypeName).toBe(error.errorTypeName)
+    expect(typeof view.createdBy).toBe('object')
+    expect(view.createdBy.id).toBe(user.id)
+    expect(view.errorType).toBe(error.errorType)
     expect(view.errorBucket).toBe(error.errorBucket)
-    expect(view.errorDefinition).toBe(error.errorDefinition)
+    expect(view.errorDefenition).toBe(error.errorDefenition)
     expect(view.status).toBe(error.status)
-    expect(view.createdAt).toBe(error.createdAt)
-    expect(view.updatedAt).toBe(error.updatedAt)
     expect(view.createdAt).toBeTruthy()
     expect(view.updatedAt).toBeTruthy()
   })
@@ -25,12 +27,12 @@ describe('view', () => {
     const view = error.view(true)
     expect(typeof view).toBe('object')
     expect(view.id).toBe(error.id)
-    expect(view.errorTypeName).toBe(error.errorTypeName)
+    expect(typeof view.createdBy).toBe('object')
+    expect(view.createdBy.id).toBe(user.id)
+    expect(view.errorType).toBe(error.errorType)
     expect(view.errorBucket).toBe(error.errorBucket)
-    expect(view.errorDefinition).toBe(error.errorDefinition)
+    expect(view.errorDefenition).toBe(error.errorDefenition)
     expect(view.status).toBe(error.status)
-    expect(view.createdAt).toBe(error.createdAt)
-    expect(view.updatedAt).toBe(error.updatedAt)
     expect(view.createdAt).toBeTruthy()
     expect(view.updatedAt).toBeTruthy()
   })

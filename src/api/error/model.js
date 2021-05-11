@@ -1,23 +1,23 @@
 import mongoose, { Schema } from 'mongoose'
 
 const errorSchema = new Schema({
-  errorTypeName: {
+  createdBy: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  errorType: {
     type: String
   },
   errorBucket: {
     type: String
   },
-  errorDefinition: {
+  errorDefenition: {
     type: String
   },
   status: {
-    type: String
-  },
-  createdAt: {
-    type: String
-  },
-  updatedAt: {
-    type: String
+    type: Boolean,
+    default:true
   }
 }, {
   timestamps: true,
@@ -32,12 +32,11 @@ errorSchema.methods = {
     const view = {
       // simple view
       id: this.id,
-      errorTypeName: this.errorTypeName,
+      createdBy: this.createdBy ? this.createdBy.view(full) : null,
+      errorType: this.errorType,
       errorBucket: this.errorBucket,
-      errorDefinition: this.errorDefinition,
+      errorDefenition: this.errorDefenition,
       status: this.status,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }

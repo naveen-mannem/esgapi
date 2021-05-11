@@ -1,20 +1,26 @@
 import request from 'supertest'
-import { masterKey, apiRoot } from '../../config'
+import { apiRoot } from '../../config'
+import { signSync } from '../../services/jwt'
 import express from '../../services/express'
+import { User } from '../user'
 import routes, { Controversy } from '.'
 
 const app = () => express(apiRoot, routes)
 
-let controversy
+let userSession, anotherSession, controversy
 
 beforeEach(async () => {
-  controversy = await Controversy.create({})
+  const user = await User.create({ email: 'a@a.com', password: '123456' })
+  const anotherUser = await User.create({ email: 'b@b.com', password: '123456' })
+  userSession = signSync(user.id)
+  anotherSession = signSync(anotherUser.id)
+  controversy = await Controversy.create({ createdBy: user })
 })
 
-test('POST /controversy 201 (master)', async () => {
+test('POST /controversies 201 (user)', async () => {
   const { status, body } = await request(app())
     .post(`${apiRoot}`)
-    .send({ access_token: masterKey, dpCodeId: 'test', companyId: 'test', year: 'test', sourceName: 'test', sourceUrl: 'test', sourcePublicationDate: 'test', response: 'test', submittedDate: 'test', submittedBy: 'test', activeStatus: 'test', status: 'test', createdBy: 'test', createdAt: 'test', updatedAt: 'test' })
+    .send({ access_token: userSession, dpCodeId: 'test', companyId: 'test', year: 'test', sourceName: 'test', sourceUrl: 'test', sourcePublicationDate: 'test', activeStatus: 'test', submittedBy: 'test', submittedDate: 'test', response: 'test' })
   expect(status).toBe(201)
   expect(typeof body).toEqual('object')
   expect(body.dpCodeId).toEqual('test')
@@ -23,63 +29,62 @@ test('POST /controversy 201 (master)', async () => {
   expect(body.sourceName).toEqual('test')
   expect(body.sourceUrl).toEqual('test')
   expect(body.sourcePublicationDate).toEqual('test')
-  expect(body.response).toEqual('test')
-  expect(body.submittedDate).toEqual('test')
-  expect(body.submittedBy).toEqual('test')
   expect(body.activeStatus).toEqual('test')
-  expect(body.status).toEqual('test')
-  expect(body.createdBy).toEqual('test')
-  expect(body.createdAt).toEqual('test')
-  expect(body.updatedAt).toEqual('test')
+  expect(body.submittedBy).toEqual('test')
+  expect(body.submittedDate).toEqual('test')
+  expect(body.response).toEqual('test')
+  expect(typeof body.createdBy).toEqual('object')
 })
 
-test('POST /controversy 401', async () => {
+test('POST /controversies 401', async () => {
   const { status } = await request(app())
     .post(`${apiRoot}`)
   expect(status).toBe(401)
 })
 
-test('GET /controversy 200 (master)', async () => {
+test('GET /controversies 200 (user)', async () => {
   const { status, body } = await request(app())
     .get(`${apiRoot}`)
-    .query({ access_token: masterKey })
+    .query({ access_token: userSession })
   expect(status).toBe(200)
   expect(Array.isArray(body.rows)).toBe(true)
   expect(Number.isNaN(body.count)).toBe(false)
+  expect(typeof body.rows[0].createdBy).toEqual('object')
 })
 
-test('GET /controversy 401', async () => {
+test('GET /controversies 401', async () => {
   const { status } = await request(app())
     .get(`${apiRoot}`)
   expect(status).toBe(401)
 })
 
-test('GET /controversy/:id 200 (master)', async () => {
+test('GET /controversies/:id 200 (user)', async () => {
   const { status, body } = await request(app())
     .get(`${apiRoot}/${controversy.id}`)
-    .query({ access_token: masterKey })
+    .query({ access_token: userSession })
   expect(status).toBe(200)
   expect(typeof body).toEqual('object')
   expect(body.id).toEqual(controversy.id)
+  expect(typeof body.createdBy).toEqual('object')
 })
 
-test('GET /controversy/:id 401', async () => {
+test('GET /controversies/:id 401', async () => {
   const { status } = await request(app())
     .get(`${apiRoot}/${controversy.id}`)
   expect(status).toBe(401)
 })
 
-test('GET /controversy/:id 404 (master)', async () => {
+test('GET /controversies/:id 404 (user)', async () => {
   const { status } = await request(app())
     .get(apiRoot + '/123456789098765432123456')
-    .query({ access_token: masterKey })
+    .query({ access_token: userSession })
   expect(status).toBe(404)
 })
 
-test('PUT /controversy/:id 200 (master)', async () => {
+test('PUT /controversies/:id 200 (user)', async () => {
   const { status, body } = await request(app())
     .put(`${apiRoot}/${controversy.id}`)
-    .send({ access_token: masterKey, dpCodeId: 'test', companyId: 'test', year: 'test', sourceName: 'test', sourceUrl: 'test', sourcePublicationDate: 'test', response: 'test', submittedDate: 'test', submittedBy: 'test', activeStatus: 'test', status: 'test', createdBy: 'test', createdAt: 'test', updatedAt: 'test' })
+    .send({ access_token: userSession, dpCodeId: 'test', companyId: 'test', year: 'test', sourceName: 'test', sourceUrl: 'test', sourcePublicationDate: 'test', activeStatus: 'test', submittedBy: 'test', submittedDate: 'test', response: 'test' })
   expect(status).toBe(200)
   expect(typeof body).toEqual('object')
   expect(body.id).toEqual(controversy.id)
@@ -89,45 +94,56 @@ test('PUT /controversy/:id 200 (master)', async () => {
   expect(body.sourceName).toEqual('test')
   expect(body.sourceUrl).toEqual('test')
   expect(body.sourcePublicationDate).toEqual('test')
-  expect(body.response).toEqual('test')
-  expect(body.submittedDate).toEqual('test')
-  expect(body.submittedBy).toEqual('test')
   expect(body.activeStatus).toEqual('test')
-  expect(body.status).toEqual('test')
-  expect(body.createdBy).toEqual('test')
-  expect(body.createdAt).toEqual('test')
-  expect(body.updatedAt).toEqual('test')
+  expect(body.submittedBy).toEqual('test')
+  expect(body.submittedDate).toEqual('test')
+  expect(body.response).toEqual('test')
+  expect(typeof body.createdBy).toEqual('object')
 })
 
-test('PUT /controversy/:id 401', async () => {
+test('PUT /controversies/:id 401 (user) - another user', async () => {
+  const { status } = await request(app())
+    .put(`${apiRoot}/${controversy.id}`)
+    .send({ access_token: anotherSession, dpCodeId: 'test', companyId: 'test', year: 'test', sourceName: 'test', sourceUrl: 'test', sourcePublicationDate: 'test', activeStatus: 'test', submittedBy: 'test', submittedDate: 'test', response: 'test' })
+  expect(status).toBe(401)
+})
+
+test('PUT /controversies/:id 401', async () => {
   const { status } = await request(app())
     .put(`${apiRoot}/${controversy.id}`)
   expect(status).toBe(401)
 })
 
-test('PUT /controversy/:id 404 (master)', async () => {
+test('PUT /controversies/:id 404 (user)', async () => {
   const { status } = await request(app())
     .put(apiRoot + '/123456789098765432123456')
-    .send({ access_token: masterKey, dpCodeId: 'test', companyId: 'test', year: 'test', sourceName: 'test', sourceUrl: 'test', sourcePublicationDate: 'test', response: 'test', submittedDate: 'test', submittedBy: 'test', activeStatus: 'test', status: 'test', createdBy: 'test', createdAt: 'test', updatedAt: 'test' })
+    .send({ access_token: anotherSession, dpCodeId: 'test', companyId: 'test', year: 'test', sourceName: 'test', sourceUrl: 'test', sourcePublicationDate: 'test', activeStatus: 'test', submittedBy: 'test', submittedDate: 'test', response: 'test' })
   expect(status).toBe(404)
 })
 
-test('DELETE /controversy/:id 204 (master)', async () => {
+test('DELETE /controversies/:id 204 (user)', async () => {
   const { status } = await request(app())
     .delete(`${apiRoot}/${controversy.id}`)
-    .query({ access_token: masterKey })
+    .query({ access_token: userSession })
   expect(status).toBe(204)
 })
 
-test('DELETE /controversy/:id 401', async () => {
+test('DELETE /controversies/:id 401 (user) - another user', async () => {
+  const { status } = await request(app())
+    .delete(`${apiRoot}/${controversy.id}`)
+    .send({ access_token: anotherSession })
+  expect(status).toBe(401)
+})
+
+test('DELETE /controversies/:id 401', async () => {
   const { status } = await request(app())
     .delete(`${apiRoot}/${controversy.id}`)
   expect(status).toBe(401)
 })
 
-test('DELETE /controversy/:id 404 (master)', async () => {
+test('DELETE /controversies/:id 404 (user)', async () => {
   const { status } = await request(app())
     .delete(apiRoot + '/123456789098765432123456')
-    .query({ access_token: masterKey })
+    .query({ access_token: anotherSession })
   expect(status).toBe(404)
 })

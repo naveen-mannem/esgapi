@@ -1,8 +1,15 @@
 import mongoose, { Schema } from 'mongoose'
 
 const boardMembersSchema = new Schema({
+  createdBy: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
   companyId: {
-    type: String
+   type: Schema.ObjectId,
+    ref: 'Companies',
+    required: true
   },
   boardMemberName: {
     type: String
@@ -11,13 +18,8 @@ const boardMembersSchema = new Schema({
     type: String
   },
   status: {
-    type: String
-  },
-  createdAt: {
-    type: String
-  },
-  updatedAt: {
-    type: String
+    type: Boolean,
+    default: true
   }
 }, {
   timestamps: true,
@@ -32,12 +34,11 @@ boardMembersSchema.methods = {
     const view = {
       // simple view
       id: this.id,
-      companyId: this.companyId,
+      createdBy: this.createdBy ? this.createdBy.view(full) : null,
+      companyId: this.companyId ? this.companyId.view(full) : null,
       boardMemberName: this.boardMemberName,
       memberStatus: this.memberStatus,
       status: this.status,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }

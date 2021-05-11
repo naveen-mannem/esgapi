@@ -1,8 +1,15 @@
 import mongoose, { Schema } from 'mongoose'
 
 const kmpSchema = new Schema({
+  createdBy: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
   companyId: {
-    type: String
+   type: Schema.ObjectId,
+    ref: 'Companies',
+    required: true
   },
   kmpMemberName: {
     type: String
@@ -10,11 +17,9 @@ const kmpSchema = new Schema({
   memberStatus: {
     type: String
   },
-  createdAt: {
-    type: String
-  },
-  updatedAt: {
-    type: String
+  status: {
+    type: Boolean,
+    default:true
   }
 }, {
   timestamps: true,
@@ -29,11 +34,11 @@ kmpSchema.methods = {
     const view = {
       // simple view
       id: this.id,
-      companyId: this.companyId,
+      createdBy: this.createdBy ? this.createdBy.view(full) : null ,
+      companyId: this.companyId ? this.companyId.view(full) :null ,
       kmpMemberName: this.kmpMemberName,
       memberStatus: this.memberStatus,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
+      status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }

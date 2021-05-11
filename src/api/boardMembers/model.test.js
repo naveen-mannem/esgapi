@@ -1,9 +1,11 @@
 import { BoardMembers } from '.'
+import { User } from '../user'
 
-let boardMembers
+let user, boardMembers
 
 beforeEach(async () => {
-  boardMembers = await BoardMembers.create({ companyId: 'test', boardMemberName: 'test', memberStatus: 'test', status: 'test', createdAt: 'test', updatedAt: 'test' })
+  user = await User.create({ email: 'a@a.com', password: '123456' })
+  boardMembers = await BoardMembers.create({ createdBy: user, companyId: 'test', boardMemberName: 'test', memberStatus: 'test', status: 'test' })
 })
 
 describe('view', () => {
@@ -11,12 +13,12 @@ describe('view', () => {
     const view = boardMembers.view()
     expect(typeof view).toBe('object')
     expect(view.id).toBe(boardMembers.id)
+    expect(typeof view.createdBy).toBe('object')
+    expect(view.createdBy.id).toBe(user.id)
     expect(view.companyId).toBe(boardMembers.companyId)
     expect(view.boardMemberName).toBe(boardMembers.boardMemberName)
     expect(view.memberStatus).toBe(boardMembers.memberStatus)
     expect(view.status).toBe(boardMembers.status)
-    expect(view.createdAt).toBe(boardMembers.createdAt)
-    expect(view.updatedAt).toBe(boardMembers.updatedAt)
     expect(view.createdAt).toBeTruthy()
     expect(view.updatedAt).toBeTruthy()
   })
@@ -25,12 +27,12 @@ describe('view', () => {
     const view = boardMembers.view(true)
     expect(typeof view).toBe('object')
     expect(view.id).toBe(boardMembers.id)
+    expect(typeof view.createdBy).toBe('object')
+    expect(view.createdBy.id).toBe(user.id)
     expect(view.companyId).toBe(boardMembers.companyId)
     expect(view.boardMemberName).toBe(boardMembers.boardMemberName)
     expect(view.memberStatus).toBe(boardMembers.memberStatus)
     expect(view.status).toBe(boardMembers.status)
-    expect(view.createdAt).toBe(boardMembers.createdAt)
-    expect(view.updatedAt).toBe(boardMembers.updatedAt)
     expect(view.createdAt).toBeTruthy()
     expect(view.updatedAt).toBeTruthy()
   })

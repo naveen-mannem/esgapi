@@ -1,46 +1,46 @@
 import { success, notFound, authorOrAdmin } from '../../services/response/'
-import { Error } from '.'
+import { Batches } from '.'
 
 export const create = ({ user, bodymen: { body } }, res, next) =>
-  Error.create({ ...body, createdBy: user })
-    .then((error) => error.view(true))
+  Batches.create({ ...body, createdBy: user })
+    .then((batches) => batches.view(true))
     .then(success(res, 201))
     .catch(next)
 
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>
-  Error.count(query)
-    .then(count => Error.find(query, select, cursor)
+  Batches.count(query)
+    .then(count => Batches.find(query, select, cursor)
       .populate('createdBy')
-      .then((errors) => ({
+      .then((batches) => ({
         count,
-        rows: errors.map((error) => error.view())
+        rows: batches.map((batches) => batches.view())
       }))
     )
     .then(success(res))
     .catch(next)
 
 export const show = ({ params }, res, next) =>
-  Error.findById(params.id)
+  Batches.findById(params.id)
     .populate('createdBy')
     .then(notFound(res))
-    .then((error) => error ? error.view() : null)
+    .then((batches) => batches ? batches.view() : null)
     .then(success(res))
     .catch(next)
 
 export const update = ({ user, bodymen: { body }, params }, res, next) =>
-  Error.findById(params.id)
+  Batches.findById(params.id)
     .populate('createdBy')
     .then(notFound(res))
     .then(authorOrAdmin(res, user, 'createdBy'))
-    .then((error) => error ? Object.assign(error, body).save() : null)
-    .then((error) => error ? error.view(true) : null)
+    .then((batches) => batches ? Object.assign(batches, body).save() : null)
+    .then((batches) => batches ? batches.view(true) : null)
     .then(success(res))
     .catch(next)
 
 export const destroy = ({ user, params }, res, next) =>
-  Error.findById(params.id)
+  Batches.findById(params.id)
     .then(notFound(res))
     .then(authorOrAdmin(res, user, 'createdBy'))
-    .then((error) => error ? error.remove() : null)
+    .then((batches) => batches ? batches.remove() : null)
     .then(success(res, 204))
     .catch(next)

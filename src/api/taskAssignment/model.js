@@ -1,14 +1,25 @@
 import mongoose, { Schema } from 'mongoose'
 
 const taskAssignmentSchema = new Schema({
+  createdBy: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
   companyId: {
-    type: String
+   type: Schema.ObjectId,
+    ref: 'Companies',
+    required: true
   },
   categoryId: {
-    type: String
+    type: Schema.ObjectId,
+    ref: 'Categories',
+    required: true
   },
   groupId: {
-    type: String
+   type: Schema.ObjectId,
+    ref: 'Group',
+    required: true
   },
   revisionCode: {
     type: String
@@ -25,23 +36,19 @@ const taskAssignmentSchema = new Schema({
   taskStatus: {
     type: String
   },
-  analystEmail: {
-    type: String
+  analystId: {
+   type: Schema.ObjectId,
+    ref: 'User',
+    required: true
   },
-  qaEmail: {
-    type: String
-  },
-  qaSLA: {
-    type: String
+  qaId: {
+   type: Schema.ObjectId,
+    ref: 'User',
+    required: true
   },
   status: {
-    type: String
-  },
-  createdAt: {
-    type: String
-  },
-  updatedAt: {
-    type: String
+    type: Boolean,
+    default: true
   }
 }, {
   timestamps: true,
@@ -56,20 +63,18 @@ taskAssignmentSchema.methods = {
     const view = {
       // simple view
       id: this.id,
-      companyId: this.companyId,
-      categoryId: this.categoryId,
-      groupId: this.groupId,
+      createdBy: this.createdBy ? this.createdBy.view(full) : null,
+      companyId: this.companyId ?  this.companyId.view(full) : null,
+      categoryId: this.categoryId ? this.categoryId.view(full) : null,
+      groupId: this.groupId ? this.groupId(view) : null,
       revisionCode: this.revisionCode,
       assignedTo: this.assignedTo,
       year: this.year,
       analystSLA: this.analystSLA,
       taskStatus: this.taskStatus,
-      analystEmail: this.analystEmail,
-      qaEmail: this.qaEmail,
-      qaSLA: this.qaSLA,
+      analystId: this.analystId ? this.analystId.view(full) : null ,
+      qaId: this.qaId  ? this.qaId.view(full) : null ,
       status: this.status,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }

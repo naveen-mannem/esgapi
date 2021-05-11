@@ -1,46 +1,49 @@
 import { success, notFound, authorOrAdmin } from '../../services/response/'
-import { Error } from '.'
+import { Group } from '.'
 
 export const create = ({ user, bodymen: { body } }, res, next) =>
-  Error.create({ ...body, createdBy: user })
-    .then((error) => error.view(true))
+  Group.create({ ...body, createdBy: user })
+    .then((group) => group.view(true))
     .then(success(res, 201))
     .catch(next)
 
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>
-  Error.count(query)
-    .then(count => Error.find(query, select, cursor)
+  Group.count(query)
+    .then(count => Group.find(query, select, cursor)
       .populate('createdBy')
-      .then((errors) => ({
+      .populate('batchId')
+      .then((groups) => ({
         count,
-        rows: errors.map((error) => error.view())
+        rows: groups.map((group) => group.view())
       }))
     )
     .then(success(res))
     .catch(next)
 
 export const show = ({ params }, res, next) =>
-  Error.findById(params.id)
+  Group.findById(params.id)
     .populate('createdBy')
+    .populate('batchId')
     .then(notFound(res))
-    .then((error) => error ? error.view() : null)
+    .then((group) => group ? group.view() : null)
     .then(success(res))
     .catch(next)
 
 export const update = ({ user, bodymen: { body }, params }, res, next) =>
-  Error.findById(params.id)
+  Group.findById(params.id)
     .populate('createdBy')
+    .populate('batchId')
     .then(notFound(res))
     .then(authorOrAdmin(res, user, 'createdBy'))
-    .then((error) => error ? Object.assign(error, body).save() : null)
-    .then((error) => error ? error.view(true) : null)
+    .then((group) => group ? Object.assign(group, body).save() : null)
+    .then((group) => group ? group.view(true) : null)
     .then(success(res))
     .catch(next)
 
 export const destroy = ({ user, params }, res, next) =>
-  Error.findById(params.id)
+  Group.findById(params.id)
     .then(notFound(res))
     .then(authorOrAdmin(res, user, 'createdBy'))
-    .then((error) => error ? error.remove() : null)
+    .then((group) => group ? group.remove() : null)
     .then(success(res, 204))
     .catch(next)

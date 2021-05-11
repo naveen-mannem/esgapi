@@ -1,6 +1,11 @@
 import mongoose, { Schema } from 'mongoose'
 
-const batchSchema = new Schema({
+const batchesSchema = new Schema({
+  createdBy: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
   batchName: {
     type: String
   },
@@ -8,16 +13,8 @@ const batchSchema = new Schema({
     type: String
   },
   status: {
-    type: String
-  },
-  createdBy: {
-    type: String
-  },
-  createdAt: {
-    type: String
-  },
-  updatedAt: {
-    type: String
+    type: Boolean,
+    default: true
   }
 }, {
   timestamps: true,
@@ -27,17 +24,15 @@ const batchSchema = new Schema({
   }
 })
 
-batchSchema.methods = {
+batchesSchema.methods = {
   view (full) {
     const view = {
       // simple view
       id: this.id,
+      createdBy: this.createdBy ? this.createdBy.view(full) : null,
       batchName: this.batchName,
       batchSLA: this.batchSLA,
       status: this.status,
-      createdBy: this.createdBy,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }
@@ -49,7 +44,7 @@ batchSchema.methods = {
   }
 }
 
-const model = mongoose.model('Batch', batchSchema)
+const model = mongoose.model('Batches', batchesSchema)
 
 export const schema = model.schema
 export default model
