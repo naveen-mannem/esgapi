@@ -1,6 +1,11 @@
 import mongoose, { Schema } from 'mongoose'
 
 const referenceSchema = new Schema({
+  createdBy: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
   standaloneId: {
     type: Schema.ObjectId,
     ref: 'StandaloneDatapoints',
@@ -30,15 +35,12 @@ const referenceSchema = new Schema({
   filePath: {
     type: String
   },
-  createdBy: {
-    type: String
-  },
   activeStatus: {
     type: String
   },
   status: {
     type: Boolean,
-    default: true
+    default:true
   }
 }, {
   timestamps: true,
@@ -53,6 +55,7 @@ referenceSchema.methods = {
     const view = {
       // simple view
       id: this.id,
+      createdBy: this.createdBy ? this.createdBy.view(full) : null,
       standaloneId: this.standaloneId ? this.standaloneId.view(full) : null,
       sourceName: this.sourceName,
       url: this.url,
@@ -62,7 +65,6 @@ referenceSchema.methods = {
       screenshotInPNG: this.screenshotInPNG,
       screenshotType: this.screenshotType,
       filePath: this.filePath,
-      createdBy: this.createdBy,
       activeStatus: this.activeStatus,
       status: this.status,
       createdAt: this.createdAt,
