@@ -1,25 +1,29 @@
 import mongoose, { Schema } from 'mongoose'
 
 const taskSlaLogSchema = new Schema({
+  createdBy: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
   taskId: {
-    type: String
+   type: Schema.ObjectId,
+    ref: 'TaskAssigment',
+    required: true
   },
   currentDate: {
     type: String
   },
-  preferredDate: {
+  preferedDate: {
     type: String
   },
   loggedBy: {
     type: String
   },
+  taskStatus: {
+    type: String
+  },
   status: {
-    type: String
-  },
-  createdAt: {
-    type: String
-  },
-  updatedAt: {
     type: String
   }
 }, {
@@ -35,13 +39,13 @@ taskSlaLogSchema.methods = {
     const view = {
       // simple view
       id: this.id,
-      taskId: this.taskId,
+      createdBy: this.createdBy ? this.createdBy.view(full) : null,
+      taskId: this.taskId ? this.taskId.view(full) : null ,
       currentDate: this.currentDate,
-      preferredDate: this.preferredDate,
+      preferedDate: this.preferedDate,
       loggedBy: this.loggedBy,
+      taskStatus: this.taskStatus,
       status: this.status,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }
