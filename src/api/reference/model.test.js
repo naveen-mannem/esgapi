@@ -1,9 +1,11 @@
 import { Reference } from '.'
+import { User } from '../user'
 
-let reference
+let user, reference
 
 beforeEach(async () => {
-  reference = await Reference.create({ standaloneId: 'test', sourceName: 'test', url: 'test', pageNumber: 'test', publicationDate: 'test', textSnippet: 'test', screenshotInPNG: 'test', screenshotType: 'test', filePath: 'test', createdBy: 'test', activeStatus: 'test', status: 'test', createdAt: 'test', updatedAt: 'test' })
+  user = await User.create({ email: 'a@a.com', password: '123456' })
+  reference = await Reference.create({ createdBy: user, standaloneId: 'test', sourceName: 'test', url: 'test', pageNumber: 'test', publicationDate: 'test', textSnippet: 'test', screenshotInPNG: 'test', screenshotType: 'test', filePath: 'test', activeStatus: 'test', status: 'test' })
 })
 
 describe('view', () => {
@@ -11,6 +13,8 @@ describe('view', () => {
     const view = reference.view()
     expect(typeof view).toBe('object')
     expect(view.id).toBe(reference.id)
+    expect(typeof view.createdBy).toBe('object')
+    expect(view.createdBy.id).toBe(user.id)
     expect(view.standaloneId).toBe(reference.standaloneId)
     expect(view.sourceName).toBe(reference.sourceName)
     expect(view.url).toBe(reference.url)
@@ -20,11 +24,8 @@ describe('view', () => {
     expect(view.screenshotInPNG).toBe(reference.screenshotInPNG)
     expect(view.screenshotType).toBe(reference.screenshotType)
     expect(view.filePath).toBe(reference.filePath)
-    expect(view.createdBy).toBe(reference.createdBy)
     expect(view.activeStatus).toBe(reference.activeStatus)
     expect(view.status).toBe(reference.status)
-    expect(view.createdAt).toBe(reference.createdAt)
-    expect(view.updatedAt).toBe(reference.updatedAt)
     expect(view.createdAt).toBeTruthy()
     expect(view.updatedAt).toBeTruthy()
   })
@@ -33,6 +34,8 @@ describe('view', () => {
     const view = reference.view(true)
     expect(typeof view).toBe('object')
     expect(view.id).toBe(reference.id)
+    expect(typeof view.createdBy).toBe('object')
+    expect(view.createdBy.id).toBe(user.id)
     expect(view.standaloneId).toBe(reference.standaloneId)
     expect(view.sourceName).toBe(reference.sourceName)
     expect(view.url).toBe(reference.url)
@@ -42,11 +45,8 @@ describe('view', () => {
     expect(view.screenshotInPNG).toBe(reference.screenshotInPNG)
     expect(view.screenshotType).toBe(reference.screenshotType)
     expect(view.filePath).toBe(reference.filePath)
-    expect(view.createdBy).toBe(reference.createdBy)
     expect(view.activeStatus).toBe(reference.activeStatus)
     expect(view.status).toBe(reference.status)
-    expect(view.createdAt).toBe(reference.createdAt)
-    expect(view.updatedAt).toBe(reference.updatedAt)
     expect(view.createdAt).toBeTruthy()
     expect(view.updatedAt).toBeTruthy()
   })
