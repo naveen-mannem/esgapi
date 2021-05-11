@@ -1,11 +1,20 @@
 import mongoose, { Schema } from 'mongoose'
 
 const kmpMatrixDataPointsSchema = new Schema({
+  createdBy: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
   kmpId: {
-    type: String
+    type: Schema.ObjectId,
+    ref: 'kmp',
+    required: true
   },
   dpCodeId: {
-    type: String
+    type: Schema.ObjectId,
+    ref: 'Datapoints',
+    required: true
   },
   response: {
     type: String
@@ -14,13 +23,8 @@ const kmpMatrixDataPointsSchema = new Schema({
     type: String
   },
   status: {
-    type: String
-  },
-  createdAt: {
-    type: String
-  },
-  updatedAt: {
-    type: String
+    type: Boolean,
+    default:true
   }
 }, {
   timestamps: true,
@@ -35,13 +39,12 @@ kmpMatrixDataPointsSchema.methods = {
     const view = {
       // simple view
       id: this.id,
-      kmpId: this.kmpId,
-      dpCodeId: this.dpCodeId,
+      createdBy: this.createdBy ? this.createdBy.view(full) : null ,
+      kmpId: this.kmpId ? this.kmpId.view(full) : null ,
+      dpCodeId: this.dpCodeId ? this.dpCodeId.view(full) : null ,
       response: this.response,
       year: this.year,
       status: this.status,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }
