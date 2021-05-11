@@ -10,6 +10,7 @@ export const create = ({ bodymen: { body } }, res, next) =>
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>
   Rules.count(query)
     .then(count => Rules.find(query, select, cursor)
+    .populate('datapointId')
       .then((rules) => ({
         count,
         rows: rules.map((rules) => rules.view())
@@ -20,6 +21,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
 
 export const show = ({ params }, res, next) =>
   Rules.findById(params.id)
+  .populate('datapointId')
     .then(notFound(res))
     .then((rules) => rules ? rules.view() : null)
     .then(success(res))
@@ -27,6 +29,7 @@ export const show = ({ params }, res, next) =>
 
 export const update = ({ bodymen: { body }, params }, res, next) =>
   Rules.findById(params.id)
+  .populate('datapointId')
     .then(notFound(res))
     .then((rules) => rules ? Object.assign(rules, body).save() : null)
     .then((rules) => rules ? rules.view(true) : null)

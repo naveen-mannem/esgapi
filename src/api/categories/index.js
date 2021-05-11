@@ -18,7 +18,6 @@ const { categoryName, categoryCode, categoryDescription, status } = schema.tree
  * @apiParam categoryName Categories's categoryName.
  * @apiParam categoryCode Categories's categoryCode.
  * @apiParam categoryDescription Categories's categoryDescription.
- * @apiParam status Categories's status.
  * @apiSuccess {Object} categories Categories's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Categories not found.
@@ -26,7 +25,7 @@ const { categoryName, categoryCode, categoryDescription, status } = schema.tree
  */
 router.post('/',
   token({ required: true, roles: ['admin'] }),
-  body({ categoryName, categoryCode, categoryDescription, status }),
+  body({ categoryName, categoryCode, categoryDescription }),
   create)
 
 /**

@@ -27,7 +27,6 @@ const { companyId, performanceResult, response, year, standaloneStatus, taskId, 
  * @apiParam lastModifiedDate Standalone datapoints's lastModifiedDate.
  * @apiParam modifiedBy Standalone datapoints's modifiedBy.
  * @apiParam isSubmitted Standalone datapoints's isSubmitted.
- * @apiParam status Standalone datapoints's status.
  * @apiSuccess {Object} standaloneDatapoints Standalone datapoints's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Standalone datapoints not found.
@@ -35,7 +34,7 @@ const { companyId, performanceResult, response, year, standaloneStatus, taskId, 
  */
 router.post('/',
   token({ required: true }),
-  body({ companyId, performanceResult, response, year, standaloneStatus, taskId, submittedBy, submittedDate, activeStatus, lastModifiedDate, modifiedBy, isSubmitted, status }),
+  body({ companyId, performanceResult, response, year, standaloneStatus, taskId, submittedBy, submittedDate, activeStatus, lastModifiedDate, modifiedBy, isSubmitted }),
   create)
 
 /**

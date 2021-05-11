@@ -24,7 +24,9 @@ const standaloneDatapointsSchema = new Schema({
     type: String
   },
   taskId: {
-    type: String
+    type: Schema.ObjectId,
+    ref: 'TaskAssignment',
+    required: true
   },
   submittedBy: {
     type: String
@@ -67,7 +69,7 @@ standaloneDatapointsSchema.methods = {
       response: this.response,
       year: this.year,
       standaloneStatus: this.standaloneStatus,
-      taskId: this.taskId,
+      taskId: this.taskId ? this.taskId.view(full) : null,
       submittedBy: this.submittedBy,
       submittedDate: this.submittedDate,
       activeStatus: this.activeStatus,

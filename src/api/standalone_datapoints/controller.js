@@ -12,6 +12,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
     .then(count => StandaloneDatapoints.find(query, select, cursor)
       .populate('createdBy')
       .populate('companyId')
+      .populate('taskId')
       .then((standaloneDatapoints) => ({
         count,
         rows: standaloneDatapoints.map((standaloneDatapoints) => standaloneDatapoints.view())
@@ -24,6 +25,7 @@ export const show = ({ params }, res, next) =>
   StandaloneDatapoints.findById(params.id)
     .populate('createdBy')
     .populate('companyId')
+    .populate('taskId')
     .then(notFound(res))
     .then((standaloneDatapoints) => standaloneDatapoints ? standaloneDatapoints.view() : null)
     .then(success(res))
@@ -33,6 +35,7 @@ export const update = ({ user, bodymen: { body }, params }, res, next) =>
   StandaloneDatapoints.findById(params.id)
     .populate('createdBy')
     .populate('companyId')
+    .populate('taskId')
     .then(notFound(res))
     .then(authorOrAdmin(res, user, 'createdBy'))
     .then((standaloneDatapoints) => standaloneDatapoints ? Object.assign(standaloneDatapoints, body).save() : null)

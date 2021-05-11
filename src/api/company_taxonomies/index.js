@@ -17,7 +17,6 @@ const { companyId, taxonomies, status } = schema.tree
  * @apiParam {String} access_token user access token.
  * @apiParam companyId Company taxonomies's companyId.
  * @apiParam taxonomies Company taxonomies's taxonomies.
- * @apiParam status Company taxonomies's status.
  * @apiSuccess {Object} companyTaxonomies Company taxonomies's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Company taxonomies not found.
@@ -25,7 +24,7 @@ const { companyId, taxonomies, status } = schema.tree
  */
 router.post('/',
   token({ required: true }),
-  body({ companyId, taxonomies, status }),
+  body({ companyId, taxonomies }),
   create)
 
 /**

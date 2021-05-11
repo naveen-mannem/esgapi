@@ -24,7 +24,6 @@ const { companyName, cin, nicCode, nic, nicIndustry, isinCode, cmieProwessCode, 
  * @apiParam cmieProwessCode Companies's cmieProwessCode.
  * @apiParam socialAnalystName Companies's socialAnalystName.
  * @apiParam socialQAName Companies's socialQAName.
- * @apiParam status Companies's status.
  * @apiSuccess {Object} companies Companies's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Companies not found.
@@ -32,7 +31,7 @@ const { companyName, cin, nicCode, nic, nicIndustry, isinCode, cmieProwessCode, 
  */
 router.post('/',
   token({ required: true }),
-  body({ companyName, cin, nicCode, nic, nicIndustry, isinCode, cmieProwessCode, socialAnalystName, socialQAName, status }),
+  body({ companyName, cin, nicCode, nic, nicIndustry, isinCode, cmieProwessCode, socialAnalystName, socialQAName }),
   create)
 
 /**
