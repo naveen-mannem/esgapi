@@ -1,6 +1,11 @@
 import mongoose, { Schema } from 'mongoose'
 
 const polarityRuleSchema = new Schema({
+  createdAt: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
   polarityName: {
     type: String
   },
@@ -10,18 +15,15 @@ const polarityRuleSchema = new Schema({
   condition: {
     type: String
   },
-  datapointId: {
-    type: String
+  dataPointId: {
+    type: Schema.ObjectId,
+    ref: 'Datapoints',
+    required: true
   },
   status: {
-    type: String
-  },
-  createdAt: {
-    type: String
-  },
-  updatedAt: {
-    type: String
-  }
+   type:Boolean,
+   default:true
+}
 }, {
   timestamps: true,
   toJSON: {
@@ -35,13 +37,12 @@ polarityRuleSchema.methods = {
     const view = {
       // simple view
       id: this.id,
+      createdAt: this.createdAt ? this.createdAt.view(full) : null,
       polarityName: this.polarityName,
       polarityValue: this.polarityValue,
       condition: this.condition,
-      datapointId: this.datapointId,
+      dataPointId: this.dataPointId ? this.createdAt.view(full) : null ,
       status: this.status,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }
