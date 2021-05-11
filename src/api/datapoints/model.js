@@ -21,6 +21,27 @@ const datapointsSchema = new Schema({
   dataCollection: {
     type: String
   },
+  dataCollectionGuide: {
+    type: String
+  },
+  normalizedBy: {
+    type: String
+  },
+  weighted: {
+    type: String
+  },
+  relevantForIndia: {
+    type: String
+  },
+  standaloneOrMatrix: {
+    type: String
+  },
+  reference: {
+    type: String
+  },
+  industryRelevant: {
+    type: String
+  },
   unit: {
     type: String
   },
@@ -72,6 +93,13 @@ datapointsSchema.methods = {
       description: this.description,
       polarity: this.polarity,
       dataCollection: this.dataCollection,
+      dataCollectionGuide: this.dataCollectionGuide,
+      normalizedBy: this.normalizedBy,
+      weighted: this.weighted,
+      relevantForIndia: this.relevantForIndia,
+      standaloneOrMatrix: this.standaloneOrMatrix,
+      reference: this.reference,
+      industryRelevant: this.industryRelevant,
       unit: this.unit,
       signal: this.signal,
       percentile: this.percentile,

@@ -7,7 +7,7 @@ import { schema } from './model'
 export Datapoints, { schema } from './model'
 
 const router = new Router()
-const { name, code, description, dataCollection, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, dpStatus, status } = schema.tree
+const { name, code, description, dataCollection, dataCollectionGuide, normalizedBy, weighted, relevantForIndia, standaloneOrMatrix, reference, industryRelevant, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, dpStatus, status } = schema.tree
 
 /**
  * @api {post} /datapoints Create datapoints
@@ -19,6 +19,13 @@ const { name, code, description, dataCollection, unit, signal, percentile, final
  * @apiParam code Datapoints's code.
  * @apiParam description Datapoints's description.
  * @apiParam dataCollection Datapoints's dataCollection.
+ * @apiParam dataCollectionGuide Datapoints's dataCollectionGuide.
+ * @apiParam normalizedBy Datapoints's normalizedBy.
+ * @apiParam weighted Datapoints's weighted.
+ * @apiParam relevantForIndia Datapoints's relevantForIndia.
+ * @apiParam standaloneOrMatrix Datapoints's standaloneOrMatrix.
+ * @apiParam reference Datapoints's reference.
+ * @apiParam industryRelevant Datapoints's industryRelevant.
  * @apiParam unit Datapoints's unit.
  * @apiParam signal Datapoints's signal.
  * @apiParam percentile Datapoints's percentile.
@@ -33,7 +40,7 @@ const { name, code, description, dataCollection, unit, signal, percentile, final
  */
 router.post('/',
   token({ required: true }),
-  body({ name, code, description, dataCollection, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, dpStatus }),
+  body({ name, code, description, dataCollection, dataCollectionGuide, normalizedBy, weighted, relevantForIndia, standaloneOrMatrix, reference, industryRelevant, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, dpStatus }),
   create)
 
 /**
@@ -78,6 +85,13 @@ router.get('/:id',
  * @apiParam code Datapoints's code.
  * @apiParam description Datapoints's description.
  * @apiParam dataCollection Datapoints's dataCollection.
+ * @apiParam dataCollectionGuide Datapoints's dataCollectionGuide.
+ * @apiParam normalizedBy Datapoints's normalizedBy.
+ * @apiParam weighted Datapoints's weighted.
+ * @apiParam relevantForIndia Datapoints's relevantForIndia.
+ * @apiParam standaloneOrMatrix Datapoints's standaloneOrMatrix.
+ * @apiParam reference Datapoints's reference.
+ * @apiParam industryRelevant Datapoints's industryRelevant.
  * @apiParam unit Datapoints's unit.
  * @apiParam signal Datapoints's signal.
  * @apiParam percentile Datapoints's percentile.
@@ -94,7 +108,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ name, code, description, dataCollection, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, dpStatus, status }),
+  body({ name, code, description, dataCollection, dataCollectionGuide, normalizedBy, weighted, relevantForIndia, standaloneOrMatrix, reference, industryRelevant, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, dpStatus, status }),
   update)
 
 /**
