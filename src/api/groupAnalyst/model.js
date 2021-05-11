@@ -1,20 +1,24 @@
 import mongoose, { Schema } from 'mongoose'
 
 const groupAnalystSchema = new Schema({
+  createdBy: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
   userId: {
-    type: String
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
   },
   groupId: {
-    type: String
+     type: Schema.ObjectId,
+    ref: 'Group',
+    required: true
   },
   status: {
-    type: String
-  },
-  createdAt: {
-    type: String
-  },
-  updatedAt: {
-    type: String
+    type: Boolean,
+    default:true
   }
 }, {
   timestamps: true,
@@ -29,11 +33,10 @@ groupAnalystSchema.methods = {
     const view = {
       // simple view
       id: this.id,
-      userId: this.userId,
-      groupId: this.groupId,
+      createdBy: this.createdBy ? this.createdBy.view(full) : null,
+      userId: this.userId ? this.userId.view(full) : null ,
+      groupId: this.groupId ? this.groupId.view(full) : null,
       status: this.status,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }
