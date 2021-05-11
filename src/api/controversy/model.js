@@ -1,15 +1,20 @@
 import mongoose, { Schema } from 'mongoose'
 
 const controversySchema = new Schema({
+  createdBy: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
   dpCodeId: {
-  //  type: Schema.Types.ObjectId, 
-  //  ref: 'Datapoints'
-  
+   type: Schema.ObjectId,
+    ref: 'Datapoints',
+    required: true
   },
   companyId: {
-  //  type: Schema.Types.ObjectId, 
-  //  ref: 'Company'
-  
+   type: Schema.ObjectId,
+    ref: 'Companies',
+    required: true
   },
   year: {
     type: String
@@ -23,29 +28,21 @@ const controversySchema = new Schema({
   sourcePublicationDate: {
     type: String
   },
-  response: {
-    type: String
-  },
-  submittedDate: {
+  activeStatus: {
     type: String
   },
   submittedBy: {
     type: String
   },
-  activeStatus: {
+  submittedDate: {
     type: String
   },
-  status: {
+  response: {
     type: String
   },
-  createdBy: {
-    type: String
-  },
-  createdAt: {
-    type: String
-  },
-  updatedAt: {
-    type: String
+  status:{
+    type:Boolean,
+    default:true
   }
 }, {
   timestamps: true,
@@ -60,20 +57,17 @@ controversySchema.methods = {
     const view = {
       // simple view
       id: this.id,
-      dpCodeId: this.dpCodeId,
-      companyId: this.companyId,
+      createdBy: this.createdBy ? this.createdBy.view(full) : null,
+      dpCodeId: this.dpCodeId ? this.dpCodeId.view(full) : null ,
+      companyId: this.companyId ? this.companyId.view(full) : null,
       year: this.year,
       sourceName: this.sourceName,
       sourceUrl: this.sourceUrl,
       sourcePublicationDate: this.sourcePublicationDate,
-      response: this.response,
-      submittedDate: this.submittedDate,
-      submittedBy: this.submittedBy,
       activeStatus: this.activeStatus,
-      status: this.status,
-      createdBy: this.createdBy,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
+      submittedBy: this.submittedBy,
+      submittedDate: this.submittedDate,
+      response: this.response,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }
