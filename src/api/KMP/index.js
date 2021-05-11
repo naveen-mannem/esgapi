@@ -10,7 +10,7 @@ const router = new Router()
 const { companyId, kmpMemberName, memberStatus, status } = schema.tree
 
 /**
- * @api {post} /kmps Create kmp
+ * @api {post} /kmp Create kmp
  * @apiName CreateKmp
  * @apiGroup Kmp
  * @apiPermission user
@@ -29,7 +29,7 @@ router.post('/',
   create)
 
 /**
- * @api {get} /kmps Retrieve kmps
+ * @api {get} /kmp Retrieve kmps
  * @apiName RetrieveKmps
  * @apiGroup Kmp
  * @apiPermission user
@@ -46,7 +46,7 @@ router.get('/',
   index)
 
 /**
- * @api {get} /kmps/:id Retrieve kmp
+ * @api {get} /kmp/:id Retrieve kmp
  * @apiName RetrieveKmp
  * @apiGroup Kmp
  * @apiPermission user
@@ -61,7 +61,7 @@ router.get('/:id',
   show)
 
 /**
- * @api {put} /kmps/:id Update kmp
+ * @api {put} /kmp/:id Update kmp
  * @apiName UpdateKmp
  * @apiGroup Kmp
  * @apiPermission user
@@ -81,7 +81,7 @@ router.put('/:id',
   update)
 
 /**
- * @api {delete} /kmps/:id Delete kmp
+ * @api {delete} /kmp/:id Delete kmp
  * @apiName DeleteKmp
  * @apiGroup Kmp
  * @apiPermission user
