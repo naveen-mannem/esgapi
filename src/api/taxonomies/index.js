@@ -7,7 +7,7 @@ import { schema } from './model'
 export Taxonomies, { schema } from './model'
 
 const router = new Router()
-const { categoryId, themeId, keyIssueId, datapointId, indicatorName, indicatorDescription, indicatorPolarity, dataCollectionGuide, unit, dataInput, isApplicableSector, notApplicableReason, datapointType, datapointReportingPeriod, fileDataSource, sourceUrl, sourcePublicationDate, sourcePageNumber, sourceTextSnippetOrSnapshot, commentsAndCalculations, signal, controversy, controversySnippetOrSnapshot, snippetOrSnapshotUrl, sourcePublicationDateOfConspiracy, conspiracyPageNumber, normalizedBy, weighted, status } = schema.tree
+const { categoryId, themeId, keyIssueId, datapointId, dataCollectionGuide, unit, dataInput, isApplicableSector, notApplicableReason, datapointType, datapointReportingPeriod, fileDataSource, sourceUrl, sourcePublicationDate, sourcePageNumber, sourceTextSnippetOrSnapshot, commentsAndCalculations, signal, controversy, controversySnippetOrSnapshot, snippetOrSnapshotUrl, sourcePublicationDateOfConspiracy, conspiracyPageNumber, normalizedBy, weighted, status } = schema.tree
 
 /**
  * @api {post} /taxonomies Create taxonomies
@@ -19,9 +19,6 @@ const { categoryId, themeId, keyIssueId, datapointId, indicatorName, indicatorDe
  * @apiParam themeId Taxonomies's themeId.
  * @apiParam keyIssueId Taxonomies's keyIssueId.
  * @apiParam datapointId Taxonomies's datapointId.
- * @apiParam indicatorName Taxonomies's indicatorName.
- * @apiParam indicatorDescription Taxonomies's indicatorDescription.
- * @apiParam indicatorPolarity Taxonomies's indicatorPolarity.
  * @apiParam dataCollectionGuide Taxonomies's dataCollectionGuide.
  * @apiParam unit Taxonomies's unit.
  * @apiParam dataInput Taxonomies's dataInput.
@@ -50,7 +47,7 @@ const { categoryId, themeId, keyIssueId, datapointId, indicatorName, indicatorDe
  */
 router.post('/',
   token({ required: true }),
-  body({ categoryId, themeId, keyIssueId, datapointId, indicatorName, indicatorDescription, indicatorPolarity, dataCollectionGuide, unit, dataInput, isApplicableSector, notApplicableReason, datapointType, datapointReportingPeriod, fileDataSource, sourceUrl, sourcePublicationDate, sourcePageNumber, sourceTextSnippetOrSnapshot, commentsAndCalculations, signal, controversy, controversySnippetOrSnapshot, snippetOrSnapshotUrl, sourcePublicationDateOfConspiracy, conspiracyPageNumber, normalizedBy, weighted }),
+  body({ categoryId, themeId, keyIssueId, datapointId, dataCollectionGuide, unit, dataInput, isApplicableSector, notApplicableReason, datapointType, datapointReportingPeriod, fileDataSource, sourceUrl, sourcePublicationDate, sourcePageNumber, sourceTextSnippetOrSnapshot, commentsAndCalculations, signal, controversy, controversySnippetOrSnapshot, snippetOrSnapshotUrl, sourcePublicationDateOfConspiracy, conspiracyPageNumber, normalizedBy, weighted }),
   create)
 
 /**
@@ -95,9 +92,6 @@ router.get('/:id',
  * @apiParam themeId Taxonomies's themeId.
  * @apiParam keyIssueId Taxonomies's keyIssueId.
  * @apiParam datapointId Taxonomies's datapointId.
- * @apiParam indicatorName Taxonomies's indicatorName.
- * @apiParam indicatorDescription Taxonomies's indicatorDescription.
- * @apiParam indicatorPolarity Taxonomies's indicatorPolarity.
  * @apiParam dataCollectionGuide Taxonomies's dataCollectionGuide.
  * @apiParam unit Taxonomies's unit.
  * @apiParam dataInput Taxonomies's dataInput.
@@ -127,7 +121,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ categoryId, themeId, keyIssueId, datapointId, indicatorName, indicatorDescription, indicatorPolarity, dataCollectionGuide, unit, dataInput, isApplicableSector, notApplicableReason, datapointType, datapointReportingPeriod, fileDataSource, sourceUrl, sourcePublicationDate, sourcePageNumber, sourceTextSnippetOrSnapshot, commentsAndCalculations, signal, controversy, controversySnippetOrSnapshot, snippetOrSnapshotUrl, sourcePublicationDateOfConspiracy, conspiracyPageNumber, normalizedBy, weighted, status }),
+  body({ categoryId, themeId, keyIssueId, datapointId, dataCollectionGuide, unit, dataInput, isApplicableSector, notApplicableReason, datapointType, datapointReportingPeriod, fileDataSource, sourceUrl, sourcePublicationDate, sourcePageNumber, sourceTextSnippetOrSnapshot, commentsAndCalculations, signal, controversy, controversySnippetOrSnapshot, snippetOrSnapshotUrl, sourcePublicationDateOfConspiracy, conspiracyPageNumber, normalizedBy, weighted, status }),
   update)
 
 /**

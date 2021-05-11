@@ -26,15 +26,6 @@ const taxonomiesSchema = new Schema({
     ref: 'Datapoints',
     required: true
   },
-  indicatorName: {
-    type: String
-  },
-  indicatorDescription: {
-    type: String
-  },
-  indicatorPolarity: {
-    type: String
-  },
   dataCollectionGuide: {
     type: String
   },
@@ -121,10 +112,7 @@ taxonomiesSchema.methods = {
       categoryId: this.categoryId ? this.categoryId.view(full) : null,
       themeId: this.themeId ? this.themeId.view(full) : null,
       keyIssueId: this.keyIssueId ? this.keyIssueId.view(full) : null,
-      datapointId: this.datapointId,
-      indicatorName: this.indicatorName,
-      indicatorDescription: this.indicatorDescription,
-      indicatorPolarity: this.indicatorPolarity,
+      datapointId: this.datapointId ? this.datapointId.view(full) : null,
       dataCollectionGuide: this.dataCollectionGuide,
       unit: this.unit,
       dataInput: this.dataInput,
