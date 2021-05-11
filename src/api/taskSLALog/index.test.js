@@ -1,119 +1,141 @@
 import request from 'supertest'
-import { masterKey, apiRoot } from '../../config'
+import { apiRoot } from '../../config'
+import { signSync } from '../../services/jwt'
 import express from '../../services/express'
+import { User } from '../user'
 import routes, { TaskSlaLog } from '.'
 
 const app = () => express(apiRoot, routes)
 
-let taskSlaLog
+let userSession, anotherSession, taskSlaLog
 
 beforeEach(async () => {
-  taskSlaLog = await TaskSlaLog.create({})
+  const user = await User.create({ email: 'a@a.com', password: '123456' })
+  const anotherUser = await User.create({ email: 'b@b.com', password: '123456' })
+  userSession = signSync(user.id)
+  anotherSession = signSync(anotherUser.id)
+  taskSlaLog = await TaskSlaLog.create({ createdBy: user })
 })
 
-test('POST /taskSLALog 201 (master)', async () => {
+test('POST /taskSlaLogs 201 (user)', async () => {
   const { status, body } = await request(app())
     .post(`${apiRoot}`)
-    .send({ access_token: masterKey, taskId: 'test', currentDate: 'test', preferredDate: 'test', loggedBy: 'test', status: 'test', createdAt: 'test', updatedAt: 'test' })
+    .send({ access_token: userSession, taskId: 'test', currentDate: 'test', preferedDate: 'test', loggedBy: 'test', taskStatus: 'test', status: 'test' })
   expect(status).toBe(201)
   expect(typeof body).toEqual('object')
   expect(body.taskId).toEqual('test')
   expect(body.currentDate).toEqual('test')
-  expect(body.preferredDate).toEqual('test')
+  expect(body.preferedDate).toEqual('test')
   expect(body.loggedBy).toEqual('test')
+  expect(body.taskStatus).toEqual('test')
   expect(body.status).toEqual('test')
-  expect(body.createdAt).toEqual('test')
-  expect(body.updatedAt).toEqual('test')
+  expect(typeof body.createdBy).toEqual('object')
 })
 
-test('POST /taskSLALog 401', async () => {
+test('POST /taskSlaLogs 401', async () => {
   const { status } = await request(app())
     .post(`${apiRoot}`)
   expect(status).toBe(401)
 })
 
-test('GET /taskSLALog 200 (master)', async () => {
+test('GET /taskSlaLogs 200 (user)', async () => {
   const { status, body } = await request(app())
     .get(`${apiRoot}`)
-    .query({ access_token: masterKey })
+    .query({ access_token: userSession })
   expect(status).toBe(200)
   expect(Array.isArray(body.rows)).toBe(true)
   expect(Number.isNaN(body.count)).toBe(false)
+  expect(typeof body.rows[0].createdBy).toEqual('object')
 })
 
-test('GET /taskSLALog 401', async () => {
+test('GET /taskSlaLogs 401', async () => {
   const { status } = await request(app())
     .get(`${apiRoot}`)
   expect(status).toBe(401)
 })
 
-test('GET /taskSLALog/:id 200 (master)', async () => {
+test('GET /taskSlaLogs/:id 200 (user)', async () => {
   const { status, body } = await request(app())
     .get(`${apiRoot}/${taskSlaLog.id}`)
-    .query({ access_token: masterKey })
+    .query({ access_token: userSession })
   expect(status).toBe(200)
   expect(typeof body).toEqual('object')
   expect(body.id).toEqual(taskSlaLog.id)
+  expect(typeof body.createdBy).toEqual('object')
 })
 
-test('GET /taskSLALog/:id 401', async () => {
+test('GET /taskSlaLogs/:id 401', async () => {
   const { status } = await request(app())
     .get(`${apiRoot}/${taskSlaLog.id}`)
   expect(status).toBe(401)
 })
 
-test('GET /taskSLALog/:id 404 (master)', async () => {
+test('GET /taskSlaLogs/:id 404 (user)', async () => {
   const { status } = await request(app())
     .get(apiRoot + '/123456789098765432123456')
-    .query({ access_token: masterKey })
+    .query({ access_token: userSession })
   expect(status).toBe(404)
 })
 
-test('PUT /taskSLALog/:id 200 (master)', async () => {
+test('PUT /taskSlaLogs/:id 200 (user)', async () => {
   const { status, body } = await request(app())
     .put(`${apiRoot}/${taskSlaLog.id}`)
-    .send({ access_token: masterKey, taskId: 'test', currentDate: 'test', preferredDate: 'test', loggedBy: 'test', status: 'test', createdAt: 'test', updatedAt: 'test' })
+    .send({ access_token: userSession, taskId: 'test', currentDate: 'test', preferedDate: 'test', loggedBy: 'test', taskStatus: 'test', status: 'test' })
   expect(status).toBe(200)
   expect(typeof body).toEqual('object')
   expect(body.id).toEqual(taskSlaLog.id)
   expect(body.taskId).toEqual('test')
   expect(body.currentDate).toEqual('test')
-  expect(body.preferredDate).toEqual('test')
+  expect(body.preferedDate).toEqual('test')
   expect(body.loggedBy).toEqual('test')
+  expect(body.taskStatus).toEqual('test')
   expect(body.status).toEqual('test')
-  expect(body.createdAt).toEqual('test')
-  expect(body.updatedAt).toEqual('test')
+  expect(typeof body.createdBy).toEqual('object')
 })
 
-test('PUT /taskSLALog/:id 401', async () => {
+test('PUT /taskSlaLogs/:id 401 (user) - another user', async () => {
+  const { status } = await request(app())
+    .put(`${apiRoot}/${taskSlaLog.id}`)
+    .send({ access_token: anotherSession, taskId: 'test', currentDate: 'test', preferedDate: 'test', loggedBy: 'test', taskStatus: 'test', status: 'test' })
+  expect(status).toBe(401)
+})
+
+test('PUT /taskSlaLogs/:id 401', async () => {
   const { status } = await request(app())
     .put(`${apiRoot}/${taskSlaLog.id}`)
   expect(status).toBe(401)
 })
 
-test('PUT /taskSLALog/:id 404 (master)', async () => {
+test('PUT /taskSlaLogs/:id 404 (user)', async () => {
   const { status } = await request(app())
     .put(apiRoot + '/123456789098765432123456')
-    .send({ access_token: masterKey, taskId: 'test', currentDate: 'test', preferredDate: 'test', loggedBy: 'test', status: 'test', createdAt: 'test', updatedAt: 'test' })
+    .send({ access_token: anotherSession, taskId: 'test', currentDate: 'test', preferedDate: 'test', loggedBy: 'test', taskStatus: 'test', status: 'test' })
   expect(status).toBe(404)
 })
 
-test('DELETE /taskSLALog/:id 204 (master)', async () => {
+test('DELETE /taskSlaLogs/:id 204 (user)', async () => {
   const { status } = await request(app())
     .delete(`${apiRoot}/${taskSlaLog.id}`)
-    .query({ access_token: masterKey })
+    .query({ access_token: userSession })
   expect(status).toBe(204)
 })
 
-test('DELETE /taskSLALog/:id 401', async () => {
+test('DELETE /taskSlaLogs/:id 401 (user) - another user', async () => {
+  const { status } = await request(app())
+    .delete(`${apiRoot}/${taskSlaLog.id}`)
+    .send({ access_token: anotherSession })
+  expect(status).toBe(401)
+})
+
+test('DELETE /taskSlaLogs/:id 401', async () => {
   const { status } = await request(app())
     .delete(`${apiRoot}/${taskSlaLog.id}`)
   expect(status).toBe(401)
 })
 
-test('DELETE /taskSLALog/:id 404 (master)', async () => {
+test('DELETE /taskSlaLogs/:id 404 (user)', async () => {
   const { status } = await request(app())
     .delete(apiRoot + '/123456789098765432123456')
-    .query({ access_token: masterKey })
+    .query({ access_token: anotherSession })
   expect(status).toBe(404)
 })
