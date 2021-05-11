@@ -18,6 +18,9 @@ const rulesSchema = new Schema({
     ref: 'Datapoints',
     required: true
   },
+  aidDPLogic: {
+    type: String
+  },
   status: {
     type: Boolean,
     default: true
@@ -40,6 +43,7 @@ rulesSchema.methods = {
       criteria: this.criteria,
       parameter: this.parameter,
       datapointId: this.datapointId ? this.datapointId.view(full) : null,
+      aidDPLogic: this.aidDPLogic,
       status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt

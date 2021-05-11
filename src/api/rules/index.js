@@ -7,7 +7,7 @@ import { schema } from './model'
 export Rules, { schema } from './model'
 
 const router = new Router()
-const { methodName, methodType, criteria, parameter, datapointId, status } = schema.tree
+const { methodName, methodType, criteria, parameter, datapointId, aidDPLogic, status } = schema.tree
 
 /**
  * @api {post} /rules Create rules
@@ -20,6 +20,7 @@ const { methodName, methodType, criteria, parameter, datapointId, status } = sch
  * @apiParam criteria Rules's criteria.
  * @apiParam parameter Rules's parameter.
  * @apiParam datapointId Rules's datapointId.
+ * @apiParam aidDPLogic Rules's aidDPLogic.
  * @apiSuccess {Object} rules Rules's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Rules not found.
@@ -27,7 +28,7 @@ const { methodName, methodType, criteria, parameter, datapointId, status } = sch
  */
 router.post('/',
   token({ required: true }),
-  body({ methodName, methodType, criteria, parameter, datapointId }),
+  body({ methodName, methodType, criteria, parameter, datapointId, aidDPLogic }),
   create)
 
 /**
@@ -73,6 +74,7 @@ router.get('/:id',
  * @apiParam criteria Rules's criteria.
  * @apiParam parameter Rules's parameter.
  * @apiParam datapointId Rules's datapointId.
+ * @apiParam aidDPLogic Rules's aidDPLogic.
  * @apiParam status Rules's status.
  * @apiSuccess {Object} rules Rules's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
@@ -81,7 +83,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ methodName, methodType, criteria, parameter, datapointId, status }),
+  body({ methodName, methodType, criteria, parameter, datapointId, aidDPLogic, status }),
   update)
 
 /**
