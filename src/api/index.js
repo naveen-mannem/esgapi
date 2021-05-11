@@ -17,6 +17,21 @@ import validations from './validations'
 import standaloneDatapoints from './standalone_datapoints'
 import derivedDatapoints from './derived_datapoints'
 import role from './role'
+import batches from './batches'
+import reference from './reference'
+import polarityRule from './polarityRule'
+import boardMembers from './boardMembers'
+import boardMembersMatrixDataPoints from './boardMembersMatrixDataPoints'
+import kmp from './kmp'
+import kmpMatrixDataPoints from './kmpMatrixDataPoints'
+import group from './group'
+import groupAnalyst from './groupAnalyst'
+import groupQa from './groupQA'
+import taskAssignment from './taskAssignment'
+import error from './error'
+import errorDetails from './errorDetails'
+import taskSlaLog from './taskSlaLog'
+import controversy from './controversy'
 
 const router = new Router()
 
@@ -61,5 +76,21 @@ router.use('/validations', validations)
 router.use('/standalone_datapoints', standaloneDatapoints)
 router.use('/derived_datapoints', derivedDatapoints)
 router.use('/role', role)
+router.use('/batches', batches)
+router.use('/references', reference)
+router.use('/polarityRules', polarityRule)
+router.use('/boardMembers', boardMembers)
+router.use('/boardMembersMatrixDataPoints', boardMembersMatrixDataPoints)
+router.use('/kmps', kmp)
+router.use('/kmpMatrixDataPoints', kmpMatrixDataPoints)
+router.use('/groups', group)
+router.use('/groupAnalysts', groupAnalyst)
+router.use('/groupQAS', groupQa)
+router.use('/taskAssignments', taskAssignment)
+router.use('/errors', error)
+router.use('/errorDetails', errorDetails)
+router.use('/errorDetails', errorDetails)
+router.use('/taskSlaLogs', taskSlaLog)
+router.use('/controversies', controversy)
 
 export default router
