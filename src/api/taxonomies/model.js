@@ -21,8 +21,10 @@ const taxonomiesSchema = new Schema({
     ref: 'KeyIssues',
     required: true
   },
-  indicatorId: {
-    type: String
+  datapointId: {
+    type: Schema.ObjectId,
+    ref: 'Datapoints',
+    required: true
   },
   indicatorName: {
     type: String
@@ -119,7 +121,7 @@ taxonomiesSchema.methods = {
       categoryId: this.categoryId ? this.categoryId.view(full) : null,
       themeId: this.themeId ? this.themeId.view(full) : null,
       keyIssueId: this.keyIssueId ? this.keyIssueId.view(full) : null,
-      indicatorId: this.indicatorId,
+      datapointId: this.datapointId,
       indicatorName: this.indicatorName,
       indicatorDescription: this.indicatorDescription,
       indicatorPolarity: this.indicatorPolarity,

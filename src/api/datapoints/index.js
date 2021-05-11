@@ -7,7 +7,7 @@ import { schema } from './model'
 export Datapoints, { schema } from './model'
 
 const router = new Router()
-const { name, code, description, dataCollection, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, year, companyTaxonomyId, dpStatus, sourceName, sourceUrl, sourcePublicationDate, pageNumber, textSnippet, screenshotType, filePath, status } = schema.tree
+const { name, code, description, dataCollection, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, dpStatus, status } = schema.tree
 
 /**
  * @api {post} /datapoints Create datapoints
@@ -26,16 +26,6 @@ const { name, code, description, dataCollection, unit, signal, percentile, final
  * @apiParam keyIssueId Datapoints's keyIssueId.
  * @apiParam functionId Datapoints's functionId.
  * @apiParam dpType Datapoints's dpType.
- * @apiParam year Datapoints's year.
- * @apiParam companyTaxonomyId Datapoints's companyTaxonomyId.
- * @apiParam dpStatus Datapoints's dpStatus.
- * @apiParam sourceName Datapoints's sourceName.
- * @apiParam sourceUrl Datapoints's sourceUrl.
- * @apiParam sourcePublicationDate Datapoints's sourcePublicationDate.
- * @apiParam pageNumber Datapoints's pageNumber.
- * @apiParam textSnippet Datapoints's textSnippet.
- * @apiParam screenshotType Datapoints's screenshotType.
- * @apiParam filePath Datapoints's filePath.
  * @apiSuccess {Object} datapoints Datapoints's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Datapoints not found.
@@ -43,7 +33,7 @@ const { name, code, description, dataCollection, unit, signal, percentile, final
  */
 router.post('/',
   token({ required: true }),
-  body({ name, code, description, dataCollection, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, year, companyTaxonomyId, dpStatus, sourceName, sourceUrl, sourcePublicationDate, pageNumber, textSnippet, screenshotType, filePath }),
+  body({ name, code, description, dataCollection, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, dpStatus }),
   create)
 
 /**
@@ -95,16 +85,7 @@ router.get('/:id',
  * @apiParam keyIssueId Datapoints's keyIssueId.
  * @apiParam functionId Datapoints's functionId.
  * @apiParam dpType Datapoints's dpType.
- * @apiParam year Datapoints's year.
- * @apiParam companyTaxonomyId Datapoints's companyTaxonomyId.
  * @apiParam dpStatus Datapoints's dpStatus.
- * @apiParam sourceName Datapoints's sourceName.
- * @apiParam sourceUrl Datapoints's sourceUrl.
- * @apiParam sourcePublicationDate Datapoints's sourcePublicationDate.
- * @apiParam pageNumber Datapoints's pageNumber.
- * @apiParam textSnippet Datapoints's textSnippet.
- * @apiParam screenshotType Datapoints's screenshotType.
- * @apiParam filePath Datapoints's filePath.
  * @apiParam status Datapoints's status.
  * @apiSuccess {Object} datapoints Datapoints's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
@@ -113,7 +94,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ name, code, description, dataCollection, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, year, companyTaxonomyId, dpStatus, sourceName, sourceUrl, sourcePublicationDate, pageNumber, textSnippet, screenshotType, filePath, status }),
+  body({ name, code, description, dataCollection, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, dpStatus, status }),
   update)
 
 /**

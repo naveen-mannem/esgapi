@@ -14,6 +14,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
       .populate('categoryId')
       .populate('themeId')
       .populate('keyIssueId')
+      .populate('datapointId')
       .then((taxonomies) => ({
         count,
         rows: taxonomies.map((taxonomies) => taxonomies.view())
@@ -28,6 +29,7 @@ export const show = ({ params }, res, next) =>
     .populate('categoryId')
     .populate('themeId')
     .populate('keyIssueId')
+    .populate('datapointId')
     .then(notFound(res))
     .then((taxonomies) => taxonomies ? taxonomies.view() : null)
     .then(success(res))
@@ -39,6 +41,7 @@ export const update = ({ user, bodymen: { body }, params }, res, next) =>
     .populate('categoryId')
     .populate('themeId')
     .populate('keyIssueId')
+    .populate('datapointId')
     .then(notFound(res))
     .then(authorOrAdmin(res, user, 'createdBy'))
     .then((taxonomies) => taxonomies ? Object.assign(taxonomies, body).save() : null)

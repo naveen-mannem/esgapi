@@ -584,7 +584,6 @@
 | categoryName			| 			|  <p>Categories's categoryName.</p>							|
 | categoryCode			| 			|  <p>Categories's categoryCode.</p>							|
 | categoryDescription			| 			|  <p>Categories's categoryDescription.</p>							|
-| status			| 			|  <p>Categories's status.</p>							|
 
 ## Delete categories
 
@@ -657,7 +656,6 @@
 | cmieProwessCode			| 			|  <p>Companies's cmieProwessCode.</p>							|
 | socialAnalystName			| 			|  <p>Companies's socialAnalystName.</p>							|
 | socialQAName			| 			|  <p>Companies's socialQAName.</p>							|
-| status			| 			|  <p>Companies's status.</p>							|
 
 ## Delete companies
 
@@ -813,7 +811,6 @@
 | access_token			| String			|  <p>user access token.</p>							|
 | companyId			| 			|  <p>Company taxonomies's companyId.</p>							|
 | taxonomies			| 			|  <p>Company taxonomies's taxonomies.</p>							|
-| status			| 			|  <p>Company taxonomies's status.</p>							|
 
 ## Delete company taxonomies
 
@@ -987,17 +984,6 @@
 | keyIssueId			| 			|  <p>Datapoints's keyIssueId.</p>							|
 | functionId			| 			|  <p>Datapoints's functionId.</p>							|
 | dpType			| 			|  <p>Datapoints's dpType.</p>							|
-| year			| 			|  <p>Datapoints's year.</p>							|
-| companyTaxonomyId			| 			|  <p>Datapoints's companyTaxonomyId.</p>							|
-| dpStatus			| 			|  <p>Datapoints's dpStatus.</p>							|
-| sourceName			| 			|  <p>Datapoints's sourceName.</p>							|
-| sourceUrl			| 			|  <p>Datapoints's sourceUrl.</p>							|
-| sourcePublicationDate			| 			|  <p>Datapoints's sourcePublicationDate.</p>							|
-| pageNumber			| 			|  <p>Datapoints's pageNumber.</p>							|
-| textSnippet			| 			|  <p>Datapoints's textSnippet.</p>							|
-| screenshotType			| 			|  <p>Datapoints's screenshotType.</p>							|
-| filePath			| 			|  <p>Datapoints's filePath.</p>							|
-| status			| 			|  <p>Datapoints's status.</p>							|
 
 ## Delete datapoints
 
@@ -1053,16 +1039,7 @@
 | keyIssueId			| 			|  <p>Datapoints's keyIssueId.</p>							|
 | functionId			| 			|  <p>Datapoints's functionId.</p>							|
 | dpType			| 			|  <p>Datapoints's dpType.</p>							|
-| year			| 			|  <p>Datapoints's year.</p>							|
-| companyTaxonomyId			| 			|  <p>Datapoints's companyTaxonomyId.</p>							|
 | dpStatus			| 			|  <p>Datapoints's dpStatus.</p>							|
-| sourceName			| 			|  <p>Datapoints's sourceName.</p>							|
-| sourceUrl			| 			|  <p>Datapoints's sourceUrl.</p>							|
-| sourcePublicationDate			| 			|  <p>Datapoints's sourcePublicationDate.</p>							|
-| pageNumber			| 			|  <p>Datapoints's pageNumber.</p>							|
-| textSnippet			| 			|  <p>Datapoints's textSnippet.</p>							|
-| screenshotType			| 			|  <p>Datapoints's screenshotType.</p>							|
-| filePath			| 			|  <p>Datapoints's filePath.</p>							|
 | status			| 			|  <p>Datapoints's status.</p>							|
 
 # DerivedDatapoints
@@ -1087,7 +1064,6 @@
 | dpStatus			| 			|  <p>Derived datapoints's dpStatus.</p>							|
 | year			| 			|  <p>Derived datapoints's year.</p>							|
 | lastModifiedDate			| 			|  <p>Derived datapoints's lastModifiedDate.</p>							|
-| status			| 			|  <p>Derived datapoints's status.</p>							|
 
 ## Delete derived datapoints
 
@@ -1320,7 +1296,6 @@
 |---------|-----------|--------------------------------------|
 | access_token			| String			|  <p>user access token.</p>							|
 | functionType			| 			|  <p>Functions's functionType.</p>							|
-| status			| 			|  <p>Functions's status.</p>							|
 
 ## Delete functions
 
@@ -1621,7 +1596,6 @@
 | keyIssueCode			| 			|  <p>Key issues's keyIssueCode.</p>							|
 | keyIssueDescription			| 			|  <p>Key issues's keyIssueDescription.</p>							|
 | themeId			| 			|  <p>Key issues's themeId.</p>							|
-| status			| 			|  <p>Key issues's status.</p>							|
 
 ## Delete key issues
 
@@ -2145,7 +2119,6 @@
 | criteria			| 			|  <p>Rules's criteria.</p>							|
 | parameter			| 			|  <p>Rules's parameter.</p>							|
 | datapointId			| 			|  <p>Rules's datapointId.</p>							|
-| status			| 			|  <p>Rules's status.</p>							|
 
 ## Delete rules
 
@@ -2223,7 +2196,6 @@
 | lastModifiedDate			| 			|  <p>Standalone datapoints's lastModifiedDate.</p>							|
 | modifiedBy			| 			|  <p>Standalone datapoints's modifiedBy.</p>							|
 | isSubmitted			| 			|  <p>Standalone datapoints's isSubmitted.</p>							|
-| status			| 			|  <p>Standalone datapoints's status.</p>							|
 
 ## Delete standalone datapoints
 
@@ -2485,7 +2457,7 @@
 | categoryId			| 			|  <p>Taxonomies's categoryId.</p>							|
 | themeId			| 			|  <p>Taxonomies's themeId.</p>							|
 | keyIssueId			| 			|  <p>Taxonomies's keyIssueId.</p>							|
-| indicatorId			| 			|  <p>Taxonomies's indicatorId.</p>							|
+| datapointId			| 			|  <p>Taxonomies's datapointId.</p>							|
 | indicatorName			| 			|  <p>Taxonomies's indicatorName.</p>							|
 | indicatorDescription			| 			|  <p>Taxonomies's indicatorDescription.</p>							|
 | indicatorPolarity			| 			|  <p>Taxonomies's indicatorPolarity.</p>							|
@@ -2510,7 +2482,6 @@
 | conspiracyPageNumber			| 			|  <p>Taxonomies's conspiracyPageNumber.</p>							|
 | normalizedBy			| 			|  <p>Taxonomies's normalizedBy.</p>							|
 | weighted			| 			|  <p>Taxonomies's weighted.</p>							|
-| status			| 			|  <p>Taxonomies's status.</p>							|
 
 ## Delete taxonomies
 
@@ -2558,7 +2529,7 @@
 | categoryId			| 			|  <p>Taxonomies's categoryId.</p>							|
 | themeId			| 			|  <p>Taxonomies's themeId.</p>							|
 | keyIssueId			| 			|  <p>Taxonomies's keyIssueId.</p>							|
-| indicatorId			| 			|  <p>Taxonomies's indicatorId.</p>							|
+| datapointId			| 			|  <p>Taxonomies's datapointId.</p>							|
 | indicatorName			| 			|  <p>Taxonomies's indicatorName.</p>							|
 | indicatorDescription			| 			|  <p>Taxonomies's indicatorDescription.</p>							|
 | indicatorPolarity			| 			|  <p>Taxonomies's indicatorPolarity.</p>							|
@@ -2603,7 +2574,6 @@
 | themeCode			| 			|  <p>Themes's themeCode.</p>							|
 | themeDescription			| 			|  <p>Themes's themeDescription.</p>							|
 | categoryId			| 			|  <p>Themes's categoryId.</p>							|
-| status			| 			|  <p>Themes's status.</p>							|
 
 ## Delete themes
 
@@ -2856,7 +2826,6 @@
 | condition			| 			|  <p>Validations's condition.</p>							|
 | criteria			| 			|  <p>Validations's criteria.</p>							|
 | validationAlert			| 			|  <p>Validations's validationAlert.</p>							|
-| status			| 			|  <p>Validations's status.</p>							|
 
 ## Delete validations
 

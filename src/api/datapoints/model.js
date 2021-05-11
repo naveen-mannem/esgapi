@@ -15,6 +15,9 @@ const datapointsSchema = new Schema({
   description: {
     type: String
   },
+  polarity: {
+    type: String
+  },
   dataCollection: {
     type: String
   },
@@ -43,36 +46,7 @@ const datapointsSchema = new Schema({
   dpType: {
     type: String
   },
-  year: {
-    type: String
-  },
-  companyTaxonomyId: {
-    type: Schema.ObjectId,
-    ref: 'CompanyTaxonomies',
-    required: true
-  },
   dpStatus: {
-    type: String
-  },
-  sourceName: {
-    type: String
-  },
-  sourceUrl: {
-    type: String
-  },
-  sourcePublicationDate: {
-    type: String
-  },
-  pageNumber: {
-    type: String
-  },
-  textSnippet: {
-    type: String
-  },
-  screenshotType: {
-    type: String
-  },
-  filePath: {
     type: String
   },
   status: {
@@ -96,6 +70,7 @@ datapointsSchema.methods = {
       name: this.name,
       code: this.code,
       description: this.description,
+      polarity: this.polarity,
       dataCollection: this.dataCollection,
       unit: this.unit,
       signal: this.signal,
@@ -104,16 +79,7 @@ datapointsSchema.methods = {
       keyIssueId: this.keyIssueId ? this.keyIssueId.view(full) : null,
       functionId: this.functionId ? this.functionId.view(full) : null,
       dpType: this.dpType,
-      year: this.year,
-      companyTaxonomyId: this.companyTaxonomyId ? this.companyTaxonomyId.view(full) : null,
       dpStatus: this.dpStatus,
-      sourceName: this.sourceName,
-      sourceUrl: this.sourceUrl,
-      sourcePublicationDate: this.sourcePublicationDate,
-      pageNumber: this.pageNumber,
-      textSnippet: this.textSnippet,
-      screenshotType: this.screenshotType,
-      filePath: this.filePath,
       status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
