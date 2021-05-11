@@ -19,7 +19,6 @@ const { themeName, themeCode, themeDescription, categoryId, status } = schema.tr
  * @apiParam themeCode Themes's themeCode.
  * @apiParam themeDescription Themes's themeDescription.
  * @apiParam categoryId Themes's categoryId.
- * @apiParam status Themes's status.
  * @apiSuccess {Object} themes Themes's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Themes not found.
@@ -27,7 +26,7 @@ const { themeName, themeCode, themeDescription, categoryId, status } = schema.tr
  */
 router.post('/',
   token({ required: true, roles: ['admin'] }),
-  body({ themeName, themeCode, themeDescription, categoryId, status }),
+  body({ themeName, themeCode, themeDescription, categoryId }),
   create)
 
 /**

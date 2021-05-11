@@ -5,6 +5,7 @@ import { sign } from '../../services/jwt'
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>
   User.count(query)
     .then(count => User.find(query, select, cursor)
+    .populate('roleId')
       .then(users => ({
         rows: users.map((user) => user.view()),
         count
@@ -15,6 +16,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
 
 export const show = ({ params }, res, next) =>
   User.findById(params.id)
+  .populate('roleId')
     .then(notFound(res))
     .then((user) => user ? user.view() : null)
     .then(success(res))
@@ -45,6 +47,7 @@ export const create = ({ bodymen: { body } }, res, next) =>
 
 export const update = ({ bodymen: { body }, params, user }, res, next) =>
   User.findById(params.id === 'me' ? user.id : params.id)
+  .populate('roleId')
     .then(notFound(res))
     .then((result) => {
       if (!result) return null

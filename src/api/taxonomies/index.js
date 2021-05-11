@@ -43,7 +43,6 @@ const { categoryId, themeId, keyIssueId, indicatorId, indicatorName, indicatorDe
  * @apiParam conspiracyPageNumber Taxonomies's conspiracyPageNumber.
  * @apiParam normalizedBy Taxonomies's normalizedBy.
  * @apiParam weighted Taxonomies's weighted.
- * @apiParam status Taxonomies's status.
  * @apiSuccess {Object} taxonomies Taxonomies's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Taxonomies not found.
@@ -51,7 +50,7 @@ const { categoryId, themeId, keyIssueId, indicatorId, indicatorName, indicatorDe
  */
 router.post('/',
   token({ required: true }),
-  body({ categoryId, themeId, keyIssueId, indicatorId, indicatorName, indicatorDescription, indicatorPolarity, dataCollectionGuide, unit, dataInput, isApplicableSector, notApplicableReason, datapointType, datapointReportingPeriod, fileDataSource, sourceUrl, sourcePublicationDate, sourcePageNumber, sourceTextSnippetOrSnapshot, commentsAndCalculations, signal, controversy, controversySnippetOrSnapshot, snippetOrSnapshotUrl, sourcePublicationDateOfConspiracy, conspiracyPageNumber, normalizedBy, weighted, status }),
+  body({ categoryId, themeId, keyIssueId, indicatorId, indicatorName, indicatorDescription, indicatorPolarity, dataCollectionGuide, unit, dataInput, isApplicableSector, notApplicableReason, datapointType, datapointReportingPeriod, fileDataSource, sourceUrl, sourcePublicationDate, sourcePageNumber, sourceTextSnippetOrSnapshot, commentsAndCalculations, signal, controversy, controversySnippetOrSnapshot, snippetOrSnapshotUrl, sourcePublicationDateOfConspiracy, conspiracyPageNumber, normalizedBy, weighted }),
   create)
 
 /**

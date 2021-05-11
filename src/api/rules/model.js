@@ -14,10 +14,13 @@ const rulesSchema = new Schema({
     type: String
   },
   datapointId: {
-    type: String
+    type: Schema.ObjectId,
+    ref: 'Datapoints',
+    required: true
   },
   status: {
-    type: String
+    type: Boolean,
+    default: true
   }
 }, {
   timestamps: true,
@@ -36,7 +39,7 @@ rulesSchema.methods = {
       methodType: this.methodType,
       criteria: this.criteria,
       parameter: this.parameter,
-      datapointId: this.datapointId,
+      datapointId: this.datapointId ? this.datapointId.view(full) : null,
       status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt

@@ -16,7 +16,6 @@ const { functionType, status } = schema.tree
  * @apiPermission user
  * @apiParam {String} access_token user access token.
  * @apiParam functionType Functions's functionType.
- * @apiParam status Functions's status.
  * @apiSuccess {Object} functions Functions's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Functions not found.
@@ -24,7 +23,7 @@ const { functionType, status } = schema.tree
  */
 router.post('/',
   token({ required: true }),
-  body({ functionType, status }),
+  body({ functionType }),
   create)
 
 /**

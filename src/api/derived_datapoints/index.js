@@ -23,7 +23,6 @@ const { companyId, datapointId, response, performanceResult, activeStatus, dpSta
  * @apiParam dpStatus Derived datapoints's dpStatus.
  * @apiParam year Derived datapoints's year.
  * @apiParam lastModifiedDate Derived datapoints's lastModifiedDate.
- * @apiParam status Derived datapoints's status.
  * @apiSuccess {Object} derivedDatapoints Derived datapoints's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Derived datapoints not found.
@@ -31,7 +30,7 @@ const { companyId, datapointId, response, performanceResult, activeStatus, dpSta
  */
 router.post('/',
   token({ required: true }),
-  body({ companyId, datapointId, response, performanceResult, activeStatus, dpStatus, year, lastModifiedDate, status }),
+  body({ companyId, datapointId, response, performanceResult, activeStatus, dpStatus, year, lastModifiedDate }),
   create)
 
 /**

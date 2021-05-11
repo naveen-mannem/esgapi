@@ -22,7 +22,6 @@ const { datapointId, validationRule, rule, dependantCode, condition, criteria, v
  * @apiParam condition Validations's condition.
  * @apiParam criteria Validations's criteria.
  * @apiParam validationAlert Validations's validationAlert.
- * @apiParam status Validations's status.
  * @apiSuccess {Object} validations Validations's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Validations not found.
@@ -30,7 +29,7 @@ const { datapointId, validationRule, rule, dependantCode, condition, criteria, v
  */
 router.post('/',
   token({ required: true }),
-  body({ datapointId, validationRule, rule, dependantCode, condition, criteria, validationAlert, status }),
+  body({ datapointId, validationRule, rule, dependantCode, condition, criteria, validationAlert }),
   create)
 
 /**

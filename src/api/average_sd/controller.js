@@ -10,6 +10,7 @@ export const create = ({ bodymen: { body } }, res, next) =>
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>
   AverageSd.count(query)
     .then(count => AverageSd.find(query, select, cursor)
+      .populate('companyId')
       .then((averageSds) => ({
         count,
         rows: averageSds.map((averageSd) => averageSd.view())
@@ -20,6 +21,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
 
 export const show = ({ params }, res, next) =>
   AverageSd.findById(params.id)
+  .populate('companyId')
     .then(notFound(res))
     .then((averageSd) => averageSd ? averageSd.view() : null)
     .then(success(res))
@@ -27,6 +29,7 @@ export const show = ({ params }, res, next) =>
 
 export const update = ({ bodymen: { body }, params }, res, next) =>
   AverageSd.findById(params.id)
+  .populate('companyId')
     .then(notFound(res))
     .then((averageSd) => averageSd ? Object.assign(averageSd, body).save() : null)
     .then((averageSd) => averageSd ? averageSd.view(true) : null)
@@ -35,6 +38,7 @@ export const update = ({ bodymen: { body }, params }, res, next) =>
 
 export const destroy = ({ params }, res, next) =>
   AverageSd.findById(params.id)
+  .populate('companyId')
     .then(notFound(res))
     .then((averageSd) => averageSd ? averageSd.remove() : null)
     .then(success(res, 204))

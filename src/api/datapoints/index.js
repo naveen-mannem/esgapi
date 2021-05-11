@@ -36,7 +36,6 @@ const { name, code, description, dataCollection, unit, signal, percentile, final
  * @apiParam textSnippet Datapoints's textSnippet.
  * @apiParam screenshotType Datapoints's screenshotType.
  * @apiParam filePath Datapoints's filePath.
- * @apiParam status Datapoints's status.
  * @apiSuccess {Object} datapoints Datapoints's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Datapoints not found.
@@ -44,7 +43,7 @@ const { name, code, description, dataCollection, unit, signal, percentile, final
  */
 router.post('/',
   token({ required: true }),
-  body({ name, code, description, dataCollection, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, year, companyTaxonomyId, dpStatus, sourceName, sourceUrl, sourcePublicationDate, pageNumber, textSnippet, screenshotType, filePath, status }),
+  body({ name, code, description, dataCollection, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, year, companyTaxonomyId, dpStatus, sourceName, sourceUrl, sourcePublicationDate, pageNumber, textSnippet, screenshotType, filePath }),
   create)
 
 /**

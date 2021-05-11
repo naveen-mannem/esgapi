@@ -19,7 +19,6 @@ const { keyIssueName, keyIssueCode, keyIssueDescription, themeId, status } = sch
  * @apiParam keyIssueCode Key issues's keyIssueCode.
  * @apiParam keyIssueDescription Key issues's keyIssueDescription.
  * @apiParam themeId Key issues's themeId.
- * @apiParam status Key issues's status.
  * @apiSuccess {Object} keyIssues Key issues's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Key issues not found.
@@ -27,7 +26,7 @@ const { keyIssueName, keyIssueCode, keyIssueDescription, themeId, status } = sch
  */
 router.post('/',
   token({ required: true, roles: ['admin'] }),
-  body({ keyIssueName, keyIssueCode, keyIssueDescription, themeId, status }),
+  body({ keyIssueName, keyIssueCode, keyIssueDescription, themeId }),
   create)
 
 /**

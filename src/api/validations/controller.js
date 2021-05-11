@@ -11,6 +11,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
   Validations.count(query)
     .then(count => Validations.find(query, select, cursor)
       .populate('createdBy')
+      .populate('datapointId')
       .then((validations) => ({
         count,
         rows: validations.map((validations) => validations.view())
@@ -22,6 +23,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
 export const show = ({ params }, res, next) =>
   Validations.findById(params.id)
     .populate('createdBy')
+    .populate('datapointId')
     .then(notFound(res))
     .then((validations) => validations ? validations.view() : null)
     .then(success(res))
@@ -30,6 +32,7 @@ export const show = ({ params }, res, next) =>
 export const update = ({ user, bodymen: { body }, params }, res, next) =>
   Validations.findById(params.id)
     .populate('createdBy')
+    .populate('datapointId')
     .then(notFound(res))
     .then(authorOrAdmin(res, user, 'createdBy'))
     .then((validations) => validations ? Object.assign(validations, body).save() : null)
