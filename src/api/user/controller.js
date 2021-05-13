@@ -14,6 +14,21 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
     .then(success(res))
     .catch(next)
 
+export const getUsersByRole = ({ params, querymen: { query, select, cursor } }, res, next) => {
+  let findQuery = query;
+  findQuery.role = params.role ? params.role : '';
+  User.count(findQuery)
+    .then(count => User.find(findQuery, select, cursor)
+    .populate('roleId')
+      .then(users => ({
+        rows: users.map((user) => user.view()),
+        count
+      }))
+    )
+    .then(success(res))
+    .catch(next)
+}
+
 export const show = ({ params }, res, next) =>
   User.findById(params.id)
   .populate('roleId')

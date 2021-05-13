@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { password as passwordAuth, master, token } from '../../services/passport'
-import { index, showMe, show, create, update, updatePassword, destroy } from './controller'
+import { index, showMe, show, create, update, updatePassword, destroy, getUsersByRole } from './controller'
 import { schema } from './model'
 export User, { schema } from './model'
 
@@ -24,6 +24,22 @@ router.get('/',
   token({ required: true }),
   query(),
   index)
+
+/**
+ * @api {get} /users/:role Retrieve users by role
+ * @apiName RetrieveUsersByRole
+ * @apiGroup User
+ * @apiPermission user
+ * @apiParam {String} access_token User access_token.
+ * @apiUse listParams
+ * @apiSuccess {Object[]} users List of users.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ * @apiError 401 user access only.
+ */
+router.get('/:role/',
+  token({ required: true }),
+  query(),
+  getUsersByRole)
 
 /**
  * @api {get} /users/me Retrieve current user
