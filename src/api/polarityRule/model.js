@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose'
 
 const polarityRuleSchema = new Schema({
-  createdAt: {
+  createdBy: {
     type: Schema.ObjectId,
     ref: 'User',
     required: true
@@ -37,11 +37,11 @@ polarityRuleSchema.methods = {
     const view = {
       // simple view
       id: this.id,
-      createdAt: this.createdAt ? this.createdAt.view(full) : null,
+      createdBy: this.createdBy ? this.createdBy.view(full) : null,
       polarityName: this.polarityName,
       polarityValue: this.polarityValue,
       condition: this.condition,
-      dataPointId: this.dataPointId ? this.createdAt.view(full) : null ,
+      dataPointId: this.dataPointId ? this.dataPointId.view(full) : null ,
       status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
