@@ -14,21 +14,21 @@ beforeEach(async () => {
   const anotherUser = await User.create({ email: 'b@b.com', password: '123456' })
   userSession = signSync(user.id)
   anotherSession = signSync(anotherUser.id)
-  polarityRule = await PolarityRule.create({ createdAt: user })
+  polarityRule = await PolarityRule.create({ createdBy: user })
 })
 
 test('POST /polarityRules 201 (user)', async () => {
   const { status, body } = await request(app())
     .post(`${apiRoot}`)
-    .send({ access_token: userSession, polarityName: 'test', polarityValue: 'test', condition: 'test', dataPointId: 'test', status: 'test' })
+    .send({ access_token: userSession, polarityName: 'test', polarityValue: 'test', condition: 'test', datapointId: 'test', status: 'test' })
   expect(status).toBe(201)
   expect(typeof body).toEqual('object')
   expect(body.polarityName).toEqual('test')
   expect(body.polarityValue).toEqual('test')
   expect(body.condition).toEqual('test')
-  expect(body.dataPointId).toEqual('test')
+  expect(body.datapointId).toEqual('test')
   expect(body.status).toEqual('test')
-  expect(typeof body.createdAt).toEqual('object')
+  expect(typeof body.createdBy).toEqual('object')
 })
 
 test('POST /polarityRules 401', async () => {
@@ -44,7 +44,7 @@ test('GET /polarityRules 200 (user)', async () => {
   expect(status).toBe(200)
   expect(Array.isArray(body.rows)).toBe(true)
   expect(Number.isNaN(body.count)).toBe(false)
-  expect(typeof body.rows[0].createdAt).toEqual('object')
+  expect(typeof body.rows[0].createdBy).toEqual('object')
 })
 
 test('GET /polarityRules 401', async () => {
@@ -60,7 +60,7 @@ test('GET /polarityRules/:id 200 (user)', async () => {
   expect(status).toBe(200)
   expect(typeof body).toEqual('object')
   expect(body.id).toEqual(polarityRule.id)
-  expect(typeof body.createdAt).toEqual('object')
+  expect(typeof body.createdBy).toEqual('object')
 })
 
 test('GET /polarityRules/:id 401', async () => {
@@ -79,22 +79,22 @@ test('GET /polarityRules/:id 404 (user)', async () => {
 test('PUT /polarityRules/:id 200 (user)', async () => {
   const { status, body } = await request(app())
     .put(`${apiRoot}/${polarityRule.id}`)
-    .send({ access_token: userSession, polarityName: 'test', polarityValue: 'test', condition: 'test', dataPointId: 'test', status: 'test' })
+    .send({ access_token: userSession, polarityName: 'test', polarityValue: 'test', condition: 'test', datapointId: 'test', status: 'test' })
   expect(status).toBe(200)
   expect(typeof body).toEqual('object')
   expect(body.id).toEqual(polarityRule.id)
   expect(body.polarityName).toEqual('test')
   expect(body.polarityValue).toEqual('test')
   expect(body.condition).toEqual('test')
-  expect(body.dataPointId).toEqual('test')
+  expect(body.datapointId).toEqual('test')
   expect(body.status).toEqual('test')
-  expect(typeof body.createdAt).toEqual('object')
+  expect(typeof body.createdBy).toEqual('object')
 })
 
 test('PUT /polarityRules/:id 401 (user) - another user', async () => {
   const { status } = await request(app())
     .put(`${apiRoot}/${polarityRule.id}`)
-    .send({ access_token: anotherSession, polarityName: 'test', polarityValue: 'test', condition: 'test', dataPointId: 'test', status: 'test' })
+    .send({ access_token: anotherSession, polarityName: 'test', polarityValue: 'test', condition: 'test', datapointId: 'test', status: 'test' })
   expect(status).toBe(401)
 })
 
@@ -107,7 +107,7 @@ test('PUT /polarityRules/:id 401', async () => {
 test('PUT /polarityRules/:id 404 (user)', async () => {
   const { status } = await request(app())
     .put(apiRoot + '/123456789098765432123456')
-    .send({ access_token: anotherSession, polarityName: 'test', polarityValue: 'test', condition: 'test', dataPointId: 'test', status: 'test' })
+    .send({ access_token: anotherSession, polarityName: 'test', polarityValue: 'test', condition: 'test', datapointId: 'test', status: 'test' })
   expect(status).toBe(404)
 })
 

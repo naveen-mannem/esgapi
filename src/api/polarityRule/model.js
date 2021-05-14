@@ -15,7 +15,7 @@ const polarityRuleSchema = new Schema({
   condition: {
     type: String
   },
-  dataPointId: {
+  datapointId: {
     type: Schema.ObjectId,
     ref: 'Datapoints',
     required: true
@@ -41,7 +41,7 @@ polarityRuleSchema.methods = {
       polarityName: this.polarityName,
       polarityValue: this.polarityValue,
       condition: this.condition,
-      dataPointId: this.dataPointId ? this.dataPointId.view(full) : null ,
+      datapointId: this.datapointId ? this.datapointId.view(full) : null ,
       status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt

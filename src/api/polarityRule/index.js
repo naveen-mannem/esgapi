@@ -7,7 +7,7 @@ import { schema } from './model'
 export PolarityRule, { schema } from './model'
 
 const router = new Router()
-const { polarityName, polarityValue, condition, dataPointId, status } = schema.tree
+const { polarityName, polarityValue, condition, datapointId, status } = schema.tree
 
 /**
  * @api {post} /polarityRules Create polarity rule
@@ -18,7 +18,7 @@ const { polarityName, polarityValue, condition, dataPointId, status } = schema.t
  * @apiParam polarityName Polarity rule's polarityName.
  * @apiParam polarityValue Polarity rule's polarityValue.
  * @apiParam condition Polarity rule's condition.
- * @apiParam dataPointId Polarity rule's dataPointId.
+ * @apiParam datapointId Polarity rule's datapointId.
  * @apiSuccess {Object} polarityRule Polarity rule's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Polarity rule not found.
@@ -26,7 +26,7 @@ const { polarityName, polarityValue, condition, dataPointId, status } = schema.t
  */
 router.post('/',
   token({ required: true }),
-  body({ polarityName, polarityValue, condition, dataPointId }),
+  body({ polarityName, polarityValue, condition, datapointId }),
   create)
 
 /**
@@ -70,7 +70,7 @@ router.get('/:id',
  * @apiParam polarityName Polarity rule's polarityName.
  * @apiParam polarityValue Polarity rule's polarityValue.
  * @apiParam condition Polarity rule's condition.
- * @apiParam dataPointId Polarity rule's dataPointId.
+ * @apiParam datapointId Polarity rule's datapointId.
  * @apiParam status Polarity rule's status.
  * @apiSuccess {Object} polarityRule Polarity rule's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
@@ -79,7 +79,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ polarityName, polarityValue, condition, dataPointId, status }),
+  body({ polarityName, polarityValue, condition, datapointId, status }),
   update)
 
 /**

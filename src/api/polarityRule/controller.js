@@ -11,7 +11,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
   PolarityRule.count(query)
     .then(count => PolarityRule.find(query, select, cursor)
       .populate('createdBy')
-      .populate('Datapoints')
+      .populate('datapointId')
       .then((polarityRules) => ({
         count,
         rows: polarityRules.map((polarityRule) => polarityRule.view())
@@ -23,7 +23,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
 export const show = ({ params }, res, next) =>
   PolarityRule.findById(params.id)
     .populate('createdBy')
-    .populate('Datapoints')
+    .populate('datapointId')
     .then(notFound(res))
     .then((polarityRule) => polarityRule ? polarityRule.view() : null)
     .then(success(res))
@@ -32,7 +32,7 @@ export const show = ({ params }, res, next) =>
 export const update = ({ user, bodymen: { body }, params }, res, next) =>
   PolarityRule.findById(params.id)
     .populate('createdBy')
-    .populate('Datapoints')
+    .populate('datapointId')
     .then(notFound(res))
     .then(authorOrAdmin(res, user, 'createdBy'))
     .then((polarityRule) => polarityRule ? Object.assign(polarityRule, body).save() : null)
