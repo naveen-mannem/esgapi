@@ -19,7 +19,6 @@ import derivedDatapoints from './derived_datapoints'
 import role from './role'
 import batches from './batches'
 import reference from './reference'
-import polarityRule from './polarityRule'
 import boardMembers from './boardMembers'
 import boardMembersMatrixDataPoints from './boardMembersMatrixDataPoints'
 import kmp from './kmp'
@@ -32,6 +31,7 @@ import error from './error'
 import errorDetails from './errorDetails'
 import taskSlaLog from './taskSlaLog'
 import controversy from './controversy'
+import polarityRules from './polarity_rules'
 
 const router = new Router()
 
@@ -78,7 +78,6 @@ router.use('/derived_datapoints', derivedDatapoints)
 router.use('/role', role)
 router.use('/batches', batches)
 router.use('/references', reference)
-router.use('/polarityRules', polarityRule)
 router.use('/boardMembers', boardMembers)
 router.use('/boardMembersMatrixDataPoints', boardMembersMatrixDataPoints)
 router.use('/kmp', kmp)
@@ -92,5 +91,6 @@ router.use('/errorDetails', errorDetails)
 router.use('/errorDetails', errorDetails)
 router.use('/taskSlaLogs', taskSlaLog)
 router.use('/controversies', controversy)
+router.use('/polarity_rules', polarityRules)
 
 export default router

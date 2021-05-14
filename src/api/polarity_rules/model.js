@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose'
 
-const polarityRuleSchema = new Schema({
+const polarityRulesSchema = new Schema({
   createdBy: {
     type: Schema.ObjectId,
     ref: 'User',
@@ -21,9 +21,9 @@ const polarityRuleSchema = new Schema({
     required: true
   },
   status: {
-   type:Boolean,
-   default:true
-}
+    type: Boolean,
+    default: true
+  }
 }, {
   timestamps: true,
   toJSON: {
@@ -32,7 +32,7 @@ const polarityRuleSchema = new Schema({
   }
 })
 
-polarityRuleSchema.methods = {
+polarityRulesSchema.methods = {
   view (full) {
     const view = {
       // simple view
@@ -41,7 +41,7 @@ polarityRuleSchema.methods = {
       polarityName: this.polarityName,
       polarityValue: this.polarityValue,
       condition: this.condition,
-      datapointId: this.datapointId ? this.datapointId.view(full) : null ,
+      datapointId: this.datapointId ? this.datapointId.view(full) : null,
       status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
@@ -54,7 +54,7 @@ polarityRuleSchema.methods = {
   }
 }
 
-const model = mongoose.model('PolarityRule', polarityRuleSchema)
+const model = mongoose.model('PolarityRules', polarityRulesSchema)
 
 export const schema = model.schema
 export default model

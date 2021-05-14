@@ -1,49 +1,49 @@
 import { success, notFound, authorOrAdmin } from '../../services/response/'
-import { PolarityRule } from '.'
+import { PolarityRules } from '.'
 
 export const create = ({ user, bodymen: { body } }, res, next) =>
-  PolarityRule.create({ ...body, createdBy: user })
-    .then((polarityRule) => polarityRule.view(true))
+  PolarityRules.create({ ...body, createdBy: user })
+    .then((polarityRules) => polarityRules.view(true))
     .then(success(res, 201))
     .catch(next)
 
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>
-  PolarityRule.count(query)
-    .then(count => PolarityRule.find(query, select, cursor)
+  PolarityRules.count(query)
+    .then(count => PolarityRules.find(query, select, cursor)
       .populate('createdBy')
       .populate('datapointId')
       .then((polarityRules) => ({
         count,
-        rows: polarityRules.map((polarityRule) => polarityRule.view())
+        rows: polarityRules.map((polarityRules) => polarityRules.view())
       }))
     )
     .then(success(res))
     .catch(next)
 
 export const show = ({ params }, res, next) =>
-  PolarityRule.findById(params.id)
+  PolarityRules.findById(params.id)
     .populate('createdBy')
     .populate('datapointId')
     .then(notFound(res))
-    .then((polarityRule) => polarityRule ? polarityRule.view() : null)
+    .then((polarityRules) => polarityRules ? polarityRules.view() : null)
     .then(success(res))
     .catch(next)
 
 export const update = ({ user, bodymen: { body }, params }, res, next) =>
-  PolarityRule.findById(params.id)
+  PolarityRules.findById(params.id)
     .populate('createdBy')
     .populate('datapointId')
     .then(notFound(res))
     .then(authorOrAdmin(res, user, 'createdBy'))
-    .then((polarityRule) => polarityRule ? Object.assign(polarityRule, body).save() : null)
-    .then((polarityRule) => polarityRule ? polarityRule.view(true) : null)
+    .then((polarityRules) => polarityRules ? Object.assign(polarityRules, body).save() : null)
+    .then((polarityRules) => polarityRules ? polarityRules.view(true) : null)
     .then(success(res))
     .catch(next)
 
 export const destroy = ({ user, params }, res, next) =>
-  PolarityRule.findById(params.id)
+  PolarityRules.findById(params.id)
     .then(notFound(res))
     .then(authorOrAdmin(res, user, 'createdBy'))
-    .then((polarityRule) => polarityRule ? polarityRule.remove() : null)
+    .then((polarityRules) => polarityRules ? polarityRules.remove() : null)
     .then(success(res, 204))
     .catch(next)

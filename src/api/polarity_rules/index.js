@@ -4,24 +4,25 @@ import { middleware as body } from 'bodymen'
 import { token } from '../../services/passport'
 import { create, index, show, update, destroy } from './controller'
 import { schema } from './model'
-export PolarityRule, { schema } from './model'
+export PolarityRules, { schema } from './model'
 
 const router = new Router()
 const { polarityName, polarityValue, condition, datapointId, status } = schema.tree
 
 /**
- * @api {post} /polarityRules Create polarity rule
- * @apiName CreatePolarityRule
- * @apiGroup PolarityRule
+ * @api {post} /polarity_rules Create polarity rules
+ * @apiName CreatePolarityRules
+ * @apiGroup PolarityRules
  * @apiPermission user
  * @apiParam {String} access_token user access token.
- * @apiParam polarityName Polarity rule's polarityName.
- * @apiParam polarityValue Polarity rule's polarityValue.
- * @apiParam condition Polarity rule's condition.
- * @apiParam datapointId Polarity rule's datapointId.
- * @apiSuccess {Object} polarityRule Polarity rule's data.
+ * @apiParam polarityName Polarity rules's polarityName.
+ * @apiParam polarityValue Polarity rules's polarityValue.
+ * @apiParam condition Polarity rules's condition.
+ * @apiParam datapointId Polarity rules's datapointId.
+ * @apiParam status Polarity rules's status.
+ * @apiSuccess {Object} polarityRules Polarity rules's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
- * @apiError 404 Polarity rule not found.
+ * @apiError 404 Polarity rules not found.
  * @apiError 401 user access only.
  */
 router.post('/',
@@ -30,9 +31,9 @@ router.post('/',
   create)
 
 /**
- * @api {get} /polarityRules Retrieve polarity rules
+ * @api {get} /polarity_rules Retrieve polarity rules
  * @apiName RetrievePolarityRules
- * @apiGroup PolarityRule
+ * @apiGroup PolarityRules
  * @apiPermission user
  * @apiParam {String} access_token user access token.
  * @apiUse listParams
@@ -47,14 +48,14 @@ router.get('/',
   index)
 
 /**
- * @api {get} /polarityRules/:id Retrieve polarity rule
- * @apiName RetrievePolarityRule
- * @apiGroup PolarityRule
+ * @api {get} /polarity_rules/:id Retrieve polarity rules
+ * @apiName RetrievePolarityRules
+ * @apiGroup PolarityRules
  * @apiPermission user
  * @apiParam {String} access_token user access token.
- * @apiSuccess {Object} polarityRule Polarity rule's data.
+ * @apiSuccess {Object} polarityRules Polarity rules's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
- * @apiError 404 Polarity rule not found.
+ * @apiError 404 Polarity rules not found.
  * @apiError 401 user access only.
  */
 router.get('/:id',
@@ -62,19 +63,19 @@ router.get('/:id',
   show)
 
 /**
- * @api {put} /polarityRules/:id Update polarity rule
- * @apiName UpdatePolarityRule
- * @apiGroup PolarityRule
+ * @api {put} /polarity_rules/:id Update polarity rules
+ * @apiName UpdatePolarityRules
+ * @apiGroup PolarityRules
  * @apiPermission user
  * @apiParam {String} access_token user access token.
- * @apiParam polarityName Polarity rule's polarityName.
- * @apiParam polarityValue Polarity rule's polarityValue.
- * @apiParam condition Polarity rule's condition.
- * @apiParam datapointId Polarity rule's datapointId.
- * @apiParam status Polarity rule's status.
- * @apiSuccess {Object} polarityRule Polarity rule's data.
+ * @apiParam polarityName Polarity rules's polarityName.
+ * @apiParam polarityValue Polarity rules's polarityValue.
+ * @apiParam condition Polarity rules's condition.
+ * @apiParam datapointId Polarity rules's datapointId.
+ * @apiParam status Polarity rules's status.
+ * @apiSuccess {Object} polarityRules Polarity rules's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
- * @apiError 404 Polarity rule not found.
+ * @apiError 404 Polarity rules not found.
  * @apiError 401 user access only.
  */
 router.put('/:id',
@@ -83,13 +84,13 @@ router.put('/:id',
   update)
 
 /**
- * @api {delete} /polarityRules/:id Delete polarity rule
- * @apiName DeletePolarityRule
- * @apiGroup PolarityRule
+ * @api {delete} /polarity_rules/:id Delete polarity rules
+ * @apiName DeletePolarityRules
+ * @apiGroup PolarityRules
  * @apiPermission user
  * @apiParam {String} access_token user access token.
  * @apiSuccess (Success 204) 204 No Content.
- * @apiError 404 Polarity rule not found.
+ * @apiError 404 Polarity rules not found.
  * @apiError 401 user access only.
  */
 router.delete('/:id',
