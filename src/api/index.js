@@ -32,6 +32,7 @@ import errorDetails from './errorDetails'
 import taskSlaLog from './taskSlaLog'
 import controversy from './controversy'
 import polarityRules from './polarity_rules'
+import ztables from './ztables'
 
 const router = new Router()
 
@@ -92,5 +93,6 @@ router.use('/errorDetails', errorDetails)
 router.use('/taskSlaLogs', taskSlaLog)
 router.use('/controversies', controversy)
 router.use('/polarity_rules', polarityRules)
+router.use('/ztables', ztables)
 
 export default router
