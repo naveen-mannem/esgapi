@@ -7,7 +7,8 @@ const batchesSchema = new Schema({
     required: true
   },
   batchName: {
-    type: String
+    type: String,
+    unique : true
   },
   batchSLA: {
     type: []
