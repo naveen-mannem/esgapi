@@ -11,7 +11,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
   Batches.count(query)
     .then(count => Batches.find(query, select, cursor)
       .populate('createdBy')
-      .populate('companyId')
+      .populate('companyId.companyName')
       .then((batches) => ({
         count,
         rows: batches.map((batches) => batches.view())
@@ -23,7 +23,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
 export const show = ({ params }, res, next) =>
   Batches.findById(params.id)
     .populate('createdBy')
-    .populate('companyId')
+    .populate('companyId.companyName')
     .then(notFound(res))
     .then((batches) => batches ? batches.view() : null)
     .then(success(res))
@@ -32,7 +32,7 @@ export const show = ({ params }, res, next) =>
 export const update = ({ user, bodymen: { body }, params }, res, next) =>
   Batches.findById(params.id)
     .populate('createdBy')
-    .populate('companyId')
+   .populate('companyId.companyName')
     .then(notFound(res))
     .then(authorOrAdmin(res, user, 'createdBy'))
     .then((batches) => batches ? Object.assign(batches, body).save() : null)
