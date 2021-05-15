@@ -13,9 +13,10 @@ const batchesSchema = new Schema({
   batchSLA: {
     type: []
   },
-  companyId:[{ 
+  companyId:[{ companyName:{
     type: Schema.Types.ObjectId, 
     ref: 'Companies'
+  }  
   }],
   status: {
     type: Boolean,
