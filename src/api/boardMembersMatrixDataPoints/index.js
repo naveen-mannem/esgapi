@@ -7,7 +7,7 @@ import { schema } from './model'
 export BoardMembersMatrixDataPoints, { schema } from './model'
 
 const router = new Router()
-const { dpCodeId, boardMemberId, year, response, status } = schema.tree
+const { datapointId, boardMemberId, year, response, fiscalYearEndDate, status } = schema.tree
 
 /**
  * @api {post} /boardMembersMatrixDataPoints Create board members matrix data points
@@ -15,10 +15,11 @@ const { dpCodeId, boardMemberId, year, response, status } = schema.tree
  * @apiGroup BoardMembersMatrixDataPoints
  * @apiPermission user
  * @apiParam {String} access_token user access token.
- * @apiParam dpCodeId Board members matrix data points's dpCodeId.
+ * @apiParam datapointId Board members matrix data points's datapointId.
  * @apiParam boardMemberId Board members matrix data points's boardMemberId.
  * @apiParam year Board members matrix data points's year.
  * @apiParam response Board members matrix data points's response.
+ * @apiParam fiscalYearEndDate Board members matrix data points's fiscalYearEndDate.
  * @apiSuccess {Object} boardMembersMatrixDataPoints Board members matrix data points's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Board members matrix data points not found.
@@ -26,7 +27,7 @@ const { dpCodeId, boardMemberId, year, response, status } = schema.tree
  */
 router.post('/',
   token({ required: true }),
-  body({ dpCodeId, boardMemberId, year, response}),
+  body({ datapointId, boardMemberId, year, response, fiscalYearEndDate}),
   create)
 
 /**
@@ -67,10 +68,11 @@ router.get('/:id',
  * @apiGroup BoardMembersMatrixDataPoints
  * @apiPermission user
  * @apiParam {String} access_token user access token.
- * @apiParam dpCodeId Board members matrix data points's dpCodeId.
+ * @apiParam datapointId Board members matrix data points's datapointId.
  * @apiParam boardMemberId Board members matrix data points's boardMemberId.
  * @apiParam year Board members matrix data points's year.
  * @apiParam response Board members matrix data points's response.
+ * @apiParam fiscalYearEndDate Board members matrix data points's fiscalYearEndDate.
  * @apiParam status Board members matrix data points's status.
  * @apiSuccess {Object} boardMembersMatrixDataPoints Board members matrix data points's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
@@ -79,7 +81,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ dpCodeId, boardMemberId, year, response, status }),
+  body({ datapointId, boardMemberId, year, response, fiscalYearEndDate, status }),
   update)
 
 /**

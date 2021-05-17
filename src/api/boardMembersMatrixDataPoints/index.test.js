@@ -20,12 +20,13 @@ beforeEach(async () => {
 test('POST /boardMembersMatrixDataPoints 201 (user)', async () => {
   const { status, body } = await request(app())
     .post(`${apiRoot}`)
-    .send({ access_token: userSession, dpCodeId: 'test', boardMemberId: 'test', year: 'test', response: 'test', status: 'test' })
+    .send({ access_token: userSession, datapointId: 'test', boardMemberId: 'test', year: 'test', fiscalYearEndDate: 'test', response: 'test', status: 'test' })
   expect(status).toBe(201)
   expect(typeof body).toEqual('object')
-  expect(body.dpCodeId).toEqual('test')
+  expect(body.datapointId).toEqual('test')
   expect(body.boardMemberId).toEqual('test')
   expect(body.year).toEqual('test')
+  expect(body.fiscalYearEndDate).toEqual('test')
   expect(body.response).toEqual('test')
   expect(body.status).toEqual('test')
   expect(typeof body.createdBy).toEqual('object')
@@ -79,13 +80,14 @@ test('GET /boardMembersMatrixDataPoints/:id 404 (user)', async () => {
 test('PUT /boardMembersMatrixDataPoints/:id 200 (user)', async () => {
   const { status, body } = await request(app())
     .put(`${apiRoot}/${boardMembersMatrixDataPoints.id}`)
-    .send({ access_token: userSession, dpCodeId: 'test', boardMemberId: 'test', year: 'test', response: 'test', status: 'test' })
+    .send({ access_token: userSession, datapointId: 'test', boardMemberId: 'test', year: 'test', fiscalYearEndDate: 'test', response: 'test', status: 'test' })
   expect(status).toBe(200)
   expect(typeof body).toEqual('object')
   expect(body.id).toEqual(boardMembersMatrixDataPoints.id)
-  expect(body.dpCodeId).toEqual('test')
+  expect(body.datapointId).toEqual('test')
   expect(body.boardMemberId).toEqual('test')
   expect(body.year).toEqual('test')
+  expect(body.fiscalYearEndDate).toEqual('test')
   expect(body.response).toEqual('test')
   expect(body.status).toEqual('test')
   expect(typeof body.createdBy).toEqual('object')
@@ -94,7 +96,7 @@ test('PUT /boardMembersMatrixDataPoints/:id 200 (user)', async () => {
 test('PUT /boardMembersMatrixDataPoints/:id 401 (user) - another user', async () => {
   const { status } = await request(app())
     .put(`${apiRoot}/${boardMembersMatrixDataPoints.id}`)
-    .send({ access_token: anotherSession, dpCodeId: 'test', boardMemberId: 'test', year: 'test', response: 'test', status: 'test' })
+    .send({ access_token: anotherSession, datapointId: 'test', boardMemberId: 'test', year: 'test', fiscalYearEndDate: 'test', response: 'test', status: 'test' })
   expect(status).toBe(401)
 })
 
@@ -107,7 +109,7 @@ test('PUT /boardMembersMatrixDataPoints/:id 401', async () => {
 test('PUT /boardMembersMatrixDataPoints/:id 404 (user)', async () => {
   const { status } = await request(app())
     .put(apiRoot + '/123456789098765432123456')
-    .send({ access_token: anotherSession, dpCodeId: 'test', boardMemberId: 'test', year: 'test', response: 'test', status: 'test' })
+    .send({ access_token: anotherSession, datapointId: 'test', boardMemberId: 'test', year: 'test', fiscalYearEndDate: 'test', response: 'test', status: 'test' })
   expect(status).toBe(404)
 })
 

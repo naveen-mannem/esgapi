@@ -6,7 +6,7 @@ const boardMembersMatrixDataPointsSchema = new Schema({
     ref: 'User',
     required: true
   },
-  dpCodeId: {
+  datapointId: {
    type: Schema.ObjectId,
     ref: 'DataPoints',
     required: true
@@ -21,6 +21,9 @@ const boardMembersMatrixDataPointsSchema = new Schema({
   },
   response: {
     type: String
+  },
+  fiscalYearEndDate:{
+    type:String
   },
   status: {
     type: Boolean,
@@ -40,10 +43,11 @@ boardMembersMatrixDataPointsSchema.methods = {
       // simple view
       id: this.id,
       createdBy: this.createdBy ? this.createdBy.view(full) : null,
-      dpCodeId: this.dpCodeId ? this.dpCodeId.view(full) : null,
+      datapointId: this.datapointId ? this.datapointId.view(full) : null,
       boardMemberId: this.boardMemberId.view(full) ? this.boardMemberId.view(full) : null,
       year: this.year,
       response: this.response,
+      fiscalYearEndDate: this.fiscalYearEndDate,
       status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
