@@ -5,7 +5,7 @@ let user, derivedDatapoints
 
 beforeEach(async () => {
   user = await User.create({ email: 'a@a.com', password: '123456' })
-  derivedDatapoints = await DerivedDatapoints.create({ createdBy: user, companyId: 'test', datapointId: 'test', response: 'test', performanceResult: 'test', activeStatus: 'test', dpStatus: 'test', year: 'test', lastModifiedDate: 'test', status: 'test' })
+  derivedDatapoints = await DerivedDatapoints.create({ createdBy: user, companyId: 'test', datapointId: 'test', response: 'test', performanceResult: 'test', activeStatus: 'test', dpStatus: 'test', year: 'test', fiscalYearEndDate: 'test', lastModifiedDate: 'test', status: 'test' })
 })
 
 describe('view', () => {
@@ -22,6 +22,7 @@ describe('view', () => {
     expect(view.activeStatus).toBe(derivedDatapoints.activeStatus)
     expect(view.dpStatus).toBe(derivedDatapoints.dpStatus)
     expect(view.year).toBe(derivedDatapoints.year)
+    expect(view.fiscalYearEndDate).toBe(derivedDatapoints.fiscalYearEndDate)
     expect(view.lastModifiedDate).toBe(derivedDatapoints.lastModifiedDate)
     expect(view.status).toBe(derivedDatapoints.status)
     expect(view.createdAt).toBeTruthy()
@@ -41,6 +42,7 @@ describe('view', () => {
     expect(view.activeStatus).toBe(derivedDatapoints.activeStatus)
     expect(view.dpStatus).toBe(derivedDatapoints.dpStatus)
     expect(view.year).toBe(derivedDatapoints.year)
+    expect(view.fiscalYearEndDate).toBe(derivedDatapoints.fiscalYearEndDate)
     expect(view.lastModifiedDate).toBe(derivedDatapoints.lastModifiedDate)
     expect(view.status).toBe(derivedDatapoints.status)
     expect(view.createdAt).toBeTruthy()

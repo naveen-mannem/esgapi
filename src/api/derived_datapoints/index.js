@@ -7,7 +7,7 @@ import { schema } from './model'
 export DerivedDatapoints, { schema } from './model'
 
 const router = new Router()
-const { companyId, datapointId, response, performanceResult, activeStatus, dpStatus, year, lastModifiedDate, status } = schema.tree
+const { companyId, datapointId, response, performanceResult, activeStatus, dpStatus, year, fiscalYearEndDate, lastModifiedDate, status } = schema.tree
 
 /**
  * @api {post} /derived_datapoints Create derived datapoints
@@ -22,6 +22,7 @@ const { companyId, datapointId, response, performanceResult, activeStatus, dpSta
  * @apiParam activeStatus Derived datapoints's activeStatus.
  * @apiParam dpStatus Derived datapoints's dpStatus.
  * @apiParam year Derived datapoints's year.
+ * @apiParam fiscalYearEndDate Derived datapoints's fiscalYearEndDate.
  * @apiParam lastModifiedDate Derived datapoints's lastModifiedDate.
  * @apiSuccess {Object} derivedDatapoints Derived datapoints's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
@@ -30,7 +31,7 @@ const { companyId, datapointId, response, performanceResult, activeStatus, dpSta
  */
 router.post('/',
   token({ required: true }),
-  body({ companyId, datapointId, response, performanceResult, activeStatus, dpStatus, year, lastModifiedDate }),
+  body({ companyId, datapointId, response, performanceResult, activeStatus, dpStatus, year, fiscalYearEndDate, lastModifiedDate }),
   create)
 
 /**
@@ -78,6 +79,7 @@ router.get('/:id',
  * @apiParam activeStatus Derived datapoints's activeStatus.
  * @apiParam dpStatus Derived datapoints's dpStatus.
  * @apiParam year Derived datapoints's year.
+ * @apiParam fiscalYearEndDate Derived datapoints's fiscalYearEndDate.
  * @apiParam lastModifiedDate Derived datapoints's lastModifiedDate.
  * @apiParam status Derived datapoints's status.
  * @apiSuccess {Object} derivedDatapoints Derived datapoints's data.
@@ -87,7 +89,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ companyId, datapointId, response, performanceResult, activeStatus, dpStatus, year, lastModifiedDate, status }),
+  body({ companyId, datapointId, response, performanceResult, activeStatus, dpStatus, year, fiscalYearEndDate, lastModifiedDate, status }),
   update)
 
 /**

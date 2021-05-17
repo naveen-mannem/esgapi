@@ -31,6 +31,9 @@ const derivedDatapointsSchema = new Schema({
   year: {
     type: String
   },
+  fiscalYearEndDate: {
+    type: String
+  },
   lastModifiedDate: {
     type: String
   },
@@ -59,6 +62,7 @@ derivedDatapointsSchema.methods = {
       activeStatus: this.activeStatus,
       dpStatus: this.dpStatus,
       year: this.year,
+      fiscalYearEndDate: this.fiscalYearEndDate,
       lastModifiedDate: this.lastModifiedDate,
       status: this.status,
       createdAt: this.createdAt,

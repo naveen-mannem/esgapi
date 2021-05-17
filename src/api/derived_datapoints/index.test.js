@@ -20,7 +20,7 @@ beforeEach(async () => {
 test('POST /derived_datapoints 201 (user)', async () => {
   const { status, body } = await request(app())
     .post(`${apiRoot}`)
-    .send({ access_token: userSession, companyId: 'test', datapointId: 'test', response: 'test', performanceResult: 'test', activeStatus: 'test', dpStatus: 'test', year: 'test', lastModifiedDate: 'test', status: 'test' })
+    .send({ access_token: userSession, companyId: 'test', datapointId: 'test', response: 'test', performanceResult: 'test', activeStatus: 'test', dpStatus: 'test', year: 'test', fiscalYearEndDate: 'test', lastModifiedDate: 'test', status: 'test' })
   expect(status).toBe(201)
   expect(typeof body).toEqual('object')
   expect(body.companyId).toEqual('test')
@@ -30,6 +30,7 @@ test('POST /derived_datapoints 201 (user)', async () => {
   expect(body.activeStatus).toEqual('test')
   expect(body.dpStatus).toEqual('test')
   expect(body.year).toEqual('test')
+  expect(body.fiscalYearEndDate).toEqual('test')
   expect(body.lastModifiedDate).toEqual('test')
   expect(body.status).toEqual('test')
   expect(typeof body.createdBy).toEqual('object')
@@ -83,7 +84,7 @@ test('GET /derived_datapoints/:id 404 (user)', async () => {
 test('PUT /derived_datapoints/:id 200 (user)', async () => {
   const { status, body } = await request(app())
     .put(`${apiRoot}/${derivedDatapoints.id}`)
-    .send({ access_token: userSession, companyId: 'test', datapointId: 'test', response: 'test', performanceResult: 'test', activeStatus: 'test', dpStatus: 'test', year: 'test', lastModifiedDate: 'test', status: 'test' })
+    .send({ access_token: userSession, companyId: 'test', datapointId: 'test', response: 'test', performanceResult: 'test', activeStatus: 'test', dpStatus: 'test', year: 'test', fiscalYearEndDate: 'test', lastModifiedDate: 'test', status: 'test' })
   expect(status).toBe(200)
   expect(typeof body).toEqual('object')
   expect(body.id).toEqual(derivedDatapoints.id)
@@ -94,6 +95,7 @@ test('PUT /derived_datapoints/:id 200 (user)', async () => {
   expect(body.activeStatus).toEqual('test')
   expect(body.dpStatus).toEqual('test')
   expect(body.year).toEqual('test')
+  expect(body.fiscalYearEndDate).toEqual('test')
   expect(body.lastModifiedDate).toEqual('test')
   expect(body.status).toEqual('test')
   expect(typeof body.createdBy).toEqual('object')
@@ -102,7 +104,7 @@ test('PUT /derived_datapoints/:id 200 (user)', async () => {
 test('PUT /derived_datapoints/:id 401 (user) - another user', async () => {
   const { status } = await request(app())
     .put(`${apiRoot}/${derivedDatapoints.id}`)
-    .send({ access_token: anotherSession, companyId: 'test', datapointId: 'test', response: 'test', performanceResult: 'test', activeStatus: 'test', dpStatus: 'test', year: 'test', lastModifiedDate: 'test', status: 'test' })
+    .send({ access_token: anotherSession, companyId: 'test', datapointId: 'test', response: 'test', performanceResult: 'test', activeStatus: 'test', dpStatus: 'test', year: 'test', fiscalYearEndDate: 'test', lastModifiedDate: 'test', status: 'test' })
   expect(status).toBe(401)
 })
 
@@ -115,7 +117,7 @@ test('PUT /derived_datapoints/:id 401', async () => {
 test('PUT /derived_datapoints/:id 404 (user)', async () => {
   const { status } = await request(app())
     .put(apiRoot + '/123456789098765432123456')
-    .send({ access_token: anotherSession, companyId: 'test', datapointId: 'test', response: 'test', performanceResult: 'test', activeStatus: 'test', dpStatus: 'test', year: 'test', lastModifiedDate: 'test', status: 'test' })
+    .send({ access_token: anotherSession, companyId: 'test', datapointId: 'test', response: 'test', performanceResult: 'test', activeStatus: 'test', dpStatus: 'test', year: 'test', fiscalYearEndDate: 'test', lastModifiedDate: 'test', status: 'test' })
   expect(status).toBe(404)
 })
 
