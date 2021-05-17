@@ -6,10 +6,13 @@ const kmpMatrixDataPointsSchema = new Schema({
     ref: 'User',
     required: true
   },
-  kmpId: {
+  companyId: {
     type: Schema.ObjectId,
-    ref: 'kmp',
+    ref: 'Companies',
     required: true
+  },
+  kmpMemberName: {
+    type: String
   },
   datapointId: {
     type: Schema.ObjectId,
@@ -42,9 +45,10 @@ kmpMatrixDataPointsSchema.methods = {
     const view = {
       // simple view
       id: this.id,
-      createdBy: this.createdBy ? this.createdBy.view(full) : null ,
-      kmpId: this.kmpId ? this.kmpId.view(full) : null ,
-      datapointId: this.datapointId ? this.datapointId.view(full) : null ,
+      createdBy: this.createdBy ? this.createdBy.view(full) : null,
+      companyId: this.companyId ? this.companyId.view(full) : null,
+      kmpMemberName: this.kmpMemberName,
+      datapointId: this.datapointId ? this.datapointId.view(full) : null,
       response: this.response,
       year: this.year,
       fiscalYearEndDate: this.fiscalYearEndDate,

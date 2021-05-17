@@ -5,7 +5,7 @@ let user, kmpMatrixDataPoints
 
 beforeEach(async () => {
   user = await User.create({ email: 'a@a.com', password: '123456' })
-  kmpMatrixDataPoints = await KmpMatrixDataPoints.create({ createdBy: user, kmpId: 'test', datapointId: 'test', response: 'test', year: 'test', fiscalYearEndDate: 'test', status: 'test' })
+  kmpMatrixDataPoints = await KmpMatrixDataPoints.create({ createdBy: user, companyId: 'test', kmpMemberName: 'test', datapointId: 'test', response: 'test', year: 'test', fiscalYearEndDate: 'test', status: 'test' })
 })
 
 describe('view', () => {
@@ -15,7 +15,8 @@ describe('view', () => {
     expect(view.id).toBe(kmpMatrixDataPoints.id)
     expect(typeof view.createdBy).toBe('object')
     expect(view.createdBy.id).toBe(user.id)
-    expect(view.kmpId).toBe(kmpMatrixDataPoints.kmpId)
+    expect(view.companyId).toBe(kmpMatrixDataPoints.companyId)
+    expect(view.kmpMemberName).toBe(kmpMatrixDataPoints.kmpMemberName)
     expect(view.datapointId).toBe(kmpMatrixDataPoints.datapointId)
     expect(view.response).toBe(kmpMatrixDataPoints.response)
     expect(view.year).toBe(kmpMatrixDataPoints.year)
@@ -31,7 +32,8 @@ describe('view', () => {
     expect(view.id).toBe(kmpMatrixDataPoints.id)
     expect(typeof view.createdBy).toBe('object')
     expect(view.createdBy.id).toBe(user.id)
-    expect(view.kmpId).toBe(kmpMatrixDataPoints.kmpId)
+    expect(view.companyId).toBe(kmpMatrixDataPoints.companyId)
+    expect(view.kmpMemberName).toBe(kmpMatrixDataPoints.kmpMemberName)
     expect(view.datapointId).toBe(kmpMatrixDataPoints.datapointId)
     expect(view.response).toBe(kmpMatrixDataPoints.response)
     expect(view.year).toBe(kmpMatrixDataPoints.year)

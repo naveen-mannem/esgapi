@@ -7,7 +7,7 @@ import { schema } from './model'
 export KmpMatrixDataPoints, { schema } from './model'
 
 const router = new Router()
-const { kmpId, datapointId, response, year, fiscalYearEndDate, status } = schema.tree
+const { companyId, kmpMemberName, datapointId, response, year, fiscalYearEndDate, status } = schema.tree
 
 /**
  * @api {post} /kmpMatrixDataPoints Create kmp matrix data points
@@ -15,7 +15,8 @@ const { kmpId, datapointId, response, year, fiscalYearEndDate, status } = schema
  * @apiGroup KmpMatrixDataPoints
  * @apiPermission user
  * @apiParam {String} access_token user access token.
- * @apiParam kmpId Kmp matrix data points's kmpId.
+ * @apiParam companyId Kmp matrix data points's companyId.
+ * @apiParam kmpMemberName Kmp matrix data points's kmpMemberName.
  * @apiParam datapointId Kmp matrix data points's datapointId.
  * @apiParam response Kmp matrix data points's response.
  * @apiParam year Kmp matrix data points's year.
@@ -27,7 +28,7 @@ const { kmpId, datapointId, response, year, fiscalYearEndDate, status } = schema
  */
 router.post('/',
   token({ required: true }),
-  body({ kmpId, datapointId, response, year, fiscalYearEndDate}),
+  body({ companyId, kmpMemberName, datapointId, response, year, fiscalYearEndDate}),
   create)
 
 /**
@@ -68,7 +69,8 @@ router.get('/:id',
  * @apiGroup KmpMatrixDataPoints
  * @apiPermission user
  * @apiParam {String} access_token user access token.
- * @apiParam kmpId Kmp matrix data points's kmpId.
+ * @apiParam companyId Kmp matrix data points's companyId.
+ * @apiParam kmpMemberName Kmp matrix data points's kmpMemberName.
  * @apiParam datapointId Kmp matrix data points's datapointId.
  * @apiParam response Kmp matrix data points's response.
  * @apiParam year Kmp matrix data points's year.
@@ -81,7 +83,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ kmpId, datapointId, response, year, fiscalYearEndDate, status }),
+  body({ companyId, kmpMemberName, datapointId, response, year, fiscalYearEndDate, status }),
   update)
 
 /**

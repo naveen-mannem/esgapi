@@ -12,7 +12,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
     .then(count => BoardMembersMatrixDataPoints.find(query, select, cursor)
       .populate('createdBy')
       .populate('datapointId')
-      .populate('boardMemberId')
+      .populate('companyId')
       .then((boardMembersMatrixDataPoints) => ({
         count,
         rows: boardMembersMatrixDataPoints.map((boardMembersMatrixDataPoints) => boardMembersMatrixDataPoints.view())
@@ -25,7 +25,7 @@ export const show = ({ params }, res, next) =>
   BoardMembersMatrixDataPoints.findById(params.id)
     .populate('createdBy')
     .populate('datapointId')
-    .populate('boardMemberId')
+    .populate('companyId')
     .then(notFound(res))
     .then((boardMembersMatrixDataPoints) => boardMembersMatrixDataPoints ? boardMembersMatrixDataPoints.view() : null)
     .then(success(res))
@@ -35,7 +35,7 @@ export const update = ({ user, bodymen: { body }, params }, res, next) =>
   BoardMembersMatrixDataPoints.findById(params.id)
     .populate('createdBy')
     .populate('datapointId')
-    .populate('boardMemberId')
+    .populate('companyId')
     .then(notFound(res))
     .then(authorOrAdmin(res, user, 'createdBy'))
     .then((boardMembersMatrixDataPoints) => boardMembersMatrixDataPoints ? Object.assign(boardMembersMatrixDataPoints, body).save() : null)
