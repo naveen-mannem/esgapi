@@ -20,12 +20,13 @@ beforeEach(async () => {
 test('POST /kmps 201 (user)', async () => {
   const { status, body } = await request(app())
     .post(`${apiRoot}`)
-    .send({ access_token: userSession, companyId: 'test', kmpMemberName: 'test', memberStatus: 'test', status: 'test' })
+    .send({ access_token: userSession, companyId: 'test', kmpMemberName: 'test', memberStatus: 'test', year: 'test', status: 'test' })
   expect(status).toBe(201)
   expect(typeof body).toEqual('object')
   expect(body.companyId).toEqual('test')
   expect(body.kmpMemberName).toEqual('test')
   expect(body.memberStatus).toEqual('test')
+  expect(body.year).toEqual('test')
   expect(body.status).toEqual('test')
   expect(typeof body.createdBy).toEqual('object')
 })
@@ -78,13 +79,14 @@ test('GET /kmps/:id 404 (user)', async () => {
 test('PUT /kmps/:id 200 (user)', async () => {
   const { status, body } = await request(app())
     .put(`${apiRoot}/${kmp.id}`)
-    .send({ access_token: userSession, companyId: 'test', kmpMemberName: 'test', memberStatus: 'test', status: 'test' })
+    .send({ access_token: userSession, companyId: 'test', kmpMemberName: 'test', memberStatus: 'test', year: 'test', status: 'test' })
   expect(status).toBe(200)
   expect(typeof body).toEqual('object')
   expect(body.id).toEqual(kmp.id)
   expect(body.companyId).toEqual('test')
   expect(body.kmpMemberName).toEqual('test')
   expect(body.memberStatus).toEqual('test')
+  expect(body.year).toEqual('test')
   expect(body.status).toEqual('test')
   expect(typeof body.createdBy).toEqual('object')
 })
@@ -92,7 +94,7 @@ test('PUT /kmps/:id 200 (user)', async () => {
 test('PUT /kmps/:id 401 (user) - another user', async () => {
   const { status } = await request(app())
     .put(`${apiRoot}/${kmp.id}`)
-    .send({ access_token: anotherSession, companyId: 'test', kmpMemberName: 'test', memberStatus: 'test', status: 'test' })
+    .send({ access_token: anotherSession, companyId: 'test', kmpMemberName: 'test', memberStatus: 'test', year: 'test', status: 'test' })
   expect(status).toBe(401)
 })
 
@@ -105,7 +107,7 @@ test('PUT /kmps/:id 401', async () => {
 test('PUT /kmps/:id 404 (user)', async () => {
   const { status } = await request(app())
     .put(apiRoot + '/123456789098765432123456')
-    .send({ access_token: anotherSession, companyId: 'test', kmpMemberName: 'test', memberStatus: 'test', status: 'test' })
+    .send({ access_token: anotherSession, companyId: 'test', kmpMemberName: 'test', memberStatus: 'test', year: 'test', status: 'test' })
   expect(status).toBe(404)
 })
 

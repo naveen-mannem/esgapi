@@ -5,7 +5,7 @@ let user, kmp
 
 beforeEach(async () => {
   user = await User.create({ email: 'a@a.com', password: '123456' })
-  kmp = await Kmp.create({ createdBy: user, companyId: 'test', kmpMemberName: 'test', memberStatus: 'test', status: 'test' })
+  kmp = await Kmp.create({ createdBy: user, companyId: 'test', kmpMemberName: 'test', memberStatus: 'test', year: 'test', status: 'test' })
 })
 
 describe('view', () => {
@@ -18,6 +18,7 @@ describe('view', () => {
     expect(view.companyId).toBe(kmp.companyId)
     expect(view.kmpMemberName).toBe(kmp.kmpMemberName)
     expect(view.memberStatus).toBe(kmp.memberStatus)
+    expect(view.year).toBe(kmp.year)
     expect(view.status).toBe(kmp.status)
     expect(view.createdAt).toBeTruthy()
     expect(view.updatedAt).toBeTruthy()
@@ -32,6 +33,7 @@ describe('view', () => {
     expect(view.companyId).toBe(kmp.companyId)
     expect(view.kmpMemberName).toBe(kmp.kmpMemberName)
     expect(view.memberStatus).toBe(kmp.memberStatus)
+    expect(view.year).toBe(kmp.year)
     expect(view.status).toBe(kmp.status)
     expect(view.createdAt).toBeTruthy()
     expect(view.updatedAt).toBeTruthy()

@@ -7,7 +7,7 @@ import { schema } from './model'
 export Kmp, { schema } from './model'
 
 const router = new Router()
-const { companyId, kmpMemberName, memberStatus, status } = schema.tree
+const { companyId, kmpMemberName, memberStatus, year, status } = schema.tree
 
 /**
  * @api {post} /kmp Create kmp
@@ -18,6 +18,7 @@ const { companyId, kmpMemberName, memberStatus, status } = schema.tree
  * @apiParam companyId Kmp's companyId.
  * @apiParam kmpMemberName Kmp's kmpMemberName.
  * @apiParam memberStatus Kmp's memberStatus.
+ * @apiParam year Kmp's year.
  * @apiSuccess {Object} kmp Kmp's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Kmp not found.
@@ -25,7 +26,7 @@ const { companyId, kmpMemberName, memberStatus, status } = schema.tree
  */
 router.post('/',
   token({ required: true }),
-  body({ companyId, kmpMemberName, memberStatus }),
+  body({ companyId, kmpMemberName, memberStatus, year }),
   create)
 
 /**
@@ -69,6 +70,7 @@ router.get('/:id',
  * @apiParam companyId Kmp's companyId.
  * @apiParam kmpMemberName Kmp's kmpMemberName.
  * @apiParam memberStatus Kmp's memberStatus.
+ * @apiParam year Kmp's year.
  * @apiParam status Kmp's status.
  * @apiSuccess {Object} kmp Kmp's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
@@ -77,7 +79,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ companyId, kmpMemberName, memberStatus, status }),
+  body({ companyId, kmpMemberName, memberStatus, year, status }),
   update)
 
 /**

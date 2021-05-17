@@ -17,6 +17,9 @@ const kmpSchema = new Schema({
   memberStatus: {
     type: String
   },
+  year: {
+    type: String
+  },
   status: {
     type: Boolean,
     default:true
@@ -38,6 +41,7 @@ kmpSchema.methods = {
       companyId: this.companyId ? this.companyId.view(full) :null ,
       kmpMemberName: this.kmpMemberName,
       memberStatus: this.memberStatus,
+      year: this.year,
       status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
