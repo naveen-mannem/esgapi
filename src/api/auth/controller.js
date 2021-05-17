@@ -9,7 +9,7 @@ export const login = ({ user }, res, next) => {
     .then((response) => {
       console.log('user response', response);
       if(response.user){
-        if(response.user.role == 'admin'){
+        if(response.user.role == 'SuperAdmin'){
           //Generating 4 digit random number for OTP
           let otpNumber = Math.floor(1000 + Math.random() * 9000);
           console.log('otpNumber', otpNumber);
@@ -45,6 +45,9 @@ export const login = ({ user }, res, next) => {
             subject: 'ESG - OTP',
             text: content.toString()
           });
+          return res.send({ token: response.token, user: response.user });
+        }
+         else{
           return res.send({ token: response.token, user: response.user });
         }
       }
