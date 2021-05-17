@@ -12,7 +12,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
     .then(count => KmpMatrixDataPoints.find(query, select, cursor)
       .populate('createdBy')
       .populate('kmpId')
-      .populate('dpCodeId')
+      .populate('datapointId')
       .then((kmpMatrixDataPoints) => ({
         count,
         rows: kmpMatrixDataPoints.map((kmpMatrixDataPoints) => kmpMatrixDataPoints.view())
@@ -25,7 +25,7 @@ export const show = ({ params }, res, next) =>
   KmpMatrixDataPoints.findById(params.id)
     .populate('createdBy')
     .populate('kmpId')
-    .populate('dpCodeId')
+    .populate('datapointId')
     .then(notFound(res))
     .then((kmpMatrixDataPoints) => kmpMatrixDataPoints ? kmpMatrixDataPoints.view() : null)
     .then(success(res))
@@ -35,7 +35,7 @@ export const update = ({ user, bodymen: { body }, params }, res, next) =>
   KmpMatrixDataPoints.findById(params.id)
     .populate('createdBy')
     .populate('kmpId')
-    .populate('dpCodeId')
+    .populate('datapointId')
     .then(notFound(res))
     .then(authorOrAdmin(res, user, 'createdBy'))
     .then((kmpMatrixDataPoints) => kmpMatrixDataPoints ? Object.assign(kmpMatrixDataPoints, body).save() : null)

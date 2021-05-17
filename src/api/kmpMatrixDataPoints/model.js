@@ -11,7 +11,7 @@ const kmpMatrixDataPointsSchema = new Schema({
     ref: 'kmp',
     required: true
   },
-  dpCodeId: {
+  datapointId: {
     type: Schema.ObjectId,
     ref: 'Datapoints',
     required: true
@@ -20,6 +20,9 @@ const kmpMatrixDataPointsSchema = new Schema({
     type: String
   },
   year: {
+    type: String
+  },
+  fiscalYearEndDate: {
     type: String
   },
   status: {
@@ -41,9 +44,10 @@ kmpMatrixDataPointsSchema.methods = {
       id: this.id,
       createdBy: this.createdBy ? this.createdBy.view(full) : null ,
       kmpId: this.kmpId ? this.kmpId.view(full) : null ,
-      dpCodeId: this.dpCodeId ? this.dpCodeId.view(full) : null ,
+      datapointId: this.datapointId ? this.datapointId.view(full) : null ,
       response: this.response,
       year: this.year,
+      fiscalYearEndDate: this.fiscalYearEndDate,
       status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt

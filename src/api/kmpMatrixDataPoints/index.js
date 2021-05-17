@@ -7,7 +7,7 @@ import { schema } from './model'
 export KmpMatrixDataPoints, { schema } from './model'
 
 const router = new Router()
-const { kmpId, dpCodeId, response, year, status } = schema.tree
+const { kmpId, datapointId, response, year, fiscalYearEndDate, status } = schema.tree
 
 /**
  * @api {post} /kmpMatrixDataPoints Create kmp matrix data points
@@ -16,9 +16,10 @@ const { kmpId, dpCodeId, response, year, status } = schema.tree
  * @apiPermission user
  * @apiParam {String} access_token user access token.
  * @apiParam kmpId Kmp matrix data points's kmpId.
- * @apiParam dpCodeId Kmp matrix data points's dpCodeId.
+ * @apiParam datapointId Kmp matrix data points's datapointId.
  * @apiParam response Kmp matrix data points's response.
  * @apiParam year Kmp matrix data points's year.
+ * @apiParam fiscalYearEndDate Kmp matrix data points's fiscalYearEndDate.
  * @apiSuccess {Object} kmpMatrixDataPoints Kmp matrix data points's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Kmp matrix data points not found.
@@ -26,7 +27,7 @@ const { kmpId, dpCodeId, response, year, status } = schema.tree
  */
 router.post('/',
   token({ required: true }),
-  body({ kmpId, dpCodeId, response, year}),
+  body({ kmpId, datapointId, response, year, fiscalYearEndDate}),
   create)
 
 /**
@@ -68,9 +69,10 @@ router.get('/:id',
  * @apiPermission user
  * @apiParam {String} access_token user access token.
  * @apiParam kmpId Kmp matrix data points's kmpId.
- * @apiParam dpCodeId Kmp matrix data points's dpCodeId.
+ * @apiParam datapointId Kmp matrix data points's datapointId.
  * @apiParam response Kmp matrix data points's response.
  * @apiParam year Kmp matrix data points's year.
+ * @apiParam fiscalYearEndDate Kmp matrix data points's fiscalYearEndDate.
  * @apiParam status Kmp matrix data points's status.
  * @apiSuccess {Object} kmpMatrixDataPoints Kmp matrix data points's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
@@ -79,7 +81,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ kmpId, dpCodeId, response, year, status }),
+  body({ kmpId, datapointId, response, year, fiscalYearEndDate, status }),
   update)
 
 /**
