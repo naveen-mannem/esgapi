@@ -7,7 +7,7 @@ import { schema } from './model'
 export Taxonomies, { schema } from './model'
 
 const router = new Router()
-const { categoryId, themeId, keyIssueId, datapointId, dataCollectionGuide, unit, dataInput, isApplicableSector, notApplicableReason, datapointType, datapointReportingPeriod, fileDataSource, sourceUrl, sourcePublicationDate, sourcePageNumber, sourceTextSnippetOrSnapshot, commentsAndCalculations, signal, controversy, controversySnippetOrSnapshot, snippetOrSnapshotUrl, sourcePublicationDateOfConspiracy, conspiracyPageNumber, normalizedBy, weighted, status } = schema.tree
+const { name, description, status } = schema.tree
 
 /**
  * @api {post} /taxonomies Create taxonomies
@@ -15,31 +15,8 @@ const { categoryId, themeId, keyIssueId, datapointId, dataCollectionGuide, unit,
  * @apiGroup Taxonomies
  * @apiPermission user
  * @apiParam {String} access_token user access token.
- * @apiParam categoryId Taxonomies's categoryId.
- * @apiParam themeId Taxonomies's themeId.
- * @apiParam keyIssueId Taxonomies's keyIssueId.
- * @apiParam datapointId Taxonomies's datapointId.
- * @apiParam dataCollectionGuide Taxonomies's dataCollectionGuide.
- * @apiParam unit Taxonomies's unit.
- * @apiParam dataInput Taxonomies's dataInput.
- * @apiParam isApplicableSector Taxonomies's isApplicableSector.
- * @apiParam notApplicableReason Taxonomies's notApplicableReason.
- * @apiParam datapointType Taxonomies's datapointType.
- * @apiParam datapointReportingPeriod Taxonomies's datapointReportingPeriod.
- * @apiParam fileDataSource Taxonomies's fileDataSource.
- * @apiParam sourceUrl Taxonomies's sourceUrl.
- * @apiParam sourcePublicationDate Taxonomies's sourcePublicationDate.
- * @apiParam sourcePageNumber Taxonomies's sourcePageNumber.
- * @apiParam sourceTextSnippetOrSnapshot Taxonomies's sourceTextSnippetOrSnapshot.
- * @apiParam commentsAndCalculations Taxonomies's commentsAndCalculations.
- * @apiParam signal Taxonomies's signal.
- * @apiParam controversy Taxonomies's controversy.
- * @apiParam controversySnippetOrSnapshot Taxonomies's controversySnippetOrSnapshot.
- * @apiParam snippetOrSnapshotUrl Taxonomies's snippetOrSnapshotUrl.
- * @apiParam sourcePublicationDateOfConspiracy Taxonomies's sourcePublicationDateOfConspiracy.
- * @apiParam conspiracyPageNumber Taxonomies's conspiracyPageNumber.
- * @apiParam normalizedBy Taxonomies's normalizedBy.
- * @apiParam weighted Taxonomies's weighted.
+ * @apiParam name Taxonomies's name.
+ * @apiParam description Taxonomies's description.
  * @apiSuccess {Object} taxonomies Taxonomies's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Taxonomies not found.
@@ -47,7 +24,7 @@ const { categoryId, themeId, keyIssueId, datapointId, dataCollectionGuide, unit,
  */
 router.post('/',
   token({ required: true }),
-  body({ categoryId, themeId, keyIssueId, datapointId, dataCollectionGuide, unit, dataInput, isApplicableSector, notApplicableReason, datapointType, datapointReportingPeriod, fileDataSource, sourceUrl, sourcePublicationDate, sourcePageNumber, sourceTextSnippetOrSnapshot, commentsAndCalculations, signal, controversy, controversySnippetOrSnapshot, snippetOrSnapshotUrl, sourcePublicationDateOfConspiracy, conspiracyPageNumber, normalizedBy, weighted }),
+  body({ name, description }),
   create)
 
 /**
@@ -88,31 +65,8 @@ router.get('/:id',
  * @apiGroup Taxonomies
  * @apiPermission user
  * @apiParam {String} access_token user access token.
- * @apiParam categoryId Taxonomies's categoryId.
- * @apiParam themeId Taxonomies's themeId.
- * @apiParam keyIssueId Taxonomies's keyIssueId.
- * @apiParam datapointId Taxonomies's datapointId.
- * @apiParam dataCollectionGuide Taxonomies's dataCollectionGuide.
- * @apiParam unit Taxonomies's unit.
- * @apiParam dataInput Taxonomies's dataInput.
- * @apiParam isApplicableSector Taxonomies's isApplicableSector.
- * @apiParam notApplicableReason Taxonomies's notApplicableReason.
- * @apiParam datapointType Taxonomies's datapointType.
- * @apiParam datapointReportingPeriod Taxonomies's datapointReportingPeriod.
- * @apiParam fileDataSource Taxonomies's fileDataSource.
- * @apiParam sourceUrl Taxonomies's sourceUrl.
- * @apiParam sourcePublicationDate Taxonomies's sourcePublicationDate.
- * @apiParam sourcePageNumber Taxonomies's sourcePageNumber.
- * @apiParam sourceTextSnippetOrSnapshot Taxonomies's sourceTextSnippetOrSnapshot.
- * @apiParam commentsAndCalculations Taxonomies's commentsAndCalculations.
- * @apiParam signal Taxonomies's signal.
- * @apiParam controversy Taxonomies's controversy.
- * @apiParam controversySnippetOrSnapshot Taxonomies's controversySnippetOrSnapshot.
- * @apiParam snippetOrSnapshotUrl Taxonomies's snippetOrSnapshotUrl.
- * @apiParam sourcePublicationDateOfConspiracy Taxonomies's sourcePublicationDateOfConspiracy.
- * @apiParam conspiracyPageNumber Taxonomies's conspiracyPageNumber.
- * @apiParam normalizedBy Taxonomies's normalizedBy.
- * @apiParam weighted Taxonomies's weighted.
+ * @apiParam name Taxonomies's name.
+ * @apiParam description Taxonomies's description.
  * @apiParam status Taxonomies's status.
  * @apiSuccess {Object} taxonomies Taxonomies's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
@@ -121,7 +75,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ categoryId, themeId, keyIssueId, datapointId, dataCollectionGuide, unit, dataInput, isApplicableSector, notApplicableReason, datapointType, datapointReportingPeriod, fileDataSource, sourceUrl, sourcePublicationDate, sourcePageNumber, sourceTextSnippetOrSnapshot, commentsAndCalculations, signal, controversy, controversySnippetOrSnapshot, snippetOrSnapshotUrl, sourcePublicationDateOfConspiracy, conspiracyPageNumber, normalizedBy, weighted, status }),
+  body({ name, description, status }),
   update)
 
 /**
