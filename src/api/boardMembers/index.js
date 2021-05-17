@@ -7,7 +7,7 @@ import { schema } from './model'
 export BoardMembers, { schema } from './model'
 
 const router = new Router()
-const { companyId, boardMemberName, memberStatus, status } = schema.tree
+const { companyId, boardMemberName, year, memberStatus, status } = schema.tree
 
 /**
  * @api {post} /boardMembers Create board members
@@ -17,6 +17,7 @@ const { companyId, boardMemberName, memberStatus, status } = schema.tree
  * @apiParam {String} access_token user access token.
  * @apiParam companyId Board members's companyId.
  * @apiParam boardMemberName Board members's boardMemberName.
+ * @apiParam year Board members's year.
  * @apiParam memberStatus Board members's memberStatus.
  * @apiSuccess {Object} boardMembers Board members's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
@@ -25,7 +26,7 @@ const { companyId, boardMemberName, memberStatus, status } = schema.tree
  */
 router.post('/',
   token({ required: true }),
-  body({ companyId, boardMemberName, memberStatus }),
+  body({ companyId, boardMemberName, year, memberStatus }),
   create)
 
 /**
@@ -68,6 +69,7 @@ router.get('/:id',
  * @apiParam {String} access_token user access token.
  * @apiParam companyId Board members's companyId.
  * @apiParam boardMemberName Board members's boardMemberName.
+ * @apiParam year Board members's year.
  * @apiParam memberStatus Board members's memberStatus.
  * @apiParam status Board members's status.
  * @apiSuccess {Object} boardMembers Board members's data.
@@ -77,7 +79,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ companyId, boardMemberName, memberStatus, status }),
+  body({ companyId, boardMemberName, year, memberStatus, status }),
   update)
 
 /**

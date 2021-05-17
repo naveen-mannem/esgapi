@@ -14,6 +14,9 @@ const boardMembersSchema = new Schema({
   boardMemberName: {
     type: String
   },
+  year: {
+    type: String
+  },
   memberStatus: {
     type: String
   },
@@ -37,6 +40,7 @@ boardMembersSchema.methods = {
       createdBy: this.createdBy ? this.createdBy.view(full) : null,
       companyId: this.companyId ? this.companyId.view(full) : null,
       boardMemberName: this.boardMemberName,
+      year: this.year,
       memberStatus: this.memberStatus,
       status: this.status,
       createdAt: this.createdAt,
