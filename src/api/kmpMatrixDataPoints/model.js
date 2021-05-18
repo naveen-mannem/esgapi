@@ -28,6 +28,9 @@ const kmpMatrixDataPointsSchema = new Schema({
   fiscalYearEndDate: {
     type: String
   },
+  memberStatus: {
+    type: Boolean
+  },
   status: {
     type: Boolean,
     default:true
@@ -52,6 +55,7 @@ kmpMatrixDataPointsSchema.methods = {
       response: this.response,
       year: this.year,
       fiscalYearEndDate: this.fiscalYearEndDate,
+      memberStatus: this.memberStatus,
       status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt

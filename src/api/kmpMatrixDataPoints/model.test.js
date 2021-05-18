@@ -5,7 +5,7 @@ let user, kmpMatrixDataPoints
 
 beforeEach(async () => {
   user = await User.create({ email: 'a@a.com', password: '123456' })
-  kmpMatrixDataPoints = await KmpMatrixDataPoints.create({ createdBy: user, companyId: 'test', kmpMemberName: 'test', datapointId: 'test', response: 'test', year: 'test', fiscalYearEndDate: 'test', status: 'test' })
+  kmpMatrixDataPoints = await KmpMatrixDataPoints.create({ createdBy: user, companyId: 'test', kmpMemberName: 'test', datapointId: 'test', response: 'test', year: 'test', fiscalYearEndDate: 'test', memberStatus: 'test', status: 'test' })
 })
 
 describe('view', () => {
@@ -21,6 +21,7 @@ describe('view', () => {
     expect(view.response).toBe(kmpMatrixDataPoints.response)
     expect(view.year).toBe(kmpMatrixDataPoints.year)
     expect(view.fiscalYearEndDate).toBe(kmpMatrixDataPoints.fiscalYearEndDate)
+    expect(view.memberStatus).toBe(kmpMatrixDataPoints.memberStatus)
     expect(view.status).toBe(kmpMatrixDataPoints.status)
     expect(view.createdAt).toBeTruthy()
     expect(view.updatedAt).toBeTruthy()
@@ -38,6 +39,7 @@ describe('view', () => {
     expect(view.response).toBe(kmpMatrixDataPoints.response)
     expect(view.year).toBe(kmpMatrixDataPoints.year)
     expect(view.fiscalYearEndDate).toBe(kmpMatrixDataPoints.fiscalYearEndDate)
+    expect(view.memberStatus).toBe(kmpMatrixDataPoints.memberStatus)
     expect(view.status).toBe(kmpMatrixDataPoints.status)
     expect(view.createdAt).toBeTruthy()
     expect(view.updatedAt).toBeTruthy()

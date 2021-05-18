@@ -28,6 +28,9 @@ const boardMembersMatrixDataPointsSchema = new Schema({
   fiscalYearEndDate:{
     type:String
   },
+  memberStatus: {
+    type: Boolean
+  },
   status: {
     type: Boolean,
     default:true
@@ -52,6 +55,7 @@ boardMembersMatrixDataPointsSchema.methods = {
       year: this.year,
       response: this.response,
       fiscalYearEndDate: this.fiscalYearEndDate,
+      memberStatus: this.memberStatus,
       status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt

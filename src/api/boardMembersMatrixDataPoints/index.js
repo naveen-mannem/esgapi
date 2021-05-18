@@ -7,7 +7,7 @@ import { schema } from './model'
 export BoardMembersMatrixDataPoints, { schema } from './model'
 
 const router = new Router()
-const { datapointId, companyId, boardMemberName, year, response, fiscalYearEndDate, status } = schema.tree
+const { datapointId, companyId, boardMemberName, year, response, fiscalYearEndDate, memberStatus, status } = schema.tree
 
 /**
  * @api {post} /boardMembersMatrixDataPoints Create board members matrix data points
@@ -21,6 +21,7 @@ const { datapointId, companyId, boardMemberName, year, response, fiscalYearEndDa
  * @apiParam year Board members matrix data points's year.
  * @apiParam response Board members matrix data points's response.
  * @apiParam fiscalYearEndDate Board members matrix data points's fiscalYearEndDate.
+ * @apiParam memberStatus Board members matrix data points's memberStatus.
  * @apiSuccess {Object} boardMembersMatrixDataPoints Board members matrix data points's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Board members matrix data points not found.
@@ -28,7 +29,7 @@ const { datapointId, companyId, boardMemberName, year, response, fiscalYearEndDa
  */
 router.post('/',
   token({ required: true }),
-  body({ datapointId, companyId, boardMemberName, year, response, fiscalYearEndDate}),
+  body({ datapointId, companyId, boardMemberName, year, response, fiscalYearEndDate, memberStatus}),
   create)
 
 /**
@@ -75,6 +76,7 @@ router.get('/:id',
  * @apiParam year Board members matrix data points's year.
  * @apiParam response Board members matrix data points's response.
  * @apiParam fiscalYearEndDate Board members matrix data points's fiscalYearEndDate.
+ * @apiParam memberStatus Board members matrix data points's memberStatus.
  * @apiParam status Board members matrix data points's status.
  * @apiSuccess {Object} boardMembersMatrixDataPoints Board members matrix data points's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
@@ -83,7 +85,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ datapointId, companyId, boardMemberName, year, response, fiscalYearEndDate, status }),
+  body({ datapointId, companyId, boardMemberName, year, response, fiscalYearEndDate, memberStatus, status }),
   update)
 
 /**
