@@ -11,6 +11,11 @@ const standaloneDatapointsSchema = new Schema({
     ref: 'Companies',
     required: true
   },
+  datapointId: {
+    type: Schema.ObjectId,
+    ref: 'Datapoints',
+    required: true
+  },
   performanceResult: {
     type: String
   },
@@ -20,13 +25,17 @@ const standaloneDatapointsSchema = new Schema({
   year: {
     type: String
   },
+  fiscalYearEndDate: {
+    type: String
+  },
   standaloneStatus: {
     type: String
   },
   taskId: {
     type: Schema.ObjectId,
     ref: 'TaskAssignment',
-    required: true
+    required: false,
+    default: null
   },
   submittedBy: {
     type: String
@@ -65,9 +74,11 @@ standaloneDatapointsSchema.methods = {
       id: this.id,
       createdBy: this.createdBy ? this.createdBy.view(full) : null,
       companyId: this.companyId ? this.companyId.view(full) : null,
+      datapointId: this.datapointId ? this.datapointId.view(full) : null,
       performanceResult: this.performanceResult,
       response: this.response,
       year: this.year,
+      fiscalYearEndDate: this.fiscalYearEndDate,
       standaloneStatus: this.standaloneStatus,
       taskId: this.taskId ? this.taskId.view(full) : null,
       submittedBy: this.submittedBy,

@@ -20,7 +20,7 @@ beforeEach(async () => {
 test('POST /standalone_datapoints 201 (user)', async () => {
   const { status, body } = await request(app())
     .post(`${apiRoot}`)
-    .send({ access_token: userSession, companyId: 'test', performanceResult: 'test', response: 'test', year: 'test', standaloneStatus: 'test', taskId: 'test', submittedBy: 'test', submittedDate: 'test', activeStatus: 'test', lastModifiedDate: 'test', modifiedBy: 'test', isSubmitted: 'test', status: 'test' })
+    .send({ access_token: userSession, companyId: 'test', performanceResult: 'test', response: 'test', year: 'test', standaloneStatus: 'test', taskId: 'test', submittedBy: 'test', submittedDate: 'test', activeStatus: 'test', fiscalYearEndDate: 'test', lastModifiedDate: 'test', modifiedBy: 'test', isSubmitted: 'test', status: 'test' })
   expect(status).toBe(201)
   expect(typeof body).toEqual('object')
   expect(body.companyId).toEqual('test')
@@ -32,6 +32,7 @@ test('POST /standalone_datapoints 201 (user)', async () => {
   expect(body.submittedBy).toEqual('test')
   expect(body.submittedDate).toEqual('test')
   expect(body.activeStatus).toEqual('test')
+  expect(body.fiscalYearEndDate).toEqual('test')
   expect(body.lastModifiedDate).toEqual('test')
   expect(body.modifiedBy).toEqual('test')
   expect(body.isSubmitted).toEqual('test')
@@ -87,7 +88,7 @@ test('GET /standalone_datapoints/:id 404 (user)', async () => {
 test('PUT /standalone_datapoints/:id 200 (user)', async () => {
   const { status, body } = await request(app())
     .put(`${apiRoot}/${standaloneDatapoints.id}`)
-    .send({ access_token: userSession, companyId: 'test', performanceResult: 'test', response: 'test', year: 'test', standaloneStatus: 'test', taskId: 'test', submittedBy: 'test', submittedDate: 'test', activeStatus: 'test', lastModifiedDate: 'test', modifiedBy: 'test', isSubmitted: 'test', status: 'test' })
+    .send({ access_token: userSession, companyId: 'test', performanceResult: 'test', response: 'test', year: 'test', standaloneStatus: 'test', taskId: 'test', submittedBy: 'test', submittedDate: 'test', activeStatus: 'test', fiscalYearEndDate: 'test', lastModifiedDate: 'test', modifiedBy: 'test', isSubmitted: 'test', status: 'test' })
   expect(status).toBe(200)
   expect(typeof body).toEqual('object')
   expect(body.id).toEqual(standaloneDatapoints.id)
@@ -100,6 +101,7 @@ test('PUT /standalone_datapoints/:id 200 (user)', async () => {
   expect(body.submittedBy).toEqual('test')
   expect(body.submittedDate).toEqual('test')
   expect(body.activeStatus).toEqual('test')
+  expect(body.fiscalYearEndDate).toEqual('test')
   expect(body.lastModifiedDate).toEqual('test')
   expect(body.modifiedBy).toEqual('test')
   expect(body.isSubmitted).toEqual('test')
@@ -110,7 +112,7 @@ test('PUT /standalone_datapoints/:id 200 (user)', async () => {
 test('PUT /standalone_datapoints/:id 401 (user) - another user', async () => {
   const { status } = await request(app())
     .put(`${apiRoot}/${standaloneDatapoints.id}`)
-    .send({ access_token: anotherSession, companyId: 'test', performanceResult: 'test', response: 'test', year: 'test', standaloneStatus: 'test', taskId: 'test', submittedBy: 'test', submittedDate: 'test', activeStatus: 'test', lastModifiedDate: 'test', modifiedBy: 'test', isSubmitted: 'test', status: 'test' })
+    .send({ access_token: anotherSession, companyId: 'test', performanceResult: 'test', response: 'test', year: 'test', standaloneStatus: 'test', taskId: 'test', submittedBy: 'test', submittedDate: 'test', activeStatus: 'test', fiscalYearEndDate: 'test', lastModifiedDate: 'test', modifiedBy: 'test', isSubmitted: 'test', status: 'test' })
   expect(status).toBe(401)
 })
 
@@ -123,7 +125,7 @@ test('PUT /standalone_datapoints/:id 401', async () => {
 test('PUT /standalone_datapoints/:id 404 (user)', async () => {
   const { status } = await request(app())
     .put(apiRoot + '/123456789098765432123456')
-    .send({ access_token: anotherSession, companyId: 'test', performanceResult: 'test', response: 'test', year: 'test', standaloneStatus: 'test', taskId: 'test', submittedBy: 'test', submittedDate: 'test', activeStatus: 'test', lastModifiedDate: 'test', modifiedBy: 'test', isSubmitted: 'test', status: 'test' })
+    .send({ access_token: anotherSession, companyId: 'test', performanceResult: 'test', response: 'test', year: 'test', standaloneStatus: 'test', taskId: 'test', submittedBy: 'test', submittedDate: 'test', activeStatus: 'test', fiscalYearEndDate: 'test', lastModifiedDate: 'test', modifiedBy: 'test', isSubmitted: 'test', status: 'test' })
   expect(status).toBe(404)
 })
 

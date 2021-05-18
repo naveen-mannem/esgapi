@@ -5,7 +5,7 @@ let user, standaloneDatapoints
 
 beforeEach(async () => {
   user = await User.create({ email: 'a@a.com', password: '123456' })
-  standaloneDatapoints = await StandaloneDatapoints.create({ createdBy: user, companyId: 'test', performanceResult: 'test', response: 'test', year: 'test', standaloneStatus: 'test', taskId: 'test', submittedBy: 'test', submittedDate: 'test', activeStatus: 'test', lastModifiedDate: 'test', modifiedBy: 'test', isSubmitted: 'test', status: 'test' })
+  standaloneDatapoints = await StandaloneDatapoints.create({ createdBy: user, companyId: 'test', performanceResult: 'test', response: 'test', year: 'test', standaloneStatus: 'test', taskId: 'test', submittedBy: 'test', submittedDate: 'test', activeStatus: 'test', fiscalYearEndDate: 'test', lastModifiedDate: 'test', modifiedBy: 'test', isSubmitted: 'test', status: 'test' })
 })
 
 describe('view', () => {
@@ -24,6 +24,7 @@ describe('view', () => {
     expect(view.submittedBy).toBe(standaloneDatapoints.submittedBy)
     expect(view.submittedDate).toBe(standaloneDatapoints.submittedDate)
     expect(view.activeStatus).toBe(standaloneDatapoints.activeStatus)
+    expect(view.fiscalYearEndDate).toBe(standaloneDatapoints.fiscalYearEndDate)
     expect(view.lastModifiedDate).toBe(standaloneDatapoints.lastModifiedDate)
     expect(view.modifiedBy).toBe(standaloneDatapoints.modifiedBy)
     expect(view.isSubmitted).toBe(standaloneDatapoints.isSubmitted)
@@ -47,6 +48,7 @@ describe('view', () => {
     expect(view.submittedBy).toBe(standaloneDatapoints.submittedBy)
     expect(view.submittedDate).toBe(standaloneDatapoints.submittedDate)
     expect(view.activeStatus).toBe(standaloneDatapoints.activeStatus)
+    expect(view.fiscalYearEndDate).toBe(standaloneDatapoints.fiscalYearEndDate)
     expect(view.lastModifiedDate).toBe(standaloneDatapoints.lastModifiedDate)
     expect(view.modifiedBy).toBe(standaloneDatapoints.modifiedBy)
     expect(view.isSubmitted).toBe(standaloneDatapoints.isSubmitted)

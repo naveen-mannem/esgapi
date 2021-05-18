@@ -2,12 +2,12 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { token } from '../../services/passport'
-import { create, index, show, update, destroy } from './controller'
+import { create, index, show, update, destroy, uploadCompanyESGFiles } from './controller'
 import { schema } from './model'
 export StandaloneDatapoints, { schema } from './model'
 
 const router = new Router()
-const { companyId, performanceResult, response, year, standaloneStatus, taskId, submittedBy, submittedDate, activeStatus, lastModifiedDate, modifiedBy, isSubmitted, status } = schema.tree
+const { companyId, datapointId, performanceResult, response, year, fiscalYearEndDate, standaloneStatus, taskId, submittedBy, submittedDate, activeStatus, lastModifiedDate, modifiedBy, isSubmitted, status } = schema.tree
 
 /**
  * @api {post} /standalone_datapoints Create standalone datapoints
@@ -16,9 +16,11 @@ const { companyId, performanceResult, response, year, standaloneStatus, taskId, 
  * @apiPermission user
  * @apiParam {String} access_token user access token.
  * @apiParam companyId Standalone datapoints's companyId.
+ * @apiParam datapointId Standalone datapoints's datapointId.
  * @apiParam performanceResult Standalone datapoints's performanceResult.
  * @apiParam response Standalone datapoints's response.
  * @apiParam year Standalone datapoints's year.
+ * @apiParam fiscalYearEndDate Standalone datapoints's fiscalYearEndDate.
  * @apiParam standaloneStatus Standalone datapoints's standaloneStatus.
  * @apiParam taskId Standalone datapoints's taskId.
  * @apiParam submittedBy Standalone datapoints's submittedBy.
@@ -34,8 +36,24 @@ const { companyId, performanceResult, response, year, standaloneStatus, taskId, 
  */
 router.post('/',
   token({ required: true }),
-  body({ companyId, performanceResult, response, year, standaloneStatus, taskId, submittedBy, submittedDate, activeStatus, lastModifiedDate, modifiedBy, isSubmitted }),
+  body({ companyId, datapointId, performanceResult, response, year, fiscalYearEndDate, standaloneStatus, taskId, submittedBy, submittedDate, activeStatus, lastModifiedDate, modifiedBy, isSubmitted }),
   create)
+
+/**
+ * @api {post} /standalone_datapoints/upload-company-esg Upload Company ESG files
+ * @apiName UploadCompanyESGFiles
+ * @apiGroup StandaloneDatapoints
+ * @apiPermission user
+ * @apiParam {String} access_token user access token.
+ * @apiSuccess {Object} upload company esg files StandaloneDatapoints's data.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ * @apiError 404 StandaloneDatapoints not found.
+ * @apiError 401 user access only.
+ */
+router.post('/upload-company-esg',
+  token({ required: false }),
+  query(),
+  uploadCompanyESGFiles)
 
 /**
  * @api {get} /standalone_datapoints Retrieve standalone datapoints
@@ -76,9 +94,11 @@ router.get('/:id',
  * @apiPermission user
  * @apiParam {String} access_token user access token.
  * @apiParam companyId Standalone datapoints's companyId.
+ * @apiParam datapointId Standalone datapoints's datapointId.
  * @apiParam performanceResult Standalone datapoints's performanceResult.
  * @apiParam response Standalone datapoints's response.
  * @apiParam year Standalone datapoints's year.
+ * @apiParam fiscalYearEndDate Standalone datapoints's fiscalYearEndDate.
  * @apiParam standaloneStatus Standalone datapoints's standaloneStatus.
  * @apiParam taskId Standalone datapoints's taskId.
  * @apiParam submittedBy Standalone datapoints's submittedBy.
@@ -95,7 +115,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ companyId, performanceResult, response, year, standaloneStatus, taskId, submittedBy, submittedDate, activeStatus, lastModifiedDate, modifiedBy, isSubmitted, status }),
+  body({ companyId, datapointId, performanceResult, response, year, fiscalYearEndDate, standaloneStatus, taskId, submittedBy, submittedDate, activeStatus, lastModifiedDate, modifiedBy, isSubmitted, status }),
   update)
 
 /**
