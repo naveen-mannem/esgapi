@@ -13,3 +13,4 @@ coverage
 cassettes
 package-lock.json
 DOCS.md
+.vscode/launch.json
