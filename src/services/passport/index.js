@@ -5,16 +5,17 @@ import { Strategy as BearerStrategy } from 'passport-http-bearer'
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt'
 import { jwtSecret, masterKey } from '../../config'
 import User, { schema } from '../../api/user/model'
-
+import {WRONG_USER,MISSING_FIELDS,UNAUTH} from '../../constants/constants'
+ 
 export const password = () => (req, res, next) =>
   passport.authenticate('password', { session: false }, (err, user, info) => {
     if (err && err.param) {
-      return res.status(400).json(err)
+      return res.status(400).json({message:MISSING_FIELDS,error:err})
     } else if (err || !user) {
-      return res.status(401).end()
+      return res.status(401).json({message:WRONG_USER}).end()
     }
     req.logIn(user, { session: false }, (err) => {
-      if (err) return res.status(401).end()
+      if (err) return res.status(401).json({message:UNAUTH}).end()
       next()
     })
   })(req, res, next)
@@ -22,12 +23,12 @@ export const password = () => (req, res, next) =>
 export const otp = () => (req, res, next) =>
   passport.authenticate('otp', { session: false }, (err, user, info) => {
     if (err && err.param) {
-      return res.status(400).json(err)
+      return res.status(400).json({message:MISSING_FIELDS,error:err})
     } else if (err || !user) {
-      return res.status(401).end()
+      return res.status(401).json({message:UNAUTH}).end()
     }
     req.logIn(user, { session: false }, (err) => {
-      if (err) return res.status(401).end()
+      if (err) return res.status(401).json({message:UNAUTH}).end()
       next()
     })
   })(req, res, next)  
@@ -38,10 +39,10 @@ export const master = () =>
 export const token = ({ required, roles = User.roles } = {}) => (req, res, next) =>
   passport.authenticate('token', { session: false }, (err, user, info) => {
     if (err || (required && !user) || (required && !~roles.indexOf(user.role))) {
-      return res.status(401).end()
+      return res.status(401).json({message:UNAUTH}).end()
     }
     req.logIn(user, { session: false }, (err) => {
-      if (err) return res.status(401).end()
+      if (err) return res.status(401).json({message:UNAUTH}).end()
       next()
     })
   })(req, res, next)
@@ -53,10 +54,11 @@ passport.use('password', new BasicStrategy((email, password, done) => {
     if (err) done(err)
   })
 
-  User.findOne({ email }).then((user) => {
+  User.findOne({ email }).populate('roleId').then((user) => {
     if (!user) {
       done(true)
       return null
+     
     }
     return user.authenticate(password, user.password).then((user) => {
       done(null, user)

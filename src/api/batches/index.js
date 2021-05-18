@@ -7,7 +7,7 @@ import { schema } from './model'
 export Batches, { schema } from './model'
 
 const router = new Router()
-const { batchName, batchSLA, status } = schema.tree
+const { batchName, batchSLA, status,companyId } = schema.tree
 
 /**
  * @api {post} /batches Create batches
@@ -24,7 +24,7 @@ const { batchName, batchSLA, status } = schema.tree
  */
 router.post('/',
   token({ required: true }),
-  body({ batchName, batchSLA }),
+  body({ batchName, batchSLA ,companyId}),
   create)
 
 /**
@@ -75,7 +75,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ batchName, batchSLA, status }),
+  body({ batchName, batchSLA, status ,companyId}),
   update)
 
 /**

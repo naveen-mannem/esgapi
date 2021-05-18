@@ -7,11 +7,17 @@ const batchesSchema = new Schema({
     required: true
   },
   batchName: {
-    type: String
+    type: String,
+    unique : true
   },
   batchSLA: {
-    type: String
+    type: []
   },
+  companyId:[{ companyName:{
+    type: Schema.Types.ObjectId, 
+    ref: 'Companies'
+  }  
+  }],
   status: {
     type: Boolean,
     default: true
@@ -32,6 +38,7 @@ batchesSchema.methods = {
       createdBy: this.createdBy ? this.createdBy.view(full) : null,
       batchName: this.batchName,
       batchSLA: this.batchSLA,
+      companies: this.companyId ,
       status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
