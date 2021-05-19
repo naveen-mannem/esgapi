@@ -168,8 +168,8 @@ export const uploadCompanyESGFiles = async(req, res, next) => {
       }
     }
     const companiesToBeAdded = _.uniqBy(allCompanyInfos,'CIN');
-    const structuredCompanyDetails = companiesToBeAdded.map(function(item) {
-      return { 
+    const structuredCompanyDetails = companiesToBeAdded.map(async function(item) {
+      let companyObject = {
         companyName : item['Company Name'],
         cin: item['CIN'],
         nicCode: item['NIC Code'],
@@ -182,16 +182,18 @@ export const uploadCompanyESGFiles = async(req, res, next) => {
         status: true,
         createdBy: userDetail
       }
-    });
+      await Companies.findOneAndUpdate({cin:item['CIN']},{$set: companyObject },{ upsert: true });
 
-    await Companies.insertMany(structuredCompanyDetails)
-    .then((err, result) => {
-      if(err){
-        console.log('error', err);
-      } else {
-        console.log('result', result);
-      }
+      return companyObject
     });
+    // await Companies.insertMany(structuredCompanyDetails)
+    // .then((err, result) => {
+    //   if(err){
+    //     console.log('error', err);
+    //   } else {
+    //     console.log('result', result);
+    //   }
+    // });
     const companiesList = await Companies.find({status: true}).populate('createdBy');
     const datapointList = await Datapoints.find({status: true}).populate('updatedBy').populate('keyIssueId').populate('functionId');
     let filteredBoardMemberMatrixDetails = _.filter(allBoardMemberMatrixDetails, (x) => {
@@ -238,17 +240,19 @@ export const uploadCompanyESGFiles = async(req, res, next) => {
       }
     });
     var insertedCompanies = _.filter(companiesList, (item) =>
-    !_.some(structuredCompanyDetails, (obj) => item.cin === obj.cin));
+    !_.some(structuredCompanyDetails, (obj) => item['CIN'] === obj.cin));
+
     let insertedCompanyIds = [];
     _.forEach(insertedCompanies, (company) => {
       insertedCompanyIds.push(company.id);
     });
+
     let distinctObjectByYears = _.uniqBy(structuredStandaloneDetails, 'year');
     let distinctYears = [];
     _.forEach(distinctObjectByYears, (obj) => {
       distinctYears.push(obj.year);
     });
-    const markExistingRecordsAsFalse = await StandaloneDatapoints.updateOne({
+    const markExistingRecordsAsFalse =await StandaloneDatapoints.updateMany({
         "companyId" : { $in: insertedCompanyIds }, 
         "year" : { $in : distinctYears } }, { $set: { status: false} }, {});
     await StandaloneDatapoints.insertMany(structuredStandaloneDetails)
