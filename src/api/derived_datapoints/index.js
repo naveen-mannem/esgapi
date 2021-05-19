@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { token } from '../../services/passport'
-import { create, index, show, update, destroy } from './controller'
+import { create, index, show, update, destroy, calculateForACompany } from './controller'
 import { schema } from './model'
 export DerivedDatapoints, { schema } from './model'
 
@@ -65,6 +65,21 @@ router.get('/',
 router.get('/:id',
   token({ required: true }),
   show)
+
+/**
+ * @api {get} /derived_datapoints/calculate/:companyId Calculate derived datapoints for a company
+ * @apiName CalculateDerivedDatapointsForACompany
+ * @apiGroup DerivedDatapoints
+ * @apiPermission user
+ * @apiParam {String} access_token user access token.
+ * @apiSuccess {Object} derivedDatapoints Derived datapoints's data.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ * @apiError 404 Derived datapoints not found.
+ * @apiError 401 user access only.
+ */
+router.get('/calculate/:companyId',
+  token({ required: true }),
+  calculateForACompany)
 
 /**
  * @api {put} /derived_datapoints/:id Update derived datapoints
