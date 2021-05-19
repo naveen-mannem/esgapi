@@ -8,7 +8,7 @@ const boardMembersMatrixDataPointsSchema = new Schema({
   },
   datapointId: {
    type: Schema.ObjectId,
-    ref: 'DataPoints',
+    ref: 'Datapoints',
     required: true
   },
   companyId: {
