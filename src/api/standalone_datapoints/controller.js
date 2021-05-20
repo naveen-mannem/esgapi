@@ -18,34 +18,34 @@ export const create = ({ user, bodymen: { body } }, res, next) =>
 
 
 var companyESG = multer.diskStorage({ //multers disk shop photos storage settings
-  destination: function(req, file, cb) {
+  destination: function (req, file, cb) {
     // cb(null, './uploads/')
-    console.log('__dirname ', __dirname );
+    console.log('__dirname ', __dirname);
     // console.log('process.env.PWD', process.env.PWD);
     cb(null, __dirname + '/uploads');
   },
-  filename: function(req, file, cb) {
+  filename: function (req, file, cb) {
     var datetimestamp = Date.now();
     cb(null, file.fieldname + '-' + datetimestamp + '.' + file.originalname.split('.')[file.originalname.split('.').length - 1])
   }
 });
 var upload = multer({ //multer settings
-    storage: companyESG,
-    fileFilter: function(req, file, callback) { //file filter
-      if (['xls', 'xlsx', 'xlsm'].indexOf(file.originalname.split('.')[file.originalname.split('.').length - 1]) === -1) {
-        return callback(new Error('Wrong extension type'));
-      }
-      callback(null, true);      
+  storage: companyESG,
+  fileFilter: function (req, file, callback) { //file filter
+    if (['xls', 'xlsx', 'xlsm'].indexOf(file.originalname.split('.')[file.originalname.split('.').length - 1]) === -1) {
+      return callback(new Error('Wrong extension type'));
     }
-}).fields([{ name: 'file', maxCount: 3 }]);
+    callback(null, true);
+  }
+}).fields([{ name: 'file', maxCount: 60 }]);
 
-export const uploadCompanyESGFiles = async(req, res, next) => {
+export const uploadCompanyESGFiles = async (req, res, next) => {
   const userDetail = req.user;
-  upload(req, res, async function(err) {
+  upload(req, res, async function (err) {
     console.log(new Error(err));
     if (err) {
-        res.status('400').json({ error_code: 1, err_desc: err });
-        return;
+      res.status('400').json({ error_code: 1, err_desc: err });
+      return;
     }
     let allFilesObject = [];
     for (let index = 0; index < req.files.file.length; index++) {
@@ -55,13 +55,13 @@ export const uploadCompanyESGFiles = async(req, res, next) => {
       var sheet_name_list = workbook.SheetNames;
 
       sheet_name_list.forEach(function (currentSheetName) {
-        if(currentSheetName != 'Sheet3'){
+        if (currentSheetName != 'Sheet3') {
           //getting the complete sheet
           var worksheet = workbook.Sheets[currentSheetName];
           let headerRowsNumber = [];
-          if(currentSheetName == 'Matrix-Directors' || currentSheetName == 'Matrix-KMP'){
+          if (currentSheetName == 'Matrix-Directors' || currentSheetName == 'Matrix-KMP') {
             let headersIndexDetails = _.filter(worksheet, (object, index) => {
-              if(object.v == "Category"){
+              if (object.v == "Category") {
                 headerRowsNumber.push(parseInt(index.substring(1)));
                 return index;
               }
@@ -70,7 +70,7 @@ export const uploadCompanyESGFiles = async(req, res, next) => {
           var headers = {};
           var headers1 = {};
           var data = [];
-          if(currentSheetName == 'Matrix-Directors' || currentSheetName == 'Matrix-KMP'){
+          if (currentSheetName == 'Matrix-Directors' || currentSheetName == 'Matrix-KMP') {
             for (const cellId in worksheet) {
               if (cellId[0] === "!") continue;
               //parse out the column, row, and value
@@ -79,19 +79,19 @@ export const uploadCompanyESGFiles = async(req, res, next) => {
               var col = colStringName;
               // var row = parseInt(cellId.substring(1));  
               var row = parseInt(cellId.match(/(\d+)/));
-              var value = worksheet[cellId].v;  
+              var value = worksheet[cellId].v;
               //store header names
               if (row == 1) {
                 headers[col] = value;
                 // storing the header names
                 continue;
-              } else if(headerRowsNumber.includes(row) && row != 1){
+              } else if (headerRowsNumber.includes(row) && row != 1) {
                 headers1[col] = value;
                 // storing the header names
                 continue;
               }
               // if(headerRowsNumber.includes(row) && row != 1){
-              if(row > headerRowsNumber[1] && row != 1){
+              if (row > headerRowsNumber[1] && row != 1) {
                 if (!data[row]) data[row] = {};
                 data[row][headers1[col]] = value;
               } else {
@@ -108,16 +108,16 @@ export const uploadCompanyESGFiles = async(req, res, next) => {
             for (const cellId in worksheet) {
               if (cellId[0] === "!") continue;
               //parse out the column, row, and value
-              var col = cellId.substring(0, 1);  
-              var row = parseInt(cellId.substring(1));  
-              var value = worksheet[cellId].v;  
+              var col = cellId.substring(0, 1);
+              var row = parseInt(cellId.substring(1));
+              var value = worksheet[cellId].v;
               //store header names
               if (row == 1) {
                 headers[col] = value;
                 // storing the header names
                 continue;
               }
-    
+
               if (!data[row]) data[row] = {};
               data[row][headers[col]] = value;
             }
@@ -130,9 +130,9 @@ export const uploadCompanyESGFiles = async(req, res, next) => {
       });
       allFilesObject.push(parsedSheetObject)
     }
-    
+
     //processing the extracted json from excel sheets start
-    
+
     let allCompanyInfos = [];
     let allStandaloneDetails = [];
     let allBoardMemberMatrixDetails = [];
@@ -144,20 +144,20 @@ export const uploadCompanyESGFiles = async(req, res, next) => {
 
       //loop no of sheets in a file
       let currentCompanyName = '';
-      for(let singleFileIndex = 0; singleFileIndex < noOfSheetsInAnFile; singleFileIndex++) {
+      for (let singleFileIndex = 0; singleFileIndex < noOfSheetsInAnFile; singleFileIndex++) {
         //iterate each sheet in a file
         let noOfRowsInASheet = allFilesObject[allFilesArrayIndex][singleFileIndex].length;
         for (let rowIndex = 0; rowIndex < noOfRowsInASheet; rowIndex++) {
-          if(singleFileIndex == 0 && rowIndex == 0){
+          if (singleFileIndex == 0 && rowIndex == 0) {
             allCompanyInfos.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex]);
             currentCompanyName = allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex]['CIN'];
-          } else if(noOfSheetsInAnFile > 2){
-            if(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex]){
+          } else if (noOfSheetsInAnFile > 2) {
+            if (allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex]) {
               allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex].CIN = currentCompanyName;
             }
-            if(singleFileIndex == 2) {
+            if (singleFileIndex == 2) {
               allBoardMemberMatrixDetails.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex])
-            } else if(singleFileIndex == 3){
+            } else if (singleFileIndex == 3) {
               allKmpMatrixDetails.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex])
             }
           } else {
@@ -167,10 +167,13 @@ export const uploadCompanyESGFiles = async(req, res, next) => {
         }
       }
     }
-    const companiesToBeAdded = _.uniqBy(allCompanyInfos,'CIN');
-    const structuredCompanyDetails = companiesToBeAdded.map(async function(item) {
+    const companiesToBeAdded = _.uniqBy(allCompanyInfos, 'CIN');
+    const structuredCompanyDetails = [];
+    for (let index = 0; index < companiesToBeAdded.length; index++) {
+      const item = companiesToBeAdded[index];
+
       let companyObject = {
-        companyName : item['Company Name'],
+        companyName: item['Company Name'],
         cin: item['CIN'],
         nicCode: item['NIC Code'],
         nic: item['NIC Code'],
@@ -182,10 +185,9 @@ export const uploadCompanyESGFiles = async(req, res, next) => {
         status: true,
         createdBy: userDetail
       }
-      await Companies.findOneAndUpdate({cin:item['CIN']},{$set: companyObject },{ upsert: true });
-
-      return companyObject
-    });
+      await Companies.updateOne({ cin: item['CIN'] }, { $set: companyObject }, { upsert: true });
+      structuredCompanyDetails.push(companyObject);
+    }
     // await Companies.insertMany(structuredCompanyDetails)
     // .then((err, result) => {
     //   if(err){
@@ -194,32 +196,33 @@ export const uploadCompanyESGFiles = async(req, res, next) => {
     //     console.log('result', result);
     //   }
     // });
-    const companiesList = await Companies.find({status: true}).populate('createdBy');
-    const datapointList = await Datapoints.find({status: true}).populate('updatedBy').populate('keyIssueId').populate('functionId');
+
+    const datapointList = await Datapoints.find({ status: true }).populate('updatedBy').populate('keyIssueId').populate('functionId');
+    const companiesList = await Companies.find({ status: true }).populate('createdBy');
     let filteredBoardMemberMatrixDetails = _.filter(allBoardMemberMatrixDetails, (x) => {
-      if(x){
-        if(Object.keys(x)[0] != undefined ){
-          if(Object.keys(x)[0].toString() != Object.values(x)[0]){
+      if (x) {
+        if (Object.keys(x)[0] != undefined) {
+          if (Object.keys(x)[0].toString() != Object.values(x)[0]) {
             return x;
           }
         }
       }
     });
-    
+
     let filteredKmpMatrixDetails = _.filter(allKmpMatrixDetails, (x) => {
-      if(x){
-        if(Object.keys(x)[0] != undefined ){
-          if(Object.keys(x)[0].toString() != Object.values(x)[0]){
+      if (x) {
+        if (Object.keys(x)[0] != undefined) {
+          if (Object.keys(x)[0].toString() != Object.values(x)[0]) {
             return x;
           }
         }
       }
     });
-    const structuredStandaloneDetails = allStandaloneDetails.map(function(item) {
+    const structuredStandaloneDetails = allStandaloneDetails.map(function (item) {
       let companyObject = companiesList.filter(obj => obj.cin === item['CIN']);
       let datapointObject = datapointList.filter(obj => obj.code === item['DP Code']);
-      return { 
-        categoryName : item['Category'],
+      return {
+        categoryName: item['Category'],
         keyIssueName: item['Key Issues'],
         datapointId: datapointObject[0] ? datapointObject[0].id : null,
         year: item['Fiscal Year'],
@@ -240,7 +243,7 @@ export const uploadCompanyESGFiles = async(req, res, next) => {
       }
     });
     var insertedCompanies = _.filter(companiesList, (item) =>
-    !_.some(structuredCompanyDetails, (obj) => item['CIN'] === obj.cin));
+      !_.some(structuredCompanyDetails, (obj) => item.cin === obj.cin));
 
     let insertedCompanyIds = [];
     _.forEach(insertedCompanies, (company) => {
@@ -252,33 +255,34 @@ export const uploadCompanyESGFiles = async(req, res, next) => {
     _.forEach(distinctObjectByYears, (obj) => {
       distinctYears.push(obj.year);
     });
-    const markExistingRecordsAsFalse =await StandaloneDatapoints.updateMany({
-        "companyId" : { $in: insertedCompanyIds }, 
-        "year" : { $in : distinctYears } }, { $set: { status: false} }, {});
+    const markExistingRecordsAsFalse = await StandaloneDatapoints.updateMany({
+      "companyId": { $in: insertedCompanyIds },
+      "year": { $in: distinctYears }
+    }, { $set: { status: false } }, {});
     await StandaloneDatapoints.insertMany(structuredStandaloneDetails)
-    .then((err, result) => {
-      if(err){
-        console.log('error', err);
-      } else {
-        console.log('result', result);
-      }
-    });
+      .then((err, result) => {
+        if (err) {
+          console.log('error', err);
+        } else {
+          //  console.log('result', result);
+        }
+      });
 
     let boardMembersList = [];
     let inactiveBoardMembersList = [];
     let kmpMembersList = [];
-    const structuredBoardMemberMatrixDetails = filteredBoardMemberMatrixDetails.map(function(item) {
+    const structuredBoardMemberMatrixDetails = filteredBoardMemberMatrixDetails.map(function (item) {
       let companyObject = companiesList.filter(obj => obj.cin === item['CIN']);
       let datapointObject = datapointList.filter(obj => obj.code === item['DP Code']);
       let allKeyNamesList = Object.keys(item);
-      const boardMembersNameList = _.filter(allKeyNamesList, function(keyName) {
+      const boardMembersNameList = _.filter(allKeyNamesList, function (keyName) {
         return keyName != "Category" && keyName != "Key Issues" && keyName != "DP Code" && keyName != "Indicator" && keyName != "Description" && keyName != "Data Type" && keyName != "Unit" && keyName != "Fiscal Year" && keyName != "Fiscal Year End Date" && keyName != "CIN"
-        && keyName != "Source name" && keyName !="URL"  && keyName !="Page number" && keyName !="Publication date" && keyName !="Text  snippet" && keyName !="Screenshot (in png)" && keyName !="Word Doc (.docx)" && keyName !="Excel (.xlsx)" && keyName !="PDF"
-        && keyName !="File pathway (if any)"&& keyName !="Comments/Calculations" && keyName !="Data Verification"
-        && keyName !="Error Type"&& keyName !="Error Comments"&& keyName !="Internal file source"&& keyName !="Error Status"&& keyName !="Analyst Comments"&& keyName !="Additional comments";
+          && keyName != "Source name" && keyName != "URL" && keyName != "Page number" && keyName != "Publication date" && keyName != "Text  snippet" && keyName != "Screenshot (in png)" && keyName != "Word Doc (.docx)" && keyName != "Excel (.xlsx)" && keyName != "PDF"
+          && keyName != "File pathway (if any)" && keyName != "Comments/Calculations" && keyName != "Data Verification"
+          && keyName != "Error Type" && keyName != "Error Comments" && keyName != "Internal file source" && keyName != "Error Status" && keyName != "Analyst Comments" && keyName != "Additional comments";
       });
-      _.forEach(boardMembersNameList, function(value) {
-        let memberDetail = { 
+      _.forEach(boardMembersNameList, function (value) {
+        let memberDetail = {
           boardMemberName: value.trim(),
           response: item[value],
           datapointId: datapointObject[0] ? datapointObject[0].id : null,
@@ -290,8 +294,8 @@ export const uploadCompanyESGFiles = async(req, res, next) => {
           createdBy: userDetail
         };
         boardMembersList.push(memberDetail);
-        if(item['DP Code'] == 'BOIR018'){
-          if(item[value] != 'No' && item[value] != '' && item[value] != undefined && item[value] != null){
+        if (item['DP Code'] == 'BOIR018') {
+          if (item[value] != 'No' && item[value] != '' && item[value] != undefined && item[value] != null) {
             let cessaDate = getJsDateFromExcel(item[value]);
             let currentDate = new Date();
             if (cessaDate < currentDate) {
@@ -300,7 +304,7 @@ export const uploadCompanyESGFiles = async(req, res, next) => {
           }
         }
       });
-      return { 
+      return {
         datapointId: datapointObject[0] ? datapointObject[0].id : null,
         companyId: companyObject[0] ? companyObject[0].id : null,
         year: item['Fiscal Year'],
@@ -310,33 +314,38 @@ export const uploadCompanyESGFiles = async(req, res, next) => {
         createdBy: userDetail
       }
     });
-    
-    _.forEach(inactiveBoardMembersList, function(object) {
+
+    _.forEach(inactiveBoardMembersList, function (object) {
       let indexToUpdate = _.findIndex(boardMembersList, object);
       boardMembersList[indexToUpdate].memberStatus = false;
     });
+    //Marking existing Data as False in BoardMemberMatrixDP 
+    await BoardMembersMatrixDataPoints.updateMany({
+      "companyId": { $in: insertedCompanyIds },
+      "year": { $in: distinctYears }
+    }, { $set: { status: false } }, {});
     await BoardMembersMatrixDataPoints.insertMany(boardMembersList)
-    .then((err, result) => {
-      if(err){
-        console.log('error', err);
-      } else {
-        console.log('result', result);
-      }
-    });
+      .then((err, result) => {
+        if (err) {
+          console.log('error', err);
+        } else {
+          // console.log('result', result);
+        }
+      });
 
-    const structuredKmpMatrixDetails = filteredKmpMatrixDetails.map(function(item) {
+    const structuredKmpMatrixDetails = filteredKmpMatrixDetails.map(function (item) {
       let companyObject = companiesList.filter(obj => obj.cin === item['CIN']);
       let datapointObject = datapointList.filter(obj => obj.code === item['DP Code']);
       let allKeyNamesList = Object.keys(item);
-      const kmpMembersNameList = _.filter(allKeyNamesList, function(keyName) {
+      const kmpMembersNameList = _.filter(allKeyNamesList, function (keyName) {
         return keyName != "Category" && keyName != "Key Issues" && keyName != "DP Code" && keyName != "Indicator" && keyName != "Description" && keyName != "Data Type" && keyName != "Unit" && keyName != "Fiscal Year" && keyName != "Fiscal Year End Date" && keyName != "CIN"
-        && keyName != "Source name" && keyName !="URL"  && keyName !="Page number" && keyName !="Publication date" && keyName !="Text  snippet" && keyName !="Screenshot (in png)" && keyName !="Word Doc (.docx)" && keyName !="Excel (.xlsx)" && keyName !="PDF"
-        && keyName !="File pathway (if any)"&& keyName !="Comments/Calculations" && keyName !="Data Verification"
-        && keyName !="Error Type"&& keyName !="Error Comments"&& keyName !="Internal file source"&& keyName !="Error Status"&& keyName !="Analyst Comments"&& keyName !="Additional comments";
+          && keyName != "Source name" && keyName != "URL" && keyName != "Page number" && keyName != "Publication date" && keyName != "Text  snippet" && keyName != "Screenshot (in png)" && keyName != "Word Doc (.docx)" && keyName != "Excel (.xlsx)" && keyName != "PDF"
+          && keyName != "File pathway (if any)" && keyName != "Comments/Calculations" && keyName != "Data Verification"
+          && keyName != "Error Type" && keyName != "Error Comments" && keyName != "Internal file source" && keyName != "Error Status" && keyName != "Analyst Comments" && keyName != "Additional comments";
       });
       let currentMemberStatus;
-      _.forEach(kmpMembersNameList, function(value) {
-        let memberDetail = { 
+      _.forEach(kmpMembersNameList, function (value) {
+        let memberDetail = {
           kmpMemberName: value.trim(),
           response: item[value],
           memberStatus: true,
@@ -350,7 +359,7 @@ export const uploadCompanyESGFiles = async(req, res, next) => {
         kmpMembersList.push(memberDetail);
       });
 
-      return { 
+      return {
         datapointId: datapointObject[0] ? datapointObject[0].id : null,
         companyId: companyObject[0] ? companyObject[0].id : null,
         year: item['Fiscal Year'],
@@ -360,18 +369,24 @@ export const uploadCompanyESGFiles = async(req, res, next) => {
         createdBy: userDetail
       }
     });
+    await KmpMatrixDataPoints.updateMany({
+      "companyId": { $in: insertedCompanyIds },
+      "year": { $in: distinctYears }
+    }, { $set: { status: false } }, {});
     await KmpMatrixDataPoints.insertMany(kmpMembersList)
-    .then((err, result) => {
-      if(err){
-        console.log('error', err);
-      } else {
-        console.log('result', result);
-      }
-    });
+      .then((err, result) => {
+        if (err) {
+          console.log('error', err);
+        } else {
+          //  console.log('result', result);
+        }
+      });
 
-
-    res.json({ message: "Files upload success", companies: structuredCompanyDetails, allStandaloneDetails: structuredStandaloneDetails, allBoardMemberMatrixDetails: boardMembersList, allKmpMatrixDetails: kmpMembersList, data: allFilesObject });
-  });
+    console.log(structuredCompanyDetails )
+    console.log(structuredCompanyDetails)
+   // res.json({ message: "Files upload success", companies: structuredCompanyDetails, allStandaloneDetails: structuredStandaloneDetails, allBoardMemberMatrixDetails: boardMembersList, allKmpMatrixDetails: kmpMembersList, data: allFilesObject });
+    res.json({ message: "Files upload success", companies: structuredCompanyDetails})
+   });
 }
 
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>
