@@ -51,7 +51,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
     for (let index = 0; index < req.files.file.length; index++) {
       let parsedSheetObject = [];
       const filePath = req.files.file[index].path;
-      var workbook = XLSX.readFile(filePath);
+      var workbook = XLSX.readFile(filePath, {sheetStubs: false, defval: ''});
       var sheet_name_list = workbook.SheetNames;
 
       sheet_name_list.forEach(function (currentSheetName) {
@@ -95,7 +95,10 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
                 if (!data[row]) data[row] = {};
                 data[row][headers1[col]] = value;
               } else {
-                if (!data[row]) data[row] = {};
+                if (!data[row]) {
+                  data[row] = {};
+                  data[row][headers[col]] = '';
+                }
                 data[row][headers[col]] = value;
               }
             }
@@ -159,6 +162,8 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
               allBoardMemberMatrixDetails.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex])
             } else if (singleFileIndex == 3) {
               allKmpMatrixDetails.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex])
+            } else if(singleFileIndex == 1){
+              allStandaloneDetails.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex])
             }
           } else {
             allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex].CIN = currentCompanyName;
