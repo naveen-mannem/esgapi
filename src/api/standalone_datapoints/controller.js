@@ -277,7 +277,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
       let allKeyNamesList = Object.keys(item);
       const boardMembersNameList = _.filter(allKeyNamesList, function (keyName) {
         return keyName != "Category" && keyName != "Key Issues" && keyName != "DP Code" && keyName != "Indicator" && keyName != "Description" && keyName != "Data Type" && keyName != "Unit" && keyName != "Fiscal Year" && keyName != "Fiscal Year End Date" && keyName != "CIN"
-          && keyName != "Source name" && keyName != "URL" && keyName != "Page number" && keyName != "Publication date" && keyName != "Text  snippet" && keyName != "Screenshot (in png)" && keyName != "Word Doc (.docx)" && keyName != "Excel (.xlsx)" && keyName != "PDF"
+          && keyName != "Source name" && keyName != "URL" && keyName != "Page number" && keyName != "Publication date" && keyName != "Text  snippet" && keyName != "Screenshot (in png)" && keyName != "Word Doc (.docx)" && keyName != "Excel (.xlsx)" && keyName != "Excel (.xlxsx)" && keyName != "PDF"
           && keyName != "File pathway (if any)" && keyName != "Comments/Calculations" && keyName != "Data Verification"
           && keyName != "Error Type" && keyName != "Error Comments" && keyName != "Internal file source" && keyName != "Error Status" && keyName != "Analyst Comments" && keyName != "Additional comments";
       });
@@ -339,7 +339,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
       let allKeyNamesList = Object.keys(item);
       const kmpMembersNameList = _.filter(allKeyNamesList, function (keyName) {
         return keyName != "Category" && keyName != "Key Issues" && keyName != "DP Code" && keyName != "Indicator" && keyName != "Description" && keyName != "Data Type" && keyName != "Unit" && keyName != "Fiscal Year" && keyName != "Fiscal Year End Date" && keyName != "CIN"
-          && keyName != "Source name" && keyName != "URL" && keyName != "Page number" && keyName != "Publication date" && keyName != "Text  snippet" && keyName != "Screenshot (in png)" && keyName != "Word Doc (.docx)" && keyName != "Excel (.xlsx)" && keyName != "PDF"
+          && keyName != "Source name" && keyName != "URL" && keyName != "Page number" && keyName != "Publication date" && keyName != "Text  snippet" && keyName != "Screenshot (in png)" && keyName != "Word Doc (.docx)" && keyName != "Excel (.xlsx)" && keyName != "Excel (.xlxsx)" && keyName != "PDF"
           && keyName != "File pathway (if any)" && keyName != "Comments/Calculations" && keyName != "Data Verification"
           && keyName != "Error Type" && keyName != "Error Comments" && keyName != "Internal file source" && keyName != "Error Status" && keyName != "Analyst Comments" && keyName != "Additional comments";
       });

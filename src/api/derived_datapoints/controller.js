@@ -52,6 +52,8 @@ export const calculateForACompany = async({ params }, res, next) => {
       let allStandaloneDetails = [];
       let allBoardMemberMatrixDetails = [];
       let allKmpMatrixDetails = [];
+      let allDerivedDatapoints = [];
+
       let allDatapointsList = await Datapoints.find({ status: true }).populate('updatedBy').populate('keyIssueId').populate('functionId');
       for (let index = 0; index < distinctYears.length; index++) {
         allStandaloneDetails = await StandaloneDatapoints.find({ 
@@ -67,6 +69,7 @@ export const calculateForACompany = async({ params }, res, next) => {
         allBoardMemberMatrixDetails = await BoardMembersMatrixDataPoints.find({ 
           companyId: params.companyId,
           year: distinctYears[index],
+          memberStatus: true,
           status: true
         })
         .populate('createdBy')
@@ -76,6 +79,7 @@ export const calculateForACompany = async({ params }, res, next) => {
         allKmpMatrixDetails = await KmpMatrixDataPoints.find({ 
           companyId: params.companyId,
           year: distinctYears[index],
+          memberStatus: true,
           status: true
         })
         .populate('createdBy')
@@ -85,7 +89,7 @@ export const calculateForACompany = async({ params }, res, next) => {
       let mergedDetails = _.concat(allStandaloneDetails, allBoardMemberMatrixDetails, allKmpMatrixDetails);
       let matrixPercentageRules = await Rules.find({ methodName: "MatrixPercentage" }).populate('datapointId');
       for (let i = 0; i < matrixPercentageRules.length; i++) {
-        if(matrixPercentageRules[i].methodType != ""){
+        if(matrixPercentageRules[i].methodType != "" || matrixPercentageRules[i].methodType == "composite"){
           let parameters = matrixPercentageRules[i].parameter.split(",");
           console.log('parameters', parameters);
           let numerator = parameters[0] ? parameters[0] : '';
@@ -110,7 +114,32 @@ export const calculateForACompany = async({ params }, res, next) => {
           });
           console.log('numeratorValues', numeratorValues);
           console.log('denominatorValues', denominatorValues);
-        }        
+          if(numeratorValues.length > 0 && denominatorValues.length > 0 && numeratorValues.length == denominatorValues.length){
+            for (let j = 0; j < numeratorValues.length; j++) {
+              let numeratorResponseValue = numeratorValues[j].response;
+              let denominatorResponseValue = denominatorValues[j].response;
+              let derivedResponse = (numeratorResponseValue/denominatorResponseValue)*100;
+              let derivedDatapointsObject = {
+                companyId: numeratorValues[j].companyId.id,
+                datapointId: matrixPercentageRules[i].datapointId.id,
+                year: numeratorValues[j].year,
+                response: derivedResponse,
+                memberName: numeratorValues[j].boardMemberName ? numeratorValues[j].boardMemberName : [ numeratorValues[j].kmpMemberName ? numeratorValues[j].kmpMemberName : '' ],
+                memberStatus: true,
+                status: true
+              }
+              allDerivedDatapoints.push(derivedDatapointsObject);
+              if(j == numeratorValues.length-1){
+                mergedDetails = _.concat(mergedDetails, allDerivedDatapoints);
+              }
+            }
+          }
+          console.log('allDerivedDatapoints', allDerivedDatapoints);
+          console.log('mergedDetails after derived datapoints added', mergedDetails);
+        } else{
+
+        } 
+              
       }
       return res.status(200).json({ message: "Retrieved successfully!", mergedDetails: mergedDetails })
     } else {
