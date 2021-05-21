@@ -38,9 +38,9 @@ export const show = ({ params }, res, next) =>
     .catch(next)
 
 export const calculateForACompany = async({ params }, res, next) => {
-  console.log('companyId', params.companyId);
+  const companyId = params.companyId ? params.companyId : null;
 
-  await StandaloneDatapoints.find({ companyId: params.companyId, status: true })
+  await StandaloneDatapoints.find({ companyId: companyId })
   .populate('createdBy')
   .populate('datapointId')
   .populate('companyId')
@@ -57,7 +57,7 @@ export const calculateForACompany = async({ params }, res, next) => {
       let allDatapointsList = await Datapoints.find({ status: true }).populate('updatedBy').populate('keyIssueId').populate('functionId');
       for (let index = 0; index < distinctYears.length; index++) {
         allStandaloneDetails = await StandaloneDatapoints.find({ 
-          companyId: params.companyId,
+          companyId: companyId,
           year: distinctYears[index],
           status: true
         })
@@ -67,7 +67,7 @@ export const calculateForACompany = async({ params }, res, next) => {
         .populate('taskId')
         
         allBoardMemberMatrixDetails = await BoardMembersMatrixDataPoints.find({ 
-          companyId: params.companyId,
+          companyId: companyId,
           year: distinctYears[index],
           memberStatus: true,
           status: true
@@ -77,7 +77,7 @@ export const calculateForACompany = async({ params }, res, next) => {
         .populate('companyId')
         
         allKmpMatrixDetails = await KmpMatrixDataPoints.find({ 
-          companyId: params.companyId,
+          companyId: companyId,
           year: distinctYears[index],
           memberStatus: true,
           status: true
@@ -87,61 +87,172 @@ export const calculateForACompany = async({ params }, res, next) => {
         .populate('companyId')
       }
       let mergedDetails = _.concat(allStandaloneDetails, allBoardMemberMatrixDetails, allKmpMatrixDetails);
-      let matrixPercentageRules = await Rules.find({ methodName: "MatrixPercentage" }).populate('datapointId');
-      for (let i = 0; i < matrixPercentageRules.length; i++) {
-        if(matrixPercentageRules[i].methodType != "" || matrixPercentageRules[i].methodType == "composite"){
-          let parameters = matrixPercentageRules[i].parameter.split(",");
-          console.log('parameters', parameters);
-          let numerator = parameters[0] ? parameters[0] : '';
-          let denominator = parameters[1] ? parameters[1] : '';
-          console.log('matrixPercentageRules[i].datapointId', matrixPercentageRules[i].datapointId);
-          console.log('matrixPercentageRules[i].datapointId.id', matrixPercentageRules[i].datapointId.id);
-          let numeratorDpObject = _.filter(allDatapointsList, { code: numerator });
-          let denominatorDpObject = _.filter(allDatapointsList, { code: denominator });
-          let numeratorDpId = numeratorDpObject[0] ? numeratorDpObject[0].id : '';
-          let denominatorDpId = denominatorDpObject[0] ? denominatorDpObject[0].id : '';
-          let numeratorValues = [];
-          let denominatorValues = [];
-          _.filter(mergedDetails, (object, index) => {
-            for (let i = 0; i < distinctYears.length; i++) {
-              const year = distinctYears[i];
-              if(object.datapointId.id == numeratorDpId && object.companyId.id == params.companyId && object.year == year){
-                numeratorValues.push(object)
-              } else if(object.datapointId.id == denominatorDpId && object.companyId.id == params.companyId && object.year == year){
-                denominatorValues.push(object)
+      // let distinctRuleMethods = await Rules.distinct('methodName').populate('datapointId');
+      let distinctRuleMethods = [ "MatrixPercentage", "Minus", "Ratio", "Sum", "count of", "Ratio", "Percentage", "YesNo", "RatioADD", "ADD", "AsPercentage", "AsRatio", "Condition", "Multiply" ];
+      console.log('distinctRuleMethods', distinctRuleMethods);
+      //Process all rules
+      for (let ruleIndex = 0; ruleIndex < distinctRuleMethods.length; ruleIndex++) {
+        switch (distinctRuleMethods[ruleIndex]) {
+          case "ADD":
+            await addCalculation(companyId, mergedDetails, distinctYears, allDatapointsList)
+            .then((result) => {
+              if(result){
+                if(result.mergedDetails && result.allDerivedDatapoints){
+                  allDerivedDatapoints = _.concat(allDerivedDatapoints, result.allDerivedDatapoints);
+                  mergedDetails = _.concat(mergedDetails, result.allDerivedDatapoints);
+                }
               }
-            }
-          });
-          console.log('numeratorValues', numeratorValues);
-          console.log('denominatorValues', denominatorValues);
-          if(numeratorValues.length > 0 && denominatorValues.length > 0 && numeratorValues.length == denominatorValues.length){
-            for (let j = 0; j < numeratorValues.length; j++) {
-              let numeratorResponseValue = numeratorValues[j].response;
-              let denominatorResponseValue = denominatorValues[j].response;
-              let derivedResponse = (numeratorResponseValue/denominatorResponseValue)*100;
-              let derivedDatapointsObject = {
-                companyId: numeratorValues[j].companyId.id,
-                datapointId: matrixPercentageRules[i].datapointId.id,
-                year: numeratorValues[j].year,
-                response: derivedResponse,
-                memberName: numeratorValues[j].boardMemberName ? numeratorValues[j].boardMemberName : [ numeratorValues[j].kmpMemberName ? numeratorValues[j].kmpMemberName : '' ],
-                memberStatus: true,
-                status: true
+            })
+            break;
+          case "As":
+            await asCalculation(companyId, mergedDetails, distinctYears, allDatapointsList)
+            .then((result) => {
+              if(result){
+                if(result.mergedDetails && result.allDerivedDatapoints){
+                  allDerivedDatapoints = _.concat(allDerivedDatapoints, result.allDerivedDatapoints);
+                  mergedDetails = _.concat(mergedDetails, result.allDerivedDatapoints);
+                }
               }
-              allDerivedDatapoints.push(derivedDatapointsObject);
-              if(j == numeratorValues.length-1){
-                mergedDetails = _.concat(mergedDetails, allDerivedDatapoints);
+            })
+            break;
+          case "AsPercentage":
+            await asPercentageCalculation(companyId, mergedDetails, distinctYears, allDatapointsList)
+            .then((result) => {
+              if(result){
+                if(result.mergedDetails && result.allDerivedDatapoints){
+                  allDerivedDatapoints = _.concat(allDerivedDatapoints, result.allDerivedDatapoints);
+                  mergedDetails = _.concat(mergedDetails, result.allDerivedDatapoints);
+                }
               }
-            }
-          }
-          console.log('allDerivedDatapoints', allDerivedDatapoints);
-          console.log('mergedDetails after derived datapoints added', mergedDetails);
-        } else{
-
-        } 
-              
+            })
+            break;
+          case "AsRatio":
+            await asRatioCalculation(companyId, mergedDetails, distinctYears, allDatapointsList)
+            .then((result) => {
+              if(result){
+                if(result.mergedDetails && result.allDerivedDatapoints){
+                  allDerivedDatapoints = _.concat(allDerivedDatapoints, result.allDerivedDatapoints);
+                  mergedDetails = _.concat(mergedDetails, result.allDerivedDatapoints);
+                }
+              }
+            })
+            break;
+          case "Condition":
+            await conditionCalculation(companyId, mergedDetails, distinctYears, allDatapointsList)
+            .then((result) => {
+              if(result){
+                if(result.mergedDetails && result.allDerivedDatapoints){
+                  allDerivedDatapoints = _.concat(allDerivedDatapoints, result.allDerivedDatapoints);
+                  mergedDetails = _.concat(mergedDetails, result.allDerivedDatapoints);
+                }
+              }
+            })
+            break;
+          case "MatrixPercentage":
+            await matrixPercentageCalculation(companyId, mergedDetails, distinctYears, allDatapointsList)
+            .then((result) => {
+              if(result){
+                if(result.mergedDetails && result.allDerivedDatapoints){
+                  allDerivedDatapoints = _.concat(allDerivedDatapoints, result.allDerivedDatapoints);
+                  mergedDetails = _.concat(mergedDetails, result.allDerivedDatapoints);
+                }
+              }
+            })
+            break;
+          case "Minus":
+            await minusCalculation(companyId, mergedDetails, distinctYears, allDatapointsList)
+            .then((result) => {
+              if(result){
+                if(result.mergedDetails && result.allDerivedDatapoints){
+                  allDerivedDatapoints = _.concat(allDerivedDatapoints, result.allDerivedDatapoints);
+                  mergedDetails = _.concat(mergedDetails, result.allDerivedDatapoints);
+                }
+              }
+            })
+            break;
+          case "Multiply":
+            await multiplyCalculation(companyId, mergedDetails, distinctYears, allDatapointsList)
+            .then((result) => {
+              if(result){
+                if(result.mergedDetails && result.allDerivedDatapoints){
+                  allDerivedDatapoints = _.concat(allDerivedDatapoints, result.allDerivedDatapoints);
+                  mergedDetails = _.concat(mergedDetails, result.allDerivedDatapoints);
+                }
+              }
+            })
+            break;
+          case "Percentage":
+            await percentageCalculation(companyId, mergedDetails, distinctYears, allDatapointsList)
+            .then((result) => {
+              if(result){
+                if(result.mergedDetails && result.allDerivedDatapoints){
+                  allDerivedDatapoints = _.concat(allDerivedDatapoints, result.allDerivedDatapoints);
+                  mergedDetails = _.concat(mergedDetails, result.allDerivedDatapoints);
+                }
+              }
+            })
+            break;
+          case "Ratio":
+            await ratioCalculation(companyId, mergedDetails, distinctYears, allDatapointsList)
+            .then((result) => {
+              if(result){
+                if(result.mergedDetails && result.allDerivedDatapoints){
+                  allDerivedDatapoints = _.concat(allDerivedDatapoints, result.allDerivedDatapoints);
+                  mergedDetails = _.concat(mergedDetails, result.allDerivedDatapoints);
+                }
+              }
+            })
+            break;
+          case "RatioADD":
+            await ratioAddCalculation(companyId, mergedDetails, distinctYears, allDatapointsList)
+            .then((result) => {
+              if(result){
+                if(result.mergedDetails && result.allDerivedDatapoints){
+                  allDerivedDatapoints = _.concat(allDerivedDatapoints, result.allDerivedDatapoints);
+                  mergedDetails = _.concat(mergedDetails, result.allDerivedDatapoints);
+                }
+              }
+            })
+            break;
+          case "Sum":
+            await sumCalculation(companyId, mergedDetails, distinctYears, allDatapointsList)
+            .then((result) => {
+              if(result){
+                if(result.mergedDetails && result.allDerivedDatapoints){
+                  allDerivedDatapoints = _.concat(allDerivedDatapoints, result.allDerivedDatapoints);
+                  mergedDetails = _.concat(mergedDetails, result.allDerivedDatapoints);
+                }
+              }
+            })
+            break;
+          case "YesNo":
+            await yesNoCalculation(companyId, mergedDetails, distinctYears, allDatapointsList)
+            .then((result) => {
+              if(result){
+                if(result.mergedDetails && result.allDerivedDatapoints){
+                  allDerivedDatapoints = _.concat(allDerivedDatapoints, result.allDerivedDatapoints);
+                  mergedDetails = _.concat(mergedDetails, result.allDerivedDatapoints);
+                }
+              }
+            })
+            break;
+          case "count of":
+            await countOfCalculation(companyId, mergedDetails, distinctYears, allDatapointsList)
+            .then((result) => {
+              if(result){
+                if(result.mergedDetails && result.allDerivedDatapoints){
+                  allDerivedDatapoints = _.concat(allDerivedDatapoints, result.allDerivedDatapoints);
+                  mergedDetails = _.concat(mergedDetails, result.allDerivedDatapoints);
+                }
+              }
+            })
+            break;
+        
+          default:
+            break;
+        }        
       }
-      return res.status(200).json({ message: "Retrieved successfully!", mergedDetails: mergedDetails })
+      return res.status(200).json({ message: "Retrieved successfully!", allDerivedDatapoints: allDerivedDatapoints, mergedDetails: mergedDetails })
     } else {
       return res.status(500).json({ message: "No year wise data present for this company!" })
     }
@@ -167,3 +278,206 @@ export const destroy = ({ user, params }, res, next) =>
     .then((derivedDatapoints) => derivedDatapoints ? derivedDatapoints.remove() : null)
     .then(success(res, 204))
     .catch(next)
+
+async function matrixPercentageCalculation(companyId, mergedDetails, distinctYears, allDatapointsList){
+  let allDerivedDatapoints = [];
+  let matrixPercentageRules = await Rules.find({ methodName: "MatrixPercentage" }).populate('datapointId');
+  for (let i = 0; i < matrixPercentageRules.length; i++) {
+    if(matrixPercentageRules[i].methodType != "" || matrixPercentageRules[i].methodType == "composite"){
+      let parameters = matrixPercentageRules[i].parameter.split(",");
+      console.log('parameters', parameters);
+      let numerator = parameters[0] ? parameters[0] : '';
+      let denominator = parameters[1] ? parameters[1] : '';
+      console.log('matrixPercentageRules[i].datapointId', matrixPercentageRules[i].datapointId);
+      console.log('matrixPercentageRules[i].datapointId.id', matrixPercentageRules[i].datapointId.id);
+      let numeratorDpObject = _.filter(allDatapointsList, { code: numerator });
+      let denominatorDpObject = _.filter(allDatapointsList, { code: denominator });
+      let numeratorDpId = numeratorDpObject[0] ? numeratorDpObject[0].id : '';
+      let denominatorDpId = denominatorDpObject[0] ? denominatorDpObject[0].id : '';
+      let numeratorValues = [];
+      let denominatorValues = [];
+      _.filter(mergedDetails, (object, index) => {
+        for (let i = 0; i < distinctYears.length; i++) {
+          const year = distinctYears[i];
+          if(object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year){
+            numeratorValues.push(object)
+          } else if(object.datapointId.id == denominatorDpId && object.companyId.id == companyId && object.year == year){
+            denominatorValues.push(object)
+          }
+        }
+      });
+      console.log('numeratorValues', numeratorValues);
+      console.log('denominatorValues', denominatorValues);
+      if(numeratorValues.length > 0 && denominatorValues.length > 0 && numeratorValues.length == denominatorValues.length){
+        for (let j = 0; j < numeratorValues.length; j++) {
+          let numeratorResponseValue = parseInt(numeratorValues[j].response ? [ isNaN(numeratorValues[j].response) ? '0' : numeratorValues[j].response.replace(',', '') ] : '0');
+          let denominatorResponseValue = parseInt(denominatorValues[j].response ? [ isNaN(denominatorValues[j].response) ? '0' : denominatorValues[j].response.replace(',', '') ] : '0');
+          let derivedResponse = (numeratorResponseValue/denominatorResponseValue)*100;
+          let derivedDatapointsObject = {
+            companyId: numeratorValues[j].companyId.id,
+            datapointId: matrixPercentageRules[i].datapointId.id,
+            year: numeratorValues[j].year,
+            response: derivedResponse,
+            memberName: numeratorValues[j].memberName ? numeratorValues[j].memberName.replace('\r\n', ' ') : '' ,
+            memberStatus: true,
+            status: true
+          }
+          allDerivedDatapoints.push(derivedDatapointsObject);
+          if(j == numeratorValues.length-1){
+            mergedDetails = _.concat(mergedDetails, allDerivedDatapoints);
+          }
+        }
+      }
+      console.log('allDerivedDatapoints', allDerivedDatapoints);
+      console.log('mergedDetails after derived datapoints added', mergedDetails);
+    } else{
+      let parameters = matrixPercentageRules[i].parameter.split(",");
+      console.log('parameters', parameters);
+      let numerator = parameters[0] ? parameters[0] : '';
+      let denominator = parameters[1] ? parameters[1] : '';
+      console.log('matrixPercentageRules[i].datapointId', matrixPercentageRules[i].datapointId);
+      console.log('matrixPercentageRules[i].datapointId.id', matrixPercentageRules[i].datapointId.id);
+      let numeratorDpObject = _.filter(allDatapointsList, { code: numerator });
+      let denominatorDpObject = _.filter(allDatapointsList, { code: denominator });
+      let numeratorDpId = numeratorDpObject[0] ? numeratorDpObject[0].id : '';
+      let denominatorDpId = denominatorDpObject[0] ? denominatorDpObject[0].id : '';
+      let numeratorValues = [];
+      let denominatorValues = [];
+      _.filter(mergedDetails, (object, index) => {
+        for (let i = 0; i < distinctYears.length; i++) {
+          const year = distinctYears[i];
+          if(object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year){
+            numeratorValues.push(object)
+          } else if(object.datapointId.id == denominatorDpId && object.companyId.id == companyId && object.year == year){
+            denominatorValues.push(object)
+          }
+        }
+      });
+      console.log('numeratorValues', numeratorValues);
+      console.log('denominatorValues', denominatorValues);
+      if(numeratorValues.length > 0 && denominatorValues.length > 0){
+        for (let j = 0; j < numeratorValues.length; j++) {
+          let numeratorResponseValue = parseInt(numeratorValues[j].response ? [ isNaN(numeratorValues[j].response) ? '0' : numeratorValues[j].response.replace(',', '') ] : '0');
+          let denominatorResponseValue = parseInt(denominatorValues[0].response ? [ isNaN(denominatorValues[0].response) ? '0' : denominatorValues[0].response.replace(',', '') ] : '0');
+          let derivedResponse = (numeratorResponseValue/denominatorResponseValue)*100;
+          let derivedDatapointsObject = {
+            companyId: numeratorValues[j].companyId.id,
+            datapointId: matrixPercentageRules[i].datapointId.id,
+            year: numeratorValues[j].year,
+            response: derivedResponse,
+            memberName: numeratorValues[j].memberName ? numeratorValues[j].memberName.replace('\r\n', ' ') : '',
+            memberStatus: true,
+            status: true
+          }
+          allDerivedDatapoints.push(derivedDatapointsObject);
+          if(j == numeratorValues.length-1){
+            mergedDetails = _.concat(mergedDetails, allDerivedDatapoints);
+          }
+        }
+      }
+      console.log('allDerivedDatapoints', allDerivedDatapoints);
+      console.log('mergedDetails after derived datapoints added', mergedDetails);
+    }
+    if(i == matrixPercentageRules.length-1){
+      return { allDerivedDatapoints: allDerivedDatapoints };
+    }
+  }
+}
+
+async function addCalculation(companyId, mergedDetails, distinctYears, allDatapointsList){
+  let allDerivedDatapoints = [];
+  let addRules = await Rules.find({ methodName: "ADD" }).populate('datapointId');
+  console.log('add Calculation');
+  return { allDerivedDatapoints: [{ "name": "ithuvum summa" }] };
+}
+
+async function asCalculation(companyId, mergedDetails, distinctYears, allDatapointsList){
+  let allDerivedDatapoints = [];
+  let asRules = await Rules.find({ methodName: "As" }).populate('datapointId');
+  console.log('as Calculation');
+}
+
+async function asPercentageCalculation(companyId, mergedDetails, distinctYears, allDatapointsList){
+  let allDerivedDatapoints = [];
+  let asPercentageRules = await Rules.find({ methodName: "AsPercentage" }).populate('datapointId');
+  console.log('asPercentage Calculation');
+}
+
+async function asRatioCalculation(companyId, mergedDetails, distinctYears, allDatapointsList){
+  let allDerivedDatapoints = [];
+  let asRatioRules = await Rules.find({ methodName: "AsRatio" }).populate('datapointId');
+  console.log('asRatio Calculation');
+}
+
+async function conditionCalculation(companyId, mergedDetails, distinctYears, allDatapointsList){
+  let allDerivedDatapoints = [];
+  let asRatioRules = await Rules.find({ methodName: "Condition" }).populate('datapointId');
+  console.log('condition Calculation');
+}
+
+async function minusCalculation(companyId, mergedDetails, distinctYears, allDatapointsList){
+  let allDerivedDatapoints = [];
+  let asRatioRules = await Rules.find({ methodName: "Minus" }).populate('datapointId');
+  console.log('minus Calculation');
+}
+
+async function multiplyCalculation(companyId, mergedDetails, distinctYears, allDatapointsList){
+  let allDerivedDatapoints = [];
+  let asRatioRules = await Rules.find({ methodName: "Multiply" }).populate('datapointId');
+  console.log('multiply Calculation');
+}
+
+async function percentageCalculation(companyId, mergedDetails, distinctYears, allDatapointsList){
+  let allDerivedDatapoints = [];
+  let asRatioRules = await Rules.find({ methodName: "Percentage" }).populate('datapointId');
+  console.log('percentage Calculation');
+}
+
+async function ratioAddCalculation(companyId, mergedDetails, distinctYears, allDatapointsList){
+  let allDerivedDatapoints = [];
+  let asRatioRules = await Rules.find({ methodName: "RatioADD" }).populate('datapointId');
+  console.log('ratio add Calculation');
+}
+
+async function sumCalculation(companyId, mergedDetails, distinctYears, allDatapointsList){
+  let allDerivedDatapoints = [];
+  let asRatioRules = await Rules.find({ methodName: "Sum" }).populate('datapointId');
+  console.log('sum Calculation');
+}
+
+async function yesNoCalculation(companyId, mergedDetails, distinctYears, allDatapointsList){
+  let allDerivedDatapoints = [];
+  let asRatioRules = await Rules.find({ methodName: "YesNo" }).populate('datapointId');
+  console.log('yes no Calculation');
+}
+
+async function countOfCalculation(companyId, mergedDetails, distinctYears, allDatapointsList){
+  let allDerivedDatapoints = [];
+  let asRatioRules = await Rules.find({ methodName: "count of" }).populate('datapointId');
+  console.log('count of Calculation');
+}
+
+async function ratioCalculation(companyId, mergedDetails, distinctYears, allDatapointsList){
+  let allDerivedDatapoints = [];
+  //find MACR002, MACR007 and MACR010 from allDatapointsList using _.filter of lodash
+  //and loop that array first
+  let threeDatapoints = ["ObjectId1", "ObjectId2", "Object3"];
+  for (let index = 0; index < threeDatapoints.length; index++) {
+    const element = array[index];
+    // numerator/denominator
+    // push the result in allDerivedDatapoints and return the object
+  }
+
+
+  let asRatioRules = await Rules.find({ methodName: "Ratio" }).populate('datapointId');
+
+  for (let j = 0; j < asRatioRules.length; j++) {
+    const element = asRatioRules[j];
+    if(!threeDatapoints.includes(asRatioRules[j])){
+      // push the result in allDerivedDatapoints and return the object
+    }
+    
+  }
+
+  console.log('conditionCalculation');
+}
