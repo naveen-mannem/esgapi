@@ -11,7 +11,7 @@ const kmpMatrixDataPointsSchema = new Schema({
     ref: 'Companies',
     required: true
   },
-  kmpMemberName: {
+  memberName: {
     type: String
   },
   datapointId: {
@@ -50,7 +50,7 @@ kmpMatrixDataPointsSchema.methods = {
       id: this.id,
       createdBy: this.createdBy ? this.createdBy.view(full) : null,
       companyId: this.companyId ? this.companyId.view(full) : null,
-      kmpMemberName: this.kmpMemberName,
+      memberName: this.memberName,
       datapointId: this.datapointId ? this.datapointId.view(full) : null,
       response: this.response,
       year: this.year,

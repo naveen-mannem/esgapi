@@ -16,7 +16,7 @@ const boardMembersMatrixDataPointsSchema = new Schema({
     ref: 'Companies',
     required: true
   },
-  boardMemberName: {
+  memberName: {
     type: String
   },
   year: {
@@ -51,7 +51,7 @@ boardMembersMatrixDataPointsSchema.methods = {
       createdBy: this.createdBy ? this.createdBy.view(full) : null,
       datapointId: this.datapointId ? this.datapointId.view(full) : null,
       companyId: this.companyId.view(full) ? this.companyId.view(full) : null,
-      boardMemberName: this.boardMemberName,
+      memberName: this.memberName,
       year: this.year,
       response: this.response,
       fiscalYearEndDate: this.fiscalYearEndDate,

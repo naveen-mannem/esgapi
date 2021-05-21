@@ -20,11 +20,11 @@ beforeEach(async () => {
 test('POST /kmpMatrixDataPoints 201 (user)', async () => {
   const { status, body } = await request(app())
     .post(`${apiRoot}`)
-    .send({ access_token: userSession, companyId: 'test', kmpMemberName: 'test', datapointId: 'test', response: 'test', year: 'test', fiscalYearEndDate: 'test', memberStatus: 'test', status: 'test' })
+    .send({ access_token: userSession, companyId: 'test', memberName: 'test', datapointId: 'test', response: 'test', year: 'test', fiscalYearEndDate: 'test', memberStatus: 'test', status: 'test' })
   expect(status).toBe(201)
   expect(typeof body).toEqual('object')
   expect(body.companyId).toEqual('test')
-  expect(body.kmpMemberName).toEqual('test')
+  expect(body.memberName).toEqual('test')
   expect(body.datapointId).toEqual('test')
   expect(body.response).toEqual('test')
   expect(body.year).toEqual('test')
@@ -82,12 +82,12 @@ test('GET /kmpMatrixDataPoints/:id 404 (user)', async () => {
 test('PUT /kmpMatrixDataPoints/:id 200 (user)', async () => {
   const { status, body } = await request(app())
     .put(`${apiRoot}/${kmpMatrixDataPoints.id}`)
-    .send({ access_token: userSession, companyId: 'test', kmpMemberName: 'test', datapointId: 'test', response: 'test', year: 'test', fiscalYearEndDate: 'test', memberStatus: 'test', status: 'test' })
+    .send({ access_token: userSession, companyId: 'test', memberName: 'test', datapointId: 'test', response: 'test', year: 'test', fiscalYearEndDate: 'test', memberStatus: 'test', status: 'test' })
   expect(status).toBe(200)
   expect(typeof body).toEqual('object')
   expect(body.id).toEqual(kmpMatrixDataPoints.id)
   expect(body.companyId).toEqual('test')
-  expect(body.kmpMemberName).toEqual('test')
+  expect(body.memberName).toEqual('test')
   expect(body.datapointId).toEqual('test')
   expect(body.response).toEqual('test')
   expect(body.year).toEqual('test')
@@ -100,7 +100,7 @@ test('PUT /kmpMatrixDataPoints/:id 200 (user)', async () => {
 test('PUT /kmpMatrixDataPoints/:id 401 (user) - another user', async () => {
   const { status } = await request(app())
     .put(`${apiRoot}/${kmpMatrixDataPoints.id}`)
-    .send({ access_token: anotherSession, companyId: 'test', kmpMemberName: 'test', datapointId: 'test', response: 'test', year: 'test', fiscalYearEndDate: 'test', memberStatus: 'test', status: 'test' })
+    .send({ access_token: anotherSession, companyId: 'test', memberName: 'test', datapointId: 'test', response: 'test', year: 'test', fiscalYearEndDate: 'test', memberStatus: 'test', status: 'test' })
   expect(status).toBe(401)
 })
 
@@ -113,7 +113,7 @@ test('PUT /kmpMatrixDataPoints/:id 401', async () => {
 test('PUT /kmpMatrixDataPoints/:id 404 (user)', async () => {
   const { status } = await request(app())
     .put(apiRoot + '/123456789098765432123456')
-    .send({ access_token: anotherSession, companyId: 'test', kmpMemberName: 'test', datapointId: 'test', response: 'test', year: 'test', fiscalYearEndDate: 'test', memberStatus: 'test', status: 'test' })
+    .send({ access_token: anotherSession, companyId: 'test', memberName: 'test', datapointId: 'test', response: 'test', year: 'test', fiscalYearEndDate: 'test', memberStatus: 'test', status: 'test' })
   expect(status).toBe(404)
 })
 

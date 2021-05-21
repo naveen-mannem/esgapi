@@ -7,7 +7,7 @@ import { schema } from './model'
 export BoardMembersMatrixDataPoints, { schema } from './model'
 
 const router = new Router()
-const { datapointId, companyId, boardMemberName, year, response, fiscalYearEndDate, memberStatus, status } = schema.tree
+const { datapointId, companyId, memberName, year, response, fiscalYearEndDate, memberStatus, status } = schema.tree
 
 /**
  * @api {post} /boardMembersMatrixDataPoints Create board members matrix data points
@@ -17,7 +17,7 @@ const { datapointId, companyId, boardMemberName, year, response, fiscalYearEndDa
  * @apiParam {String} access_token user access token.
  * @apiParam datapointId Board members matrix data points's datapointId.
  * @apiParam companyId Board members matrix data points's companyId.
- * @apiParam boardMemberName Board members matrix data points's boardMemberName.
+ * @apiParam memberName Board members matrix data points's memberName.
  * @apiParam year Board members matrix data points's year.
  * @apiParam response Board members matrix data points's response.
  * @apiParam fiscalYearEndDate Board members matrix data points's fiscalYearEndDate.
@@ -29,7 +29,7 @@ const { datapointId, companyId, boardMemberName, year, response, fiscalYearEndDa
  */
 router.post('/',
   token({ required: true }),
-  body({ datapointId, companyId, boardMemberName, year, response, fiscalYearEndDate, memberStatus}),
+  body({ datapointId, companyId, memberName, year, response, fiscalYearEndDate, memberStatus}),
   create)
 
 /**
@@ -72,7 +72,7 @@ router.get('/:id',
  * @apiParam {String} access_token user access token.
  * @apiParam datapointId Board members matrix data points's datapointId.
  * @apiParam companyId Board members matrix data points's companyId.
- * @apiParam boardMemberName Board members matrix data points's boardMemberName.
+ * @apiParam memberName Board members matrix data points's memberName.
  * @apiParam year Board members matrix data points's year.
  * @apiParam response Board members matrix data points's response.
  * @apiParam fiscalYearEndDate Board members matrix data points's fiscalYearEndDate.
@@ -85,7 +85,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ datapointId, companyId, boardMemberName, year, response, fiscalYearEndDate, memberStatus, status }),
+  body({ datapointId, companyId, memberName, year, response, fiscalYearEndDate, memberStatus, status }),
   update)
 
 /**

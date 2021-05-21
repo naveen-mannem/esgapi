@@ -5,7 +5,7 @@ let user, boardMembersMatrixDataPoints
 
 beforeEach(async () => {
   user = await User.create({ email: 'a@a.com', password: '123456' })
-  boardMembersMatrixDataPoints = await BoardMembersMatrixDataPoints.create({ createdBy: user, datapointId: 'test', companyId: 'test', boardMemberName: 'test', year: 'test', fiscalYearEndDate: 'test', response: 'test', memberStatus: 'test', status: 'test' })
+  boardMembersMatrixDataPoints = await BoardMembersMatrixDataPoints.create({ createdBy: user, datapointId: 'test', companyId: 'test', memberName: 'test', year: 'test', fiscalYearEndDate: 'test', response: 'test', memberStatus: 'test', status: 'test' })
 })
 
 describe('view', () => {
@@ -17,7 +17,7 @@ describe('view', () => {
     expect(view.createdBy.id).toBe(user.id)
     expect(view.datapointId).toBe(boardMembersMatrixDataPoints.datapointId)
     expect(view.companyId).toBe(boardMembersMatrixDataPoints.companyId)
-    expect(view.boardMemberName).toBe(boardMembersMatrixDataPoints.boardMemberName)
+    expect(view.memberName).toBe(boardMembersMatrixDataPoints.memberName)
     expect(view.year).toBe(boardMembersMatrixDataPoints.year)
     expect(view.fiscalYearEndDate).toBe(boardMembersMatrixDataPoints.fiscalYearEndDate)
     expect(view.response).toBe(boardMembersMatrixDataPoints.response)
@@ -35,7 +35,7 @@ describe('view', () => {
     expect(view.createdBy.id).toBe(user.id)
     expect(view.datapointId).toBe(boardMembersMatrixDataPoints.datapointId)
     expect(view.companyId).toBe(boardMembersMatrixDataPoints.companyId)
-    expect(view.boardMemberName).toBe(boardMembersMatrixDataPoints.boardMemberName)
+    expect(view.memberName).toBe(boardMembersMatrixDataPoints.memberName)
     expect(view.year).toBe(boardMembersMatrixDataPoints.year)
     expect(view.fiscalYearEndDate).toBe(boardMembersMatrixDataPoints.fiscalYearEndDate)
     expect(view.response).toBe(boardMembersMatrixDataPoints.response)

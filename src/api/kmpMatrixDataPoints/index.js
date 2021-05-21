@@ -7,7 +7,7 @@ import { schema } from './model'
 export KmpMatrixDataPoints, { schema } from './model'
 
 const router = new Router()
-const { companyId, kmpMemberName, datapointId, response, year, fiscalYearEndDate, memberStatus, status } = schema.tree
+const { companyId, memberName, datapointId, response, year, fiscalYearEndDate, memberStatus, status } = schema.tree
 
 /**
  * @api {post} /kmpMatrixDataPoints Create kmp matrix data points
@@ -16,7 +16,7 @@ const { companyId, kmpMemberName, datapointId, response, year, fiscalYearEndDate
  * @apiPermission user
  * @apiParam {String} access_token user access token.
  * @apiParam companyId Kmp matrix data points's companyId.
- * @apiParam kmpMemberName Kmp matrix data points's kmpMemberName.
+ * @apiParam memberName Kmp matrix data points's memberName.
  * @apiParam datapointId Kmp matrix data points's datapointId.
  * @apiParam response Kmp matrix data points's response.
  * @apiParam year Kmp matrix data points's year.
@@ -29,7 +29,7 @@ const { companyId, kmpMemberName, datapointId, response, year, fiscalYearEndDate
  */
 router.post('/',
   token({ required: true }),
-  body({ companyId, kmpMemberName, datapointId, response, year, fiscalYearEndDate, memberStatus}),
+  body({ companyId, memberName, datapointId, response, year, fiscalYearEndDate, memberStatus}),
   create)
 
 /**
@@ -71,7 +71,7 @@ router.get('/:id',
  * @apiPermission user
  * @apiParam {String} access_token user access token.
  * @apiParam companyId Kmp matrix data points's companyId.
- * @apiParam kmpMemberName Kmp matrix data points's kmpMemberName.
+ * @apiParam memberName Kmp matrix data points's memberName.
  * @apiParam datapointId Kmp matrix data points's datapointId.
  * @apiParam response Kmp matrix data points's response.
  * @apiParam year Kmp matrix data points's year.
@@ -85,7 +85,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ companyId, kmpMemberName, datapointId, response, year, fiscalYearEndDate, memberStatus, status }),
+  body({ companyId, memberName, datapointId, response, year, fiscalYearEndDate, memberStatus, status }),
   update)
 
 /**
