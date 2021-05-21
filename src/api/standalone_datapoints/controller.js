@@ -82,24 +82,34 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
               var value = worksheet[cellId].v;
               //store header names
               if (row == 1) {
-                headers[col] = value;
+                if(value != "Error types and definitions"){
+                  if(isNaN(value)) { 
+                    headers[col] = value.replace('\r\n', ' ');
+                  }
+                }
                 // storing the header names
                 continue;
               } else if (headerRowsNumber.includes(row) && row != 1) {
-                headers1[col] = value;
+                if(isNaN(value)) { 
+                  headers1[col] = value.replace('\r\n', ' ');
+                }
                 // storing the header names
                 continue;
               }
               // if(headerRowsNumber.includes(row) && row != 1){
               if (row > headerRowsNumber[1] && row != 1) {
                 if (!data[row]) data[row] = {};
-                data[row][headers1[col]] = value;
+                if(isNaN(value)) { 
+                  data[row][headers1[col]] = value.replace('\r\n', ' ');
+                }
               } else {
                 if (!data[row]) {
                   data[row] = {};
                   data[row][headers[col]] = '';
                 }
-                data[row][headers[col]] = value;
+                if(isNaN(value)) { 
+                  data[row][headers[col]] = value.replace('\r\n', ' ');
+                }
               }
             }
             //drop those first two rows which are empty
@@ -281,14 +291,25 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
       let datapointObject = datapointList.filter(obj => obj.code === item['DP Code']);
       let allKeyNamesList = Object.keys(item);
       const boardMembersNameList = _.filter(allKeyNamesList, function (keyName) {
-        return keyName != "Category" && keyName != "Key Issues" && keyName != "DP Code" && keyName != "Indicator" && keyName != "Description" && keyName != "Data Type" && keyName != "Unit" && keyName != "Fiscal Year" && keyName != "Fiscal Year End Date" && keyName != "CIN"
-          && keyName != "Source name" && keyName != "URL" && keyName != "Page number" && keyName != "Publication date" && keyName != "Text  snippet" && keyName != "Screenshot (in png)" && keyName != "Word Doc (.docx)" && keyName != "Excel (.xlsx)" && keyName != "Excel (.xlxsx)" && keyName != "PDF"
-          && keyName != "File pathway (if any)" && keyName != "Comments/Calculations" && keyName != "Data Verification"
-          && keyName != "Error Type" && keyName != "Error Comments" && keyName != "Internal file source" && keyName != "Error Status" && keyName != "Analyst Comments" && keyName != "Additional comments";
+        let trimmedKeyName = keyName.replace(/\s/g, "").replace('\r\n', '').toLowerCase();
+        return trimmedKeyName != "category" && trimmedKeyName != "keyissues" && trimmedKeyName != "dpcode" 
+        && trimmedKeyName != "indicator" && trimmedKeyName != "description" && trimmedKeyName != "datatype" 
+        && trimmedKeyName != "unit" && trimmedKeyName != "fiscalyear" && trimmedKeyName != "fiscalyearenddate" 
+        && trimmedKeyName != "cin" && trimmedKeyName != "sourcename" && trimmedKeyName != "url" 
+        && trimmedKeyName != "pagenumber" && trimmedKeyName != "publicationdate" && trimmedKeyName != "textsnippet" 
+        && trimmedKeyName != "screenshot(inpng)" && trimmedKeyName != "worddoc(.docx)" && trimmedKeyName != "excel(.xlsx)" 
+        && trimmedKeyName != "excel(.xlxsx)" && trimmedKeyName != "pdf" && trimmedKeyName != "filepathway(ifany)" 
+        && trimmedKeyName != "comments/calculations" && trimmedKeyName != "dataverification" 
+        && trimmedKeyName != "errortype" && trimmedKeyName != "errorcomments" && trimmedKeyName != "internalfilesource" 
+        && trimmedKeyName != "errorstatus" && trimmedKeyName != "analystcomments" && trimmedKeyName != "additionalcomments" 
+        && trimmedKeyName != "errortypesanddefinitions" && trimmedKeyName != "count" && trimmedKeyName != "20" 
+        && trimmedKeyName != "t2.evidencenotsubstantive" && trimmedKeyName != "0" && trimmedKeyName != "7" 
+        && trimmedKeyName != "goodtohave" && trimmedKeyName != "t2.others/noerror" 
+        && trimmedKeyName != "whenitisnotananalysterror/itisjustasuggestion" && trimmedKeyName != "undefined";
       });
       _.forEach(boardMembersNameList, function (value) {
         let memberDetail = {
-          boardMemberName: value.trim(),
+          memberName: value,
           response: item[value],
           datapointId: datapointObject[0] ? datapointObject[0].id : null,
           companyId: companyObject[0] ? companyObject[0].id : null,
@@ -343,15 +364,26 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
       let datapointObject = datapointList.filter(obj => obj.code === item['DP Code']);
       let allKeyNamesList = Object.keys(item);
       const kmpMembersNameList = _.filter(allKeyNamesList, function (keyName) {
-        return keyName != "Category" && keyName != "Key Issues" && keyName != "DP Code" && keyName != "Indicator" && keyName != "Description" && keyName != "Data Type" && keyName != "Unit" && keyName != "Fiscal Year" && keyName != "Fiscal Year End Date" && keyName != "CIN"
-          && keyName != "Source name" && keyName != "URL" && keyName != "Page number" && keyName != "Publication date" && keyName != "Text  snippet" && keyName != "Screenshot (in png)" && keyName != "Word Doc (.docx)" && keyName != "Excel (.xlsx)" && keyName != "Excel (.xlxsx)" && keyName != "PDF"
-          && keyName != "File pathway (if any)" && keyName != "Comments/Calculations" && keyName != "Data Verification"
-          && keyName != "Error Type" && keyName != "Error Comments" && keyName != "Internal file source" && keyName != "Error Status" && keyName != "Analyst Comments" && keyName != "Additional comments";
+        let trimmedKeyName = keyName.replace(/\s/g, "").replace('\r\n', '').toLowerCase();
+        return trimmedKeyName != "category" && trimmedKeyName != "keyissues" && trimmedKeyName != "dpcode" 
+        && trimmedKeyName != "indicator" && trimmedKeyName != "description" && trimmedKeyName != "datatype" 
+        && trimmedKeyName != "unit" && trimmedKeyName != "fiscalyear" && trimmedKeyName != "fiscalyearenddate" 
+        && trimmedKeyName != "cin" && trimmedKeyName != "sourcename" && trimmedKeyName != "url" 
+        && trimmedKeyName != "pagenumber" && trimmedKeyName != "publicationdate" && trimmedKeyName != "textsnippet" 
+        && trimmedKeyName != "screenshot(inpng)" && trimmedKeyName != "worddoc(.docx)" && trimmedKeyName != "excel(.xlsx)" 
+        && trimmedKeyName != "excel(.xlxsx)" && trimmedKeyName != "pdf" && trimmedKeyName != "filepathway(ifany)" 
+        && trimmedKeyName != "comments/calculations" && trimmedKeyName != "dataverification" 
+        && trimmedKeyName != "errortype" && trimmedKeyName != "errorcomments" && trimmedKeyName != "internalfilesource" 
+        && trimmedKeyName != "errorstatus" && trimmedKeyName != "analystcomments" && trimmedKeyName != "additionalcomments" 
+        && trimmedKeyName != "errortypesanddefinitions" && trimmedKeyName != "count" && trimmedKeyName != "20" 
+        && trimmedKeyName != "t2.evidencenotsubstantive" && trimmedKeyName != "0" && trimmedKeyName != "7" 
+        && trimmedKeyName != "goodtohave" && trimmedKeyName != "t2.others/noerror" 
+        && trimmedKeyName != "whenitisnotananalysterror/itisjustasuggestion" && trimmedKeyName != "undefined";
       });
       let currentMemberStatus;
       _.forEach(kmpMembersNameList, function (value) {
         let memberDetail = {
-          kmpMemberName: value.trim(),
+          memberName: value,
           response: item[value],
           memberStatus: true,
           datapointId: datapointObject[0] ? datapointObject[0].id : null,
