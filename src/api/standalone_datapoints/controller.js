@@ -39,6 +39,22 @@ var upload = multer({ //multer settings
   }
 }).fields([{ name: 'file', maxCount: 60 }]);
 
+function alphaToNum(alpha) {
+  var i = 0, num = 0, len = alpha.length;
+  for (i; i < len; i++) {
+    num = num * 26 + alpha.charCodeAt(i) - 0x40;
+  }
+  return num - 1;
+}
+
+function numToAlpha(num) {
+  var alpha = '';
+  for (num; num >= 0; num = parseInt(num / 26, 10) - 1) {
+    alpha = String.fromCharCode(num % 26 + 0x41) + alpha;
+  }
+  return alpha;
+}
+
 export const uploadCompanyESGFiles = async (req, res, next) => {
   const userDetail = req.user;
   upload(req, res, async function (err) {
@@ -58,6 +74,15 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
         if (currentSheetName != 'Sheet3') {
           //getting the complete sheet
           var worksheet = workbook.Sheets[currentSheetName];
+          var idx, allColumnNames = [];
+          var rangeNum = worksheet['!ref'].split(':').map(function(val) {
+            return alphaToNum(val.replace(/[0-9]/g, ''));
+          })
+          var start = rangeNum[0];
+          var end = rangeNum[1] + 1;
+          for (idx = start; idx < end ; idx++) {
+            allColumnNames.push(numToAlpha(idx));
+          }
           let headerRowsNumber = [];
           if (currentSheetName == 'Matrix-Directors' || currentSheetName == 'Matrix-KMP') {
             let headersIndexDetails = _.filter(worksheet, (object, index) => {
@@ -99,16 +124,57 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
               // if(headerRowsNumber.includes(row) && row != 1){
               if (row > headerRowsNumber[1] && row != 1) {
                 if (!data[row]) data[row] = {};
-                if(isNaN(value)) { 
-                  data[row][headers1[col]] = value.replace('\r\n', ' ');
+                if(col != 'A'){
+                  if(headers1['A']){
+                    if(data[row][headers1['A']]){
+                      //take all column names in an array
+                      let currentColumnIndex = allColumnNames.indexOf(col);
+                      let previousColumnIndex = currentColumnIndex-1;
+                      let nextColumnIndex = currentColumnIndex+1;
+                      data[row][headers1[col]] = value;
+                      if(!data[row][headers1[allColumnNames[previousColumnIndex]]] && previousColumnIndex !=0){
+                        data[row][headers1[allColumnNames[previousColumnIndex]]] = '';
+                      }
+                      if(!data[row][headers1[allColumnNames[nextColumnIndex]]]){
+                        data[row][headers1[allColumnNames[nextColumnIndex]]] = '';
+                      }
+                    }
+                  }
+                } else {
+                  if(isNaN(value)) { 
+                    data[row][headers1[col]] = value.replace('\r\n', ' ');
+                  } else {
+                    data[row][headers1[col]] = value;
+                  }
                 }
               } else {
                 if (!data[row]) {
                   data[row] = {};
                   data[row][headers[col]] = '';
                 }
-                if(isNaN(value)) { 
-                  data[row][headers[col]] = value.replace('\r\n', ' ');
+                
+                if(col != 'A'){
+                  if(headers['A']){
+                    if(data[row][headers['A']]){
+                      //take all column names in an array
+                      let currentColumnIndex = allColumnNames.indexOf(col);
+                      let previousColumnIndex = currentColumnIndex-1;
+                      let nextColumnIndex = currentColumnIndex+1;
+                      data[row][headers[col]] = value;
+                      if(!data[row][headers[allColumnNames[previousColumnIndex]]] && previousColumnIndex !=0){
+                        data[row][headers[allColumnNames[previousColumnIndex]]] = '';
+                      }
+                      if(!data[row][headers[allColumnNames[nextColumnIndex]]]){
+                        data[row][headers[allColumnNames[nextColumnIndex]]] = '';
+                      }
+                    }
+                  }
+                } else {
+                  if(isNaN(value)) { 
+                    data[row][headers[col]] = value.replace('\r\n', ' ');
+                  } else {
+                    data[row][headers[col]] = value;
+                  }
                 }
               }
             }
@@ -131,8 +197,26 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
                 continue;
               }
 
-              if (!data[row]) data[row] = {};
-              data[row][headers[col]] = value;
+              if (!data[row] && value) data[row] = {};
+              if(col != 'A'){
+                if(headers['A']){
+                  if(data[row][headers['A']]){
+                    //take all column names in an array
+                    let currentColumnIndex = allColumnNames.indexOf(col);
+                    let previousColumnIndex = currentColumnIndex-1;
+                    let nextColumnIndex = currentColumnIndex+1;
+                    data[row][headers[col]] = value;
+                    if(!data[row][headers[allColumnNames[previousColumnIndex]]] && previousColumnIndex !=0){
+                      data[row][headers[allColumnNames[previousColumnIndex]]] = '';
+                    }
+                    if(!data[row][headers[allColumnNames[nextColumnIndex]]]){
+                      data[row][headers[allColumnNames[nextColumnIndex]]] = '';
+                    }
+                  }
+                }
+              } else {
+                data[row][headers[col]] = value;
+              }
             }
             //drop those first two rows which are empty
             data.shift();
@@ -162,22 +246,26 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
         let noOfRowsInASheet = allFilesObject[allFilesArrayIndex][singleFileIndex].length;
         for (let rowIndex = 0; rowIndex < noOfRowsInASheet; rowIndex++) {
           if (singleFileIndex == 0 && rowIndex == 0) {
-            allCompanyInfos.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex]);
-            currentCompanyName = allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex]['CIN'];
-          } else if (noOfSheetsInAnFile > 2) {
-            if (allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex]) {
-              allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex].CIN = currentCompanyName;
+            if(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex]){
+              allCompanyInfos.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex]);
+              currentCompanyName = allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex]['CIN'];
             }
-            if (singleFileIndex == 2) {
-              allBoardMemberMatrixDetails.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex])
-            } else if (singleFileIndex == 3) {
-              allKmpMatrixDetails.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex])
-            } else if(singleFileIndex == 1){
-              allStandaloneDetails.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex])
+          } else if (noOfSheetsInAnFile > 2) {
+            if (allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex] && allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex]['DP Code']) {
+              allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex].CIN = currentCompanyName;
+              if (singleFileIndex == 2) {
+                allBoardMemberMatrixDetails.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex])
+              } else if (singleFileIndex == 3) {
+                allKmpMatrixDetails.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex])
+              } else if(singleFileIndex == 1){
+                allStandaloneDetails.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex])
+              }
             }
           } else {
-            allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex].CIN = currentCompanyName;
-            allStandaloneDetails.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex])
+            if(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex] && allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex]['DP Code']){
+              allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex].CIN = currentCompanyName;
+              allStandaloneDetails.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex])
+            }
           }
         }
       }
@@ -302,10 +390,10 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
         && trimmedKeyName != "comments/calculations" && trimmedKeyName != "dataverification" 
         && trimmedKeyName != "errortype" && trimmedKeyName != "errorcomments" && trimmedKeyName != "internalfilesource" 
         && trimmedKeyName != "errorstatus" && trimmedKeyName != "analystcomments" && trimmedKeyName != "additionalcomments" 
-        && trimmedKeyName != "errortypesanddefinitions" && trimmedKeyName != "count" && trimmedKeyName != "20" 
+        && trimmedKeyName != "errortypesanddefinitions" && trimmedKeyName != "errortypesanddefinations" && trimmedKeyName != "count" && trimmedKeyName != "20" 
         && trimmedKeyName != "t2.evidencenotsubstantive" && trimmedKeyName != "0" && trimmedKeyName != "7" 
-        && trimmedKeyName != "goodtohave" && trimmedKeyName != "t2.others/noerror" 
-        && trimmedKeyName != "whenitisnotananalysterror/itisjustasuggestion" && trimmedKeyName != "undefined";
+        && trimmedKeyName != "goodtohave" && trimmedKeyName != "t2.others/noerror" && trimmedKeyName != "percentile" 
+        && trimmedKeyName != "whenitisnotananalysterror/itisjustasuggestion" && trimmedKeyName != "undefined" && trimmedKeyName.length > 2;
       });
       _.forEach(boardMembersNameList, function (value) {
         let memberDetail = {
@@ -375,10 +463,10 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
         && trimmedKeyName != "comments/calculations" && trimmedKeyName != "dataverification" 
         && trimmedKeyName != "errortype" && trimmedKeyName != "errorcomments" && trimmedKeyName != "internalfilesource" 
         && trimmedKeyName != "errorstatus" && trimmedKeyName != "analystcomments" && trimmedKeyName != "additionalcomments" 
-        && trimmedKeyName != "errortypesanddefinitions" && trimmedKeyName != "count" && trimmedKeyName != "20" 
+        && trimmedKeyName != "errortypesanddefinitions" && trimmedKeyName != "errortypesanddefinations" && trimmedKeyName != "count" && trimmedKeyName != "20" 
         && trimmedKeyName != "t2.evidencenotsubstantive" && trimmedKeyName != "0" && trimmedKeyName != "7" 
-        && trimmedKeyName != "goodtohave" && trimmedKeyName != "t2.others/noerror" 
-        && trimmedKeyName != "whenitisnotananalysterror/itisjustasuggestion" && trimmedKeyName != "undefined";
+        && trimmedKeyName != "goodtohave" && trimmedKeyName != "t2.others/noerror" && trimmedKeyName != "percentile" 
+        && trimmedKeyName != "whenitisnotananalysterror/itisjustasuggestion" && trimmedKeyName != "undefined" && trimmedKeyName.length > 2;
       });
       let currentMemberStatus;
       _.forEach(kmpMembersNameList, function (value) {
@@ -418,9 +506,6 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
           //  console.log('result', result);
         }
       });
-
-    console.log(structuredCompanyDetails )
-    console.log(structuredCompanyDetails)
    // res.json({ message: "Files upload success", companies: structuredCompanyDetails, allStandaloneDetails: structuredStandaloneDetails, allBoardMemberMatrixDetails: boardMembersList, allKmpMatrixDetails: kmpMembersList, data: allFilesObject });
     res.json({ message: "Files upload success", companies: structuredCompanyDetails})
    });
