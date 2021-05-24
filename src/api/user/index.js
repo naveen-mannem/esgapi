@@ -8,8 +8,7 @@ export User, { schema } from './model'
 
 const router = new Router()
 const { email, password, name, picture, role, roleId, otp, status ,firstName ,middleName,lastName,phoneNumber,PANCard,adharCard,bankAccountNumber,
-  bankIFSCCode,nameOfTheAccountHolder,authendicationLetter,companyIdCard,companyName} = schema.tree
-const onboardingdetails=''
+  bankIFSCCode,nameOfTheAccountHolder,authendicationLetter,companyIdCard,companyName, onboardingdetails, pancard,aadhar,cancelledcheque} = schema.tree
 /**
  * @api {get} /users Retrieve users
  * @apiName RetrieveUsers
