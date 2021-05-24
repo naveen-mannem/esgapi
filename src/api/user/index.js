@@ -2,13 +2,14 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { password as passwordAuth, master, token } from '../../services/passport'
-import { index, showMe, show, create, update, updatePassword, destroy, getUsersByRole } from './controller'
+import { index, showMe, show, create, update, updatePassword, destroy, getUsersByRole,onBoardingEmpolyee,onBoardingClientRep,onBoardingCompanyRep } from './controller'
 import { schema } from './model'
 export User, { schema } from './model'
 
 const router = new Router()
-const { email, password, name, picture, role, roleId, otp, status } = schema.tree
-
+const { email, password, name, picture, role, roleId, otp, status ,firstName ,middleName,lastName,phoneNumber,PANCard,adharCard,bankAccountNumber,
+  bankIFSCCode,nameOfTheAccountHolder,authendicationLetter,companyIdCard,companyName} = schema.tree
+const onboardingdetails=''
 /**
  * @api {get} /users Retrieve users
  * @apiName RetrieveUsers
@@ -134,5 +135,20 @@ router.put('/:id/password',
 router.delete('/:id',
   token({ required: true, roles: ['admin'] }),
   destroy)
+
+router.post('/onBoardEmployee',
+token({required:true}),
+body({onboardingdetails,pancard,aadhar,cancelledcheque}),
+onBoardingEmpolyee)
+
+router.post('/onBoardClientRep',
+token({required:true}),
+body({onboardingdetails}),
+onBoardingClientRep)
+
+router.post('/onBoardCompanyRep',
+token({required:true}),
+body({onboardingdetails}),
+onBoardingCompanyRep)
 
 export default router
