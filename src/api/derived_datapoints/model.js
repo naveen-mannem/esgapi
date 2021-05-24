@@ -20,22 +20,27 @@ const derivedDatapointsSchema = new Schema({
     type: String
   },
   performanceResult: {
-    type: String
+    type: String,
+    default: ''
   },
   activeStatus: {
-    type: String
+    type: String,
+    default: ''
   },
   dpStatus: {
-    type: String
+    type: String,
+    default: ''
   },
   year: {
     type: String
   },
   fiscalYearEndDate: {
-    type: String
+    type: String,
+    default: ''
   },
   lastModifiedDate: {
-    type: String
+    type: String,
+    default: ''
   },
   status: {
     type: Boolean,
