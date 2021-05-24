@@ -250,7 +250,7 @@ export const calculateForACompany = async({ user, params }, res, next) => {
           });
         }
       }
-      return res.status(200).json({ message: "Retrieved successfully!", allDerivedDatapoints: allDerivedDatapoints, mergedDetails: mergedDetails })
+      return res.status(200).json({ message: "Retrieved successfully!", allDerivedDatapoints: allDerivedDatapoints })
     } else {
       return res.status(500).json({ message: "No year wise data present for this company!" })
     }
