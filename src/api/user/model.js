@@ -46,6 +46,64 @@ const userSchema = new Schema({
   status: {
     type: Boolean,
     default: true
+  },
+  firstName:{
+    type: String,
+    required:false
+  },
+  middleName:{
+    type: String,
+    required:false
+  },
+  lastName:{
+    type: String,
+    required:false
+  },
+  
+  phoneNumber:{
+    type: String,
+    required:false
+  },
+  PANCard:{
+    type: String,
+    required:false
+  },
+  adharCard:{
+    type: String,
+    required:false
+  },
+  bankAccountNumber:{
+    type: String,
+    required:false
+  },
+  bankIFSCCode:{
+    type: String,
+    required:false
+  },
+  nameOfTheAccountHolder:{
+    type: String,
+    required:false
+  },
+  pancardUpload:{
+    type: String,
+    required:false
+  },
+  aadharUpload:{
+    type: String,
+    required:false
+  },
+  cancelledchequeUpload:{
+    type: String,
+    required:false
+  },
+  authendicationLetter:{
+    type: String,
+    required:false
+  },
+  companyName:[],
+  companyIdCard:{
+    type: String,
+    required:false
   }
 }, {
   timestamps: true
