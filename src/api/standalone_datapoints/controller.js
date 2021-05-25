@@ -279,7 +279,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
         companyName: item['Company Name'],
         cin: item['CIN'],
         nicCode: item['NIC Code'],
-        nic: item['NIC Code'],
+        nic: item['NIC Code'].toString().substring(0, 2),
         nicIndustry: item['NIC industry'],
         isinCode: item['ISIN Code'],
         cmieProwessCode: item['CMIE/Prowess Code'],
@@ -410,7 +410,13 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
         boardMembersList.push(memberDetail);
         if (item['DP Code'] == 'BOIR018') {
           if (item[value] != 'No' && item[value] != '' && item[value] != undefined && item[value] != null) {
-            let cessaDate = getJsDateFromExcel(item[value]);
+            
+            let cessaDate;
+            try {
+              cessaDate = getJsDateFromExcel(item[value]);        
+            } catch (error) {
+              return res.status(500).json({ message: `Found invalid date format in ${companyObject ? companyObject.companyName : 'a company'}, please correct and try again!` })
+            }
             let currentDate = new Date();
             if (cessaDate < currentDate) {
               inactiveBoardMembersList.push(memberDetail)

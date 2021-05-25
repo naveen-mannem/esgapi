@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { token } from '../../services/passport'
-import { create, index, show, update, destroy } from './controller'
+import { create, index, show, update, destroy, percentileCalculation } from './controller'
 import { schema } from './model'
 export PolarityRules, { schema } from './model'
 
@@ -61,6 +61,21 @@ router.get('/',
 router.get('/:id',
   token({ required: true }),
   show)
+
+/**
+ * @api {get} /polarity_rules/calculate_percentile/:nic Retrieve percentile calculation
+ * @apiName PercentileCalculation
+ * @apiGroup PolarityRules
+ * @apiPermission user
+ * @apiParam {String} access_token user access token.
+ * @apiSuccess {Object} polarityRules Polarity rules's data.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ * @apiError 404 Polarity rules not found.
+ * @apiError 401 user access only.
+ */
+router.get('/calculate_percentile/:nic',
+  token({ required: true }),
+  percentileCalculation)
 
 /**
  * @api {put} /polarity_rules/:id Update polarity rules
