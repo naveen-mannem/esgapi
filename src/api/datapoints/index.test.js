@@ -20,12 +20,14 @@ beforeEach(async () => {
 test('POST /datapoints 201 (user)', async () => {
   const { status, body } = await request(app())
     .post(`${apiRoot}`)
-    .send({ access_token: userSession, name: 'test', code: 'test', description: 'test', dataCollection: 'test', unit: 'test', signal: 'test', percentile: 'test', finalUnit: 'test', keyIssueId: 'test', functionId: 'test', dpType: 'test', year: 'test', companyTaxonomyId: 'test', dpStatus: 'test', sourceName: 'test', sourceUrl: 'test', sourcePublicationDate: 'test', pageNumber: 'test', textSnippet: 'test', screenshotType: 'test', filePath: 'test', status: 'test' })
+    .send({ access_token: userSession, categoryId: 'test', name: 'test', code: 'test', description: 'test', polarity: 'test', dataCollection: 'test', unit: 'test', signal: 'test', percentile: 'test', finalUnit: 'test', keyIssueId: 'test', functionId: 'test', dpType: 'test', year: 'test', companyTaxonomyId: 'test', dpStatus: 'test', sourceName: 'test', sourceUrl: 'test', sourcePublicationDate: 'test', pageNumber: 'test', textSnippet: 'test', screenshotType: 'test', filePath: 'test', status: 'test' })
   expect(status).toBe(201)
   expect(typeof body).toEqual('object')
+  expect(body.categoryId).toEqual('test')
   expect(body.name).toEqual('test')
   expect(body.code).toEqual('test')
   expect(body.description).toEqual('test')
+  expect(body.polarity).toEqual('test')
   expect(body.dataCollection).toEqual('test')
   expect(body.unit).toEqual('test')
   expect(body.signal).toEqual('test')
@@ -96,13 +98,15 @@ test('GET /datapoints/:id 404 (user)', async () => {
 test('PUT /datapoints/:id 200 (user)', async () => {
   const { status, body } = await request(app())
     .put(`${apiRoot}/${datapoints.id}`)
-    .send({ access_token: userSession, name: 'test', code: 'test', description: 'test', dataCollection: 'test', unit: 'test', signal: 'test', percentile: 'test', finalUnit: 'test', keyIssueId: 'test', functionId: 'test', dpType: 'test', year: 'test', companyTaxonomyId: 'test', dpStatus: 'test', sourceName: 'test', sourceUrl: 'test', sourcePublicationDate: 'test', pageNumber: 'test', textSnippet: 'test', screenshotType: 'test', filePath: 'test', status: 'test' })
+    .send({ access_token: userSession, categoryId: 'test', name: 'test', code: 'test', description: 'test', polarity: 'test', dataCollection: 'test', unit: 'test', signal: 'test', percentile: 'test', finalUnit: 'test', keyIssueId: 'test', functionId: 'test', dpType: 'test', year: 'test', companyTaxonomyId: 'test', dpStatus: 'test', sourceName: 'test', sourceUrl: 'test', sourcePublicationDate: 'test', pageNumber: 'test', textSnippet: 'test', screenshotType: 'test', filePath: 'test', status: 'test' })
   expect(status).toBe(200)
   expect(typeof body).toEqual('object')
   expect(body.id).toEqual(datapoints.id)
+  expect(body.categoryId).toEqual('test')
   expect(body.name).toEqual('test')
   expect(body.code).toEqual('test')
   expect(body.description).toEqual('test')
+  expect(body.polarity).toEqual('test')
   expect(body.dataCollection).toEqual('test')
   expect(body.unit).toEqual('test')
   expect(body.signal).toEqual('test')
@@ -128,7 +132,7 @@ test('PUT /datapoints/:id 200 (user)', async () => {
 test('PUT /datapoints/:id 401 (user) - another user', async () => {
   const { status } = await request(app())
     .put(`${apiRoot}/${datapoints.id}`)
-    .send({ access_token: anotherSession, name: 'test', code: 'test', description: 'test', dataCollection: 'test', unit: 'test', signal: 'test', percentile: 'test', finalUnit: 'test', keyIssueId: 'test', functionId: 'test', dpType: 'test', year: 'test', companyTaxonomyId: 'test', dpStatus: 'test', sourceName: 'test', sourceUrl: 'test', sourcePublicationDate: 'test', pageNumber: 'test', textSnippet: 'test', screenshotType: 'test', filePath: 'test', status: 'test' })
+    .send({ access_token: anotherSession, categoryId: 'test', name: 'test', code: 'test', description: 'test', polarity: 'test', dataCollection: 'test', unit: 'test', signal: 'test', percentile: 'test', finalUnit: 'test', keyIssueId: 'test', functionId: 'test', dpType: 'test', year: 'test', companyTaxonomyId: 'test', dpStatus: 'test', sourceName: 'test', sourceUrl: 'test', sourcePublicationDate: 'test', pageNumber: 'test', textSnippet: 'test', screenshotType: 'test', filePath: 'test', status: 'test' })
   expect(status).toBe(401)
 })
 
@@ -141,7 +145,7 @@ test('PUT /datapoints/:id 401', async () => {
 test('PUT /datapoints/:id 404 (user)', async () => {
   const { status } = await request(app())
     .put(apiRoot + '/123456789098765432123456')
-    .send({ access_token: anotherSession, name: 'test', code: 'test', description: 'test', dataCollection: 'test', unit: 'test', signal: 'test', percentile: 'test', finalUnit: 'test', keyIssueId: 'test', functionId: 'test', dpType: 'test', year: 'test', companyTaxonomyId: 'test', dpStatus: 'test', sourceName: 'test', sourceUrl: 'test', sourcePublicationDate: 'test', pageNumber: 'test', textSnippet: 'test', screenshotType: 'test', filePath: 'test', status: 'test' })
+    .send({ access_token: anotherSession, categoryId: 'test', name: 'test', code: 'test', description: 'test', polarity: 'test', dataCollection: 'test', unit: 'test', signal: 'test', percentile: 'test', finalUnit: 'test', keyIssueId: 'test', functionId: 'test', dpType: 'test', year: 'test', companyTaxonomyId: 'test', dpStatus: 'test', sourceName: 'test', sourceUrl: 'test', sourcePublicationDate: 'test', pageNumber: 'test', textSnippet: 'test', screenshotType: 'test', filePath: 'test', status: 'test' })
   expect(status).toBe(404)
 })
 

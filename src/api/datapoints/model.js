@@ -6,6 +6,11 @@ const datapointsSchema = new Schema({
     ref: 'User',
     required: true
   },
+  categoryId: {
+    type: Schema.ObjectId,
+    ref: 'Categories',
+    required: true
+  },
   name: {
     type: String
   },
@@ -88,6 +93,7 @@ datapointsSchema.methods = {
       // simple view
       id: this.id,
       updatedBy: this.updatedBy ? this.updatedBy.view(full) : null,
+      categoryId: this.categoryId ? this.categoryId.view(full) : null,
       name: this.name,
       code: this.code,
       description: this.description,

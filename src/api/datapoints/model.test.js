@@ -5,7 +5,7 @@ let user, datapoints
 
 beforeEach(async () => {
   user = await User.create({ email: 'a@a.com', password: '123456' })
-  datapoints = await Datapoints.create({ updatedBy: user, name: 'test', code: 'test', description: 'test', dataCollection: 'test', unit: 'test', signal: 'test', percentile: 'test', finalUnit: 'test', keyIssueId: 'test', functionId: 'test', dpType: 'test', year: 'test', companyTaxonomyId: 'test', dpStatus: 'test', sourceName: 'test', sourceUrl: 'test', sourcePublicationDate: 'test', pageNumber: 'test', textSnippet: 'test', screenshotType: 'test', filePath: 'test', status: 'test' })
+  datapoints = await Datapoints.create({ updatedBy: user, categoryId: 'test', name: 'test', code: 'test', description: 'test', polarity: 'test', dataCollection: 'test', unit: 'test', signal: 'test', percentile: 'test', finalUnit: 'test', keyIssueId: 'test', functionId: 'test', dpType: 'test', year: 'test', companyTaxonomyId: 'test', dpStatus: 'test', sourceName: 'test', sourceUrl: 'test', sourcePublicationDate: 'test', pageNumber: 'test', textSnippet: 'test', screenshotType: 'test', filePath: 'test', status: 'test' })
 })
 
 describe('view', () => {
@@ -15,9 +15,11 @@ describe('view', () => {
     expect(view.id).toBe(datapoints.id)
     expect(typeof view.updatedBy).toBe('object')
     expect(view.updatedBy.id).toBe(user.id)
+    expect(view.categoryId).toBe(datapoints.categoryId)
     expect(view.name).toBe(datapoints.name)
     expect(view.code).toBe(datapoints.code)
     expect(view.description).toBe(datapoints.description)
+    expect(view.polarity).toBe(datapoints.polarity)
     expect(view.dataCollection).toBe(datapoints.dataCollection)
     expect(view.unit).toBe(datapoints.unit)
     expect(view.signal).toBe(datapoints.signal)
@@ -47,9 +49,11 @@ describe('view', () => {
     expect(view.id).toBe(datapoints.id)
     expect(typeof view.updatedBy).toBe('object')
     expect(view.updatedBy.id).toBe(user.id)
+    expect(view.categoryId).toBe(datapoints.categoryId)
     expect(view.name).toBe(datapoints.name)
     expect(view.code).toBe(datapoints.code)
     expect(view.description).toBe(datapoints.description)
+    expect(view.polarity).toBe(datapoints.polarity)
     expect(view.dataCollection).toBe(datapoints.dataCollection)
     expect(view.unit).toBe(datapoints.unit)
     expect(view.signal).toBe(datapoints.signal)

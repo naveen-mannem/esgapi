@@ -2,12 +2,12 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { token } from '../../services/passport'
-import { create, index, show, update, destroy } from './controller'
+import { create, index, show, update, destroy, includePolarityFromJson, includeCategoryIdsFromJson } from './controller'
 import { schema } from './model'
 export Datapoints, { schema } from './model'
 
 const router = new Router()
-const { name, code, description, dataCollection, dataCollectionGuide, normalizedBy, weighted, relevantForIndia, standaloneOrMatrix, reference, industryRelevant, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, dpStatus, status } = schema.tree
+const { categoryId, name, code, description, polarity, dataCollection, dataCollectionGuide, normalizedBy, weighted, relevantForIndia, standaloneOrMatrix, reference, industryRelevant, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, dpStatus, status } = schema.tree
 
 /**
  * @api {post} /datapoints Create datapoints
@@ -15,9 +15,11 @@ const { name, code, description, dataCollection, dataCollectionGuide, normalized
  * @apiGroup Datapoints
  * @apiPermission user
  * @apiParam {String} access_token user access token.
+ * @apiParam categoryId Datapoints's categoryId.
  * @apiParam name Datapoints's name.
  * @apiParam code Datapoints's code.
  * @apiParam description Datapoints's description.
+ * @apiParam polarity Datapoints's polarity.
  * @apiParam dataCollection Datapoints's dataCollection.
  * @apiParam dataCollectionGuide Datapoints's dataCollectionGuide.
  * @apiParam normalizedBy Datapoints's normalizedBy.
@@ -40,7 +42,7 @@ const { name, code, description, dataCollection, dataCollectionGuide, normalized
  */
 router.post('/',
   token({ required: true }),
-  body({ name, code, description, dataCollection, dataCollectionGuide, normalizedBy, weighted, relevantForIndia, standaloneOrMatrix, reference, industryRelevant, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, dpStatus }),
+  body({ categoryId, name, code, description, polarity, dataCollection, dataCollectionGuide, normalizedBy, weighted, relevantForIndia, standaloneOrMatrix, reference, industryRelevant, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, dpStatus }),
   create)
 
 /**
@@ -76,15 +78,47 @@ router.get('/:id',
   show)
 
 /**
+ * @api {get} /datapoints/import-from-json/polarity Add polarity for datapoints
+ * @apiName AddPolarityForAllDatapoints
+ * @apiGroup Datapoints
+ * @apiPermission user
+ * @apiParam {String} access_token user access token.
+ * @apiSuccess {Object} datapoints Datapoints's data.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ * @apiError 404 Datapoints not found.
+ * @apiError 401 user access only.
+ */
+ router.get('/import-from-json/polarity',
+ token({ required: true }),
+ includePolarityFromJson)
+
+/**
+* @api {get} /datapoints/import-from-json/categoryId Add categoryId for datapoints
+* @apiName AddCategoryIdForAllDatapoints
+* @apiGroup Datapoints
+* @apiPermission user
+* @apiParam {String} access_token user access token.
+* @apiSuccess {Object} datapoints Datapoints's data.
+* @apiError {Object} 400 Some parameters may contain invalid values.
+* @apiError 404 Datapoints not found.
+* @apiError 401 user access only.
+*/
+router.get('/import-from-json/categoryId',
+token({ required: true }),
+includeCategoryIdsFromJson)
+
+/**
  * @api {put} /datapoints/:id Update datapoints
  * @apiName UpdateDatapoints
  * @apiGroup Datapoints
  * @apiPermission user
  * @apiParam {String} access_token user access token.
+ * @apiParam categoryId Datapoints's categoryId.
  * @apiParam name Datapoints's name.
  * @apiParam code Datapoints's code.
  * @apiParam description Datapoints's description.
  * @apiParam dataCollection Datapoints's dataCollection.
+ * @apiParam polarity Datapoints's polarity.
  * @apiParam dataCollectionGuide Datapoints's dataCollectionGuide.
  * @apiParam normalizedBy Datapoints's normalizedBy.
  * @apiParam weighted Datapoints's weighted.
@@ -108,7 +142,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ name, code, description, dataCollection, dataCollectionGuide, normalizedBy, weighted, relevantForIndia, standaloneOrMatrix, reference, industryRelevant, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, dpStatus, status }),
+  body({ categoryId, name, code, description, polarity, dataCollection, dataCollectionGuide, normalizedBy, weighted, relevantForIndia, standaloneOrMatrix, reference, industryRelevant, unit, signal, percentile, finalUnit, keyIssueId, functionId, dpType, dpStatus, status }),
   update)
 
 /**
