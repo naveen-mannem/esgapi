@@ -346,7 +346,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
       }
     });
     var insertedCompanies = _.filter(companiesList, (item) =>
-      !_.some(structuredCompanyDetails, (obj) => item.cin === obj.cin));
+      _.some(structuredCompanyDetails, (obj) => item.cin === obj.cin));
 
     let insertedCompanyIds = [];
     _.forEach(insertedCompanies, (company) => {
@@ -409,7 +409,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
         };
         boardMembersList.push(memberDetail);
         if (item['DP Code'] == 'BOIR018') {
-          if ((item[value].toLowerCase() != 'n' || item[value].toLowerCase() != 'no') && item[value] != '' && item[value] != undefined && item[value] != null) {
+          if ((item[value].toString().toLowerCase() != 'n' || item[value].toString().toLowerCase() != 'no') && item[value].toString() != '' && item[value] != undefined && item[value] != null) {
             
             let cessaDate;
             try {
@@ -439,19 +439,6 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
       let indexToUpdate = _.findIndex(boardMembersList, object);
       boardMembersList[indexToUpdate].memberStatus = false;
     });
-    //Marking existing Data as False in BoardMemberMatrixDP 
-    await BoardMembersMatrixDataPoints.updateMany({
-      "companyId": { $in: insertedCompanyIds },
-      "year": { $in: distinctYears }
-    }, { $set: { status: false } }, {});
-    await BoardMembersMatrixDataPoints.insertMany(boardMembersList)
-      .then((err, result) => {
-        if (err) {
-          console.log('error', err);
-        } else {
-          // console.log('result', result);
-        }
-      });
 
     const structuredKmpMatrixDetails = filteredKmpMatrixDetails.map(function (item) {
       let companyObject = companiesList.filter(obj => obj.cin === item['CIN']);
@@ -500,6 +487,65 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
         createdBy: userDetail
       }
     });
+
+    let dpToFind = await Datapoints.findOne({ code: "BOIP007" });
+    let bmmDpsToFind = await Datapoints.find({ code: { $in: ["BOCR013", "BOCR014", "BOCR015", "BOCR016", "BOCR018", "BODR005", "BOIR021", "BOSP003", "BOSP004", "BOSR009"] } });
+    let kmpDpsToUpdate = await Datapoints.find({ code: { $in: ["MACR023", "MACR024", "MACR025", "MACR026", "MACR029", "MASR008", "MASR009", "MASP002", "MASP003", "MASR007"] } });
+    if (dpToFind) {
+      for (let yearIndex = 0; yearIndex < distinctYears.length; yearIndex++) {
+        const year = distinctYears[yearIndex];
+        for (let companyIndex = 0; companyIndex < insertedCompanyIds.length; companyIndex++) {
+          const companyId = insertedCompanyIds[companyIndex];
+          let executiveMembersList = _.filter(boardMembersList, function (object) {
+            if(object.datapointId == dpToFind.id && object.companyId == companyId && object.year == year && object.response == 'Yes' ){
+              return object;
+            }
+          }); 
+          if (executiveMembersList.length > 0) {
+            for (let executiveMemberIndex = 0; executiveMemberIndex < executiveMembersList.length; executiveMemberIndex++) {
+              const executiveMemberObject = executiveMembersList[executiveMemberIndex];
+              
+              for (let findIndex = 0; findIndex < bmmDpsToFind.length; findIndex++) {
+                const bmmDpObject = bmmDpsToFind[findIndex];
+                let responseToUpdate = _.filter(boardMembersList, function(obj) { 
+                  return obj.datapointId == bmmDpObject.id
+                  && obj.companyId == companyId
+                  && obj.year == year
+                  && obj.memberName == executiveMemberObject.memberName; });
+                if (responseToUpdate.length > 0) {
+                  let memberDetail = {
+                    memberName: executiveMemberObject.memberName,
+                    response: responseToUpdate[0].response ? responseToUpdate[0].response : '',
+                    memberStatus: true,
+                    datapointId: kmpDpsToUpdate[findIndex] ? kmpDpsToUpdate[findIndex].id : null,
+                    companyId: companyId,
+                    year: year,
+                    fiscalYearEndDate: executiveMemberObject.fiscalYearEndDate,
+                    status: true,
+                    createdBy: userDetail
+                  };
+                  kmpMembersList.push(memberDetail)
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    //Marking existing Data as False in BoardMemberMatrixDP 
+    await BoardMembersMatrixDataPoints.updateMany({
+      "companyId": { $in: insertedCompanyIds },
+      "year": { $in: distinctYears }
+    }, { $set: { status: false } }, {});
+    await BoardMembersMatrixDataPoints.insertMany(boardMembersList)
+      .then((err, result) => {
+        if (err) {
+          console.log('error', err);
+        } else {
+          // console.log('result', result);
+        }
+      });
     await KmpMatrixDataPoints.updateMany({
       "companyId": { $in: insertedCompanyIds },
       "year": { $in: distinctYears }
