@@ -84,7 +84,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
             allColumnNames.push(numToAlpha(idx));
           }
           let headerRowsNumber = [];
-          if (currentSheetName == 'Matrix-Directors' || currentSheetName == 'Matrix-KMP') {
+          if (currentSheetName.toLowerCase() == 'matrix-directors' || currentSheetName.toLowerCase() == 'matrix-kmp') {
             let headersIndexDetails = _.filter(worksheet, (object, index) => {
               if (object.v == "Category") {
                 headerRowsNumber.push(parseInt(index.substring(1)));
@@ -95,7 +95,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
           var headers = {};
           var headers1 = {};
           var data = [];
-          if (currentSheetName == 'Matrix-Directors' || currentSheetName == 'Matrix-KMP') {
+          if (currentSheetName.toLowerCase() == 'matrix-directors' || currentSheetName.toLowerCase() == 'matrix-kmp') {
             for (const cellId in worksheet) {
               if (cellId[0] === "!") continue;
               //parse out the column, row, and value
@@ -409,7 +409,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
         };
         boardMembersList.push(memberDetail);
         if (item['DP Code'] == 'BOIR018') {
-          if (item[value] != 'No' && item[value] != '' && item[value] != undefined && item[value] != null) {
+          if ((item[value].toLowerCase() != 'n' || item[value].toLowerCase() != 'no') && item[value] != '' && item[value] != undefined && item[value] != null) {
             
             let cessaDate;
             try {

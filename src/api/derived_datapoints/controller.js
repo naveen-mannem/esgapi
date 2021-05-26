@@ -387,9 +387,9 @@ async function addCalculation(companyId, mergedDetails, distinctYears, allDatapo
           //perform calc
           if (numeratorValue.response == 0) {
             derivedResponse = 0;
-          } else if (numeratorValue.response == '' || numeratorValue.response == ' ' || numeratorValue.response == 'NA') {
+          } else if (numeratorValue.response == '' || numeratorValue.response == ' ' || numeratorValue.response.toLowerCase() == 'na') {
             derivedResponse = 'NA';
-          } else if (denominatorValue.response == 0 || denominatorValue.response == '' || denominatorValue.response == ' ' || denominatorValue.response == 'NA') {
+          } else if (denominatorValue.response == 0 || denominatorValue.response == '' || denominatorValue.response == ' ' || denominatorValue.response.toLowerCase() == 'na') {
             derivedResponse = 'NA';
           } else {
             derivedResponse = parseInt(numeratorValue.response)+parseInt(denominatorValue.response);
@@ -455,9 +455,9 @@ async function asPercentageCalculation(companyId, mergedDetails, distinctYears, 
           //perform calc
           if (numeratorValue.response == 0) {
             derivedResponse = 0;
-          } else if (numeratorValue.response == '' || numeratorValue.response == ' ' || numeratorValue.response == 'NA') {
+          } else if (numeratorValue.response == '' || numeratorValue.response == ' ' || numeratorValue.response.toLowerCase() == 'na') {
             derivedResponse = 'NA';
-          } else if (denominatorValue.response == 0 || denominatorValue.response == '' || denominatorValue.response == ' ' || denominatorValue.response == 'NA') {
+          } else if (denominatorValue.response == 0 || denominatorValue.response == '' || denominatorValue.response == ' ' || denominatorValue.response.toLowerCase() == 'na') {
             derivedResponse = 'NA';
           } else {
             derivedResponse = (parseInt(numeratorValue.response)/parseInt(denominatorValue.response))*100;
@@ -495,9 +495,9 @@ async function asRatioCalculation(companyId, mergedDetails, distinctYears, allDa
           //perform calc
           if (numeratorValue.response == 0) {
             derivedResponse = 0;
-          } else if (numeratorValue.response == '' || numeratorValue.response == ' ' || numeratorValue.response == 'NA') {
+          } else if (numeratorValue.response == '' || numeratorValue.response == ' ' || numeratorValue.response.toLowerCase() == 'na') {
             derivedResponse = 'NA';
-          } else if (denominatorValue.response == 0 || denominatorValue.response == '' || denominatorValue.response == ' ' || denominatorValue.response == 'NA') {
+          } else if (denominatorValue.response == 0 || denominatorValue.response == '' || denominatorValue.response == ' ' || denominatorValue.response.toLowerCase() == 'na') {
             derivedResponse = 'NA';
           } else {
             derivedResponse = parseInt(numeratorValue.response)/parseInt(denominatorValue.response)
@@ -576,7 +576,7 @@ async function minusCalculation(companyId, mergedDetails, distinctYears, allData
     if(numeratorValues.length > 0 && denominatorValues.length > 0 && numeratorValues.length == denominatorValues.length){
       for (let j = 0; j < numeratorValues.length; j++) {
         let derivedResponse;
-        if(denominatorValues[j].response == ' ' || denominatorValues[j].response == '' || denominatorValues[j].response == 'NA'){
+        if(denominatorValues[j].response == ' ' || denominatorValues[j].response == '' || denominatorValues[j].response.toLowerCase() == 'na'){
           derivedResponse = 'NA';
         } else {
           let numeratorConvertedDate;
@@ -652,7 +652,7 @@ async function multiplyCalculation(companyId, mergedDetails, distinctYears, allD
             multipliedResponse = (numerator / denominator) * 2000 * 1000000;
           }
           if (asMultiplyRules[i].methodType == "composite") {
-            if (multipliedResponse == 'NA') {
+            if (multipliedResponse.toLowerCase() == 'na') {
               let thirdParameterValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: thirdParameterDpId, year: year });
               await StandaloneDatapoints.updateOne({ _id: ruleResponseObject.id }, { $set: { response: thirdParameterValue.response } });
             } else {
@@ -695,13 +695,13 @@ async function percentageCalculation(companyId, mergedDetails, distinctYears, al
           const year = distinctYears[i];
           if(object.memberStatus == true){
             if(object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year){
-              if(object.response == 'NA' || object.response == '' || object.response == " "){
+              if(object.response.toLowerCase() == 'na' || object.response == '' || object.response == " "){
                 numeratorSum += 0;
               } else {
                 numeratorSum += isNaN(object.response) ? 0 : parseInt(object.response.replace(',', ''));
               }
             } else if(object.datapointId.id == denominatorDpId && object.companyId.id == companyId && object.year == year){
-              if(object.response == 'NA' || object.response == '' || object.response == " "){
+              if(object.response.toLowerCase() == 'na' || object.response == '' || object.response == " "){
                 denominatorSum += 0;
               } else {
                 denominatorSum += isNaN(object.response) ? 0 : parseInt(object.response.replace(',', ''));
@@ -746,15 +746,15 @@ async function percentageCalculation(companyId, mergedDetails, distinctYears, al
         for (let j = 0; j < numeratorValues.length; j++) {
           let derivedResponse;
 
-          if(numeratorValues[j].response == ' ' || numeratorValues[j] == '' || numeratorValues[j] == 'NA'){
+          if(numeratorValues[j].response == ' ' || numeratorValues[j].response == '' || numeratorValues[j].response.toLowerCase() == 'na'){
             derivedResponse = 'NA';
-          } else if(numeratorValues[j] == '0' || numeratorValues[j] == 0){
+          } else if(numeratorValues[j].response == '0' || numeratorValues[j].response == 0){
             derivedResponse = '0';
           } else {
-            if(denominatorValues[j].response == ' ' || denominatorValues[j] == '' || denominatorValues[j] == 'NA' || denominatorValues[j] == '0'){
+            if(denominatorValues[j].response == ' ' || denominatorValues[j].response == '' || denominatorValues[j].response.toLowerCase() == 'na' || denominatorValues[j].response == '0'){
               derivedResponse = 'NA';
             } else {
-              derivedResponse = (parseInt(numeratorValues[j].replace(',', ''))/parseInt(denominatorValues[j].replace(',', '')))*100;
+              derivedResponse = (parseInt(numeratorValues[j].response.replace(',', ''))/parseInt(denominatorValues[j].response.replace(',', '')))*100;
             }
           }
           let derivedDatapointsObject = {
@@ -801,11 +801,11 @@ async function ratioAddCalculation(companyId, mergedDetails, distinctYears, allD
       } else {
         addResponse = Number(numeratorValue.response.replace(/,/g, '').trim()) + Number(denominatorValue.response.replace(/,/g, '').trim());
         //  = await percent(numeratorValue.response, addResponse);
-        if (numeratorValue.response === " " || numeratorValue.response == 'NA') {
+        if (numeratorValue.response === " " || numeratorValue.response.toLowerCase() == 'na') {
           percentResponse = 'NA';
         } else if (numeratorValue.response == 0) {
           resolve(0)
-        } else if (percentResponse == 0 || percentResponse == 'NA') {
+        } else if (percentResponse == 0 || percentResponse.toLowerCase() == 'na') {
           percentResponse = "NA";
         } else {
           let numeratorNumber;          
@@ -898,7 +898,7 @@ async function yesNoCalculation(companyId, mergedDetails, distinctYears, allData
         let parameterDpObject = _.filter(allDatapointsList, { code: parameters[k] });
         let parameterDpId = parameterDpObject[0] ? parameterDpObject[0].id : '';
           let dpResponse = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: parameterDpId, year: year });
-          if (dpResponse.response.trim() == 'Yes' || dpResponse.response == 'Y') {
+          if (dpResponse.response.toLowerCase().trim() == 'yes' || dpResponse.response.toLowerCase() == 'y') {
               count++;
           }
       }
@@ -961,11 +961,11 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
             let count = 0;
             numeratorList = numeratorList.filter(e => String(e.response).trim());
             denominatorList = denominatorList.filter(e => String(e.response).trim());
-            if (countOfRules[i].criteria == 'Y') {
+            if (countOfRules[i].criteria.toLowerCase() == 'y' || countOfRules[i].criteria.toLowerCase() == 'yes') {
               for (let ix = 0; ix < denominatorList.length; ix++) {
                 for (let jx = 0; jx < numeratorList.length; jx++) {
                   if (denominatorList[ix].dirName == numeratorList[jx].dirName) {
-                    if (denominatorList[ix].value == 'Yes' && numeratorList[jx].value == 'Yes') {
+                    if ((denominatorList[ix].value.toLowerCase() == 'yes' && numeratorList[jx].value.toLowerCase() == 'yes') || (denominatorList[ix].value.toLowerCase() == 'y' && numeratorList[jx].value.toLowerCase() == 'y')) {
                       count++;
                     }
                   }
@@ -990,7 +990,7 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
             await StandaloneDatapoints.findOne({ companyId: companyId, year: distinctYears[j], datapointId: parameterDatapointObject.id }).populate('updatedBy').populate('keyIssueId').populate('functionId')
             .then((resp) => {
               if (resp) {
-                if (resp.response == 'Yes' || resp.response == 'Y') {
+                if (resp.response.toLowerCase() == 'yes' || resp.response.toLowerCase() == 'y') {
                     total++;
                 } else {
                     total;
@@ -1017,26 +1017,26 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
           // let countValue = await count(arr, ruleValue.criteria)
           let finalResponse;
           
-          values = values.filter(e => String(e).trim());
-          values = values.filter(e => e != 'NA')
+          values = values.filter(e => String(e.response).trim());
+          values = values.filter(e => e.response.toLowerCase() != 'na')
           if (countOfRules[i].criteria == '2') {
             if (values.length > 0) {
               finalResponse = values.filter(item => item >= countOfRules[i].criteria).length;
             } else {
               finalResponse = 'NA';
             }
-          } else if (countOfRules[i].criteria == 'D') {
+          } else if (countOfRules[i].criteria.toLowerCase() == 'd') {
             if (values.length > 0) {
               finalResponse = values.length;
             } else {
               finalResponse = 'NA';
             }
-          } else if (countOfRules[i].criteria == 'Y') {
+          } else if (countOfRules[i].criteria.toLowerCase() == 'y' || countOfRules[i].criteria.toLowerCase() == 'yes') {
             if (values.length > 0) {
-              if (values.includes('Yes')) {
-                finalResponse = values.filter(item => item == 'Yes').length;
+              if (values.includes('Yes') || values.includes('yes') || values.includes('Y') || values.includes('y')) {
+                finalResponse = values.filter(item => item.toLowerCase() == 'yes').length;
               } else {
-                finalResponse = values.filter(item => item == 'Y').length;
+                finalResponse = values.filter(item => item.toLowerCase() == 'y').length;
               }
             } else {
               finalResponse = 'NA';
@@ -1104,7 +1104,7 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
             let sumValue;
             if (activeMemberValues.length > 0) {
               activeMemberValues = activeMemberValues.filter(e => String(e.response).trim());
-              activeMemberValues = activeMemberValues.filter(e => e.response != "NA");
+              activeMemberValues = activeMemberValues.filter(e => e.response.toLowerCase() != "na");
               sumValue = activeMemberValues.reduce(function (prev, next) {
                 return {
                   response: Number(prev.response.replace(/,/g, '').trim()) + Number(next.response.replace(/,/g, '').trim()),
@@ -1138,11 +1138,11 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
                 allDerivedDatapoints.push(derivedDatapointsObject);
               } else {
                 let derivedResponse;
-                if (sumValue === " " || sumValue == 'Y' || sumValue == 'NA') {
+                if (sumValue === " " || sumValue.toLowerCase() == 'y' || sumValue.toLowerCase() == 'na') {
                   derivedResponse = 'NA';
                 } else if (sumValue == 0) {
                   derivedResponse = 0;
-                } else if (activeMemberValues.length == 0 || activeMemberValues.length === " " || activeMemberValues.length == 'NA') {
+                } else if (activeMemberValues.length == 0 || activeMemberValues.length === " " || activeMemberValues.length.toLowerCase() == 'na') {
                   derivedResponse = 'NA';
                 } else {
                   derivedResponse = Number(sumValue.replace(/,/g, '').trim()) / activeMemberValues.length;
@@ -1170,9 +1170,9 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
             if (numeratorResponse && denominatorResponse) {
               if (numeratorResponse.response == 0) {
                 derivedResponse = 0;
-              } else if (numeratorResponse.response == '' || numeratorResponse.response == ' ' || numeratorResponse.response == 'NA') {
+              } else if (numeratorResponse.response == '' || numeratorResponse.response == ' ' || numeratorResponse.response.toLowerCase() == 'na') {
                 derivedResponse = 'NA';
-              } else if (denominatorResponse.response == 0 || denominatorResponse.response == '' || denominatorResponse.response == ' ' || denominatorResponse.response == 'NA') {
+              } else if (denominatorResponse.response == 0 || denominatorResponse.response == '' || denominatorResponse.response == ' ' || denominatorResponse.response.toLowerCase() == 'na') {
                 derivedResponse = 'NA';
               } else {
                 // derivedResponse = parseInt(numeratorResponse.response)/parseInt(denominatorResponse.response)
@@ -1216,7 +1216,7 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
           let sumValue;
           if (activeMemberValues.length > 0) {
             activeMemberValues = activeMemberValues.filter(e => String(e.response).trim());
-            activeMemberValues = activeMemberValues.filter(e => e.response != "NA");
+            activeMemberValues = activeMemberValues.filter(e => e.response.toLowerCase() != "na");
             sumValue = activeMemberValues.reduce(function (prev, next) {
               return {
                 response: Number(prev.response.replace(/,/g, '').trim()) + Number(next.response.replace(/,/g, '').trim()),
@@ -1250,11 +1250,11 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
               allDerivedDatapoints.push(derivedDatapointsObject);
             } else {
               let derivedResponse;
-              if (sumValue === " " || sumValue == 'Y' || sumValue == 'NA') {
+              if (sumValue === " " || sumValue.toLowerCase() == 'y' || sumValue.toLowerCase() == 'na') {
                 derivedResponse = 'NA';
               } else if (sumValue == 0) {
                 derivedResponse = 0;
-              } else if (activeMemberValues.length == 0 || activeMemberValues.length === " " || activeMemberValues.length == 'NA') {
+              } else if (activeMemberValues.length == 0 || activeMemberValues.length === " " || activeMemberValues.length.toLowerCase() == 'na') {
                 derivedResponse = 'NA';
               } else {
                 derivedResponse = Number(sumValue.replace(/,/g, '').trim()) / activeMemberValues.length;
@@ -1282,9 +1282,9 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
           if (numeratorResponse && denominatorResponse) {
             if (numeratorResponse.response == 0) {
               derivedResponse = 0;
-            } else if (numeratorResponse.response == '' || numeratorResponse.response == ' ' || numeratorResponse.response == 'NA') {
+            } else if (numeratorResponse.response == '' || numeratorResponse.response == ' ' || numeratorResponse.response.toLowerCase() == 'na') {
               derivedResponse = 'NA';
-            } else if (denominatorResponse.response == 0 || denominatorResponse.response == '' || denominatorResponse.response == ' ' || denominatorResponse.response == 'NA') {
+            } else if (denominatorResponse.response == 0 || denominatorResponse.response == '' || denominatorResponse.response == ' ' || denominatorResponse.response.toLowerCase() == 'na') {
               derivedResponse = 'NA';
             } else {
               // derivedResponse = parseInt(numeratorResponse.response)/parseInt(denominatorResponse.response)
