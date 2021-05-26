@@ -23,6 +23,10 @@ const derivedDatapointsSchema = new Schema({
     type: String,
     default: ''
   },
+  memberName: {
+    type: String,
+    default: ''
+  },
   activeStatus: {
     type: String,
     default: ''
@@ -64,6 +68,7 @@ derivedDatapointsSchema.methods = {
       datapointId: this.datapointId ? this.datapointId.view(full) : null,
       response: this.response,
       performanceResult: this.performanceResult,
+      memberName: this.memberName ? this.memberName : '',
       activeStatus: this.activeStatus,
       dpStatus: this.dpStatus,
       year: this.year,

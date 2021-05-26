@@ -5,7 +5,7 @@ let user, derivedDatapoints
 
 beforeEach(async () => {
   user = await User.create({ email: 'a@a.com', password: '123456' })
-  derivedDatapoints = await DerivedDatapoints.create({ createdBy: user, companyId: 'test', datapointId: 'test', response: 'test', performanceResult: 'test', activeStatus: 'test', dpStatus: 'test', year: 'test', fiscalYearEndDate: 'test', lastModifiedDate: 'test', status: 'test' })
+  derivedDatapoints = await DerivedDatapoints.create({ createdBy: user, companyId: 'test', datapointId: 'test', response: 'test', performanceResult: 'test', memberName: 'test', activeStatus: 'test', dpStatus: 'test', year: 'test', fiscalYearEndDate: 'test', lastModifiedDate: 'test', status: 'test' })
 })
 
 describe('view', () => {
@@ -19,6 +19,7 @@ describe('view', () => {
     expect(view.datapointId).toBe(derivedDatapoints.datapointId)
     expect(view.response).toBe(derivedDatapoints.response)
     expect(view.performanceResult).toBe(derivedDatapoints.performanceResult)
+    expect(view.memberName).toBe(derivedDatapoints.memberName)
     expect(view.activeStatus).toBe(derivedDatapoints.activeStatus)
     expect(view.dpStatus).toBe(derivedDatapoints.dpStatus)
     expect(view.year).toBe(derivedDatapoints.year)
@@ -39,6 +40,7 @@ describe('view', () => {
     expect(view.datapointId).toBe(derivedDatapoints.datapointId)
     expect(view.response).toBe(derivedDatapoints.response)
     expect(view.performanceResult).toBe(derivedDatapoints.performanceResult)
+    expect(view.memberName).toBe(derivedDatapoints.memberName)
     expect(view.activeStatus).toBe(derivedDatapoints.activeStatus)
     expect(view.dpStatus).toBe(derivedDatapoints.dpStatus)
     expect(view.year).toBe(derivedDatapoints.year)

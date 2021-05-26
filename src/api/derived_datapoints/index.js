@@ -7,7 +7,7 @@ import { schema } from './model'
 export DerivedDatapoints, { schema } from './model'
 
 const router = new Router()
-const { companyId, datapointId, response, performanceResult, activeStatus, dpStatus, year, fiscalYearEndDate, lastModifiedDate, status } = schema.tree
+const { companyId, datapointId, response, performanceResult, memberName, activeStatus, dpStatus, year, fiscalYearEndDate, lastModifiedDate, status } = schema.tree
 
 /**
  * @api {post} /derived_datapoints Create derived datapoints
@@ -18,6 +18,7 @@ const { companyId, datapointId, response, performanceResult, activeStatus, dpSta
  * @apiParam companyId Derived datapoints's companyId.
  * @apiParam datapointId Derived datapoints's datapointId.
  * @apiParam response Derived datapoints's response.
+ * @apiParam memberName Derived datapoints's memberName.
  * @apiParam year Derived datapoints's year.
  * @apiSuccess {Object} derivedDatapoints Derived datapoints's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
@@ -26,7 +27,7 @@ const { companyId, datapointId, response, performanceResult, activeStatus, dpSta
  */
 router.post('/',
   token({ required: true }),
-  body({ companyId, datapointId, response, year }),
+  body({ companyId, datapointId, response, memberName, year }),
   create)
 
 /**
@@ -86,6 +87,7 @@ router.get('/calculate/:companyId',
  * @apiParam datapointId Derived datapoints's datapointId.
  * @apiParam response Derived datapoints's response.
  * @apiParam performanceResult Derived datapoints's performanceResult.
+ * @apiParam memberName Derived datapoints's memberName.
  * @apiParam activeStatus Derived datapoints's activeStatus.
  * @apiParam dpStatus Derived datapoints's dpStatus.
  * @apiParam year Derived datapoints's year.
@@ -99,7 +101,7 @@ router.get('/calculate/:companyId',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ companyId, datapointId, response, performanceResult, activeStatus, dpStatus, year, fiscalYearEndDate, lastModifiedDate, status }),
+  body({ companyId, datapointId, response, performanceResult, memberName, activeStatus, dpStatus, year, fiscalYearEndDate, lastModifiedDate, status }),
   update)
 
 /**
