@@ -59,3 +59,14 @@ export const loginOtp = ({ user }, res, next) =>
     .then((token) => ({ token, user: user.view(true) }))
     .then(success(res, 201))
     .catch(next)
+
+export const validateOTP = ({ body }, res, next) => {
+  User.findOne({ email: body.email, otp: body.otp })
+  .then((resp) => {
+    if (resp) {
+      return res.status(201).json({ message: "Validation success!" })
+    } else {
+      return res.status(401).json({ message: "Invalid OTP or Email!" })
+    }
+  })
+}
