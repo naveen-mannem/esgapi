@@ -42,67 +42,17 @@ const userSchema = new Schema({
     type: String,
     trim: true
   },
+  phoneNumber: {
+    type: String,
+    default: ''
+  },
+  isUserApproved: {
+    type: Boolean,
+    default: false
+  },
   status: {
     type: Boolean,
     default: true
-  },
-  firstName:{
-    type: String,
-    required:false
-  },
-  middleName:{
-    type: String,
-    required:false
-  },
-  lastName:{
-    type: String,
-    required:false
-  },
-  
-  phoneNumber:{
-    type: String,
-    required:false
-  },
-  PANCard:{
-    type: String,
-    required:false
-  },
-  adharCard:{
-    type: String,
-    required:false
-  },
-  bankAccountNumber:{
-    type: String,
-    required:false
-  },
-  bankIFSCCode:{
-    type: String,
-    required:false
-  },
-  nameOfTheAccountHolder:{
-    type: String,
-    required:false
-  },
-  pancardUpload:{
-    type: String,
-    required:false
-  },
-  aadharUpload:{
-    type: String,
-    required:false
-  },
-  cancelledchequeUpload:{
-    type: String,
-    required:false
-  },
-  authendicationLetter:{
-    type: String,
-    required:false
-  },
-  companyName:[],
-  companyIdCard:{
-    type: String,
-    required:false
   }
 }, {
   timestamps: true
@@ -136,7 +86,7 @@ userSchema.pre('save', function (next) {
 userSchema.methods = {
   view (full) {
     const view = {}
-    let fields = ['id', 'name', 'role', 'roleId', 'picture', 'status']
+    let fields = ['id', 'name', 'email', 'role', 'roleId', 'picture', 'phoneNumber', 'isUserApproved', 'status']
 
     if (full) {
       fields = [...fields, 'email', 'createdAt']

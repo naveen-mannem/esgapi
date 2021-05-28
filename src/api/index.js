@@ -33,6 +33,9 @@ import taskSlaLog from './taskSlaLog'
 import controversy from './controversy'
 import polarityRules from './polarity_rules'
 import ztables from './ztables'
+import employees from './employees'
+import clientRepresentatives from './client-representatives'
+import companyRepresentatives from './company-representatives'
 
 const router = new Router()
 
@@ -94,5 +97,8 @@ router.use('/taskSlaLogs', taskSlaLog)
 router.use('/controversies', controversy)
 router.use('/polarity_rules', polarityRules)
 router.use('/ztables', ztables)
+router.use('/employees', employees)
+router.use('/client-representatives', clientRepresentatives)
+router.use('/company-representatives', companyRepresentatives)
 
 export default router

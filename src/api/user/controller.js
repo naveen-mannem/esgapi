@@ -1,6 +1,10 @@
 import { success, notFound } from '../../services/response/'
 import { User } from '.'
 import { sign } from '../../services/jwt'
+import { Role } from '../role'
+import { Employees } from '../employees'
+import { ClientRepresentatives } from '../client-representatives'
+import { CompanyRepresentatives } from '../company-representatives'
 
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>
   User.count(query)
@@ -59,6 +63,177 @@ export const create = ({ bodymen: { body } }, res, next) =>
         next(err)
       }
     })
+
+export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, next ) => {
+  console.log("onBoardNewUser API called");
+  console.log(body);
+  console.log(Buffer.from(body.onBoardingDetails, 'base64'));
+  let bodyData = Buffer.from(body.onBoardingDetails, 'base64');
+  let bodyDetails = bodyData.toString('ascii');
+  let onBoardingDetails =JSON.parse(bodyDetails);
+  console.log('onBoardingDetails', onBoardingDetails);
+  let roleDetails = await Role.find({ roleName: { $in: ["Employee", "Client Representative", "Company Representative"] } });
+  let role, roleId, userObject;
+  if (roleDetails.length > 0) {
+    for (let index = 0; index < roleDetails.length; index++) {
+      if (roleDetails[index].roleName == "Employee" && onBoardingDetails.roleName == "Employee") {
+        role = roleDetails[index].roleName;
+        roleId = roleDetails[index].id;
+      } else if (roleDetails[index].roleName == "Client Representative" && onBoardingDetails.roleName == "Client Representative") {
+        role = roleDetails[index].roleName;
+        roleId = roleDetails[index].id;
+      } else if (roleDetails[index].roleName == "Company Representative" && onBoardingDetails.roleName == "Company Representative") {
+        role = roleDetails[index].roleName;
+        roleId = roleDetails[index].id;
+      }
+    }
+  }
+  if (onBoardingDetails.roleName == "Employee") {
+    userObject = {
+      email: onBoardingDetails.email ? onBoardingDetails.email : '',
+      name: onBoardingDetails.firstName ? onBoardingDetails.firstName : '',
+      role: role ? role : '',
+      roleId: roleId ? roleId : '',
+      password: onBoardingDetails.password ? onBoardingDetails.password : '',
+      phoneNumber: onBoardingDetails.phoneNumber ? onBoardingDetails.phoneNumber : '',
+      isUserApproved: false,
+      status: true
+    }
+    await User.create(userObject)
+    .then(async (response) => {
+      console.log('employee user response', response);
+      if (response) {
+        let userId = response.id;
+        await Employees.create({
+          userId: userId,
+          firstName: onBoardingDetails.firstName ? onBoardingDetails.firstName : '',
+          middleName: onBoardingDetails.middleName ? onBoardingDetails.middleName : '',
+          lastName: onBoardingDetails.lastName ? onBoardingDetails.lastName : '',
+          panNumber: onBoardingDetails.panNumber ? onBoardingDetails.panNumber : '',
+          aadhaarNumber: onBoardingDetails.aadhaarNumber ? onBoardingDetails.aadhaarNumber : '',
+          bankAccountNumber: onBoardingDetails.bankAccountNumber ? onBoardingDetails.bankAccountNumber : '',
+          bankIFSCCode: onBoardingDetails.bankIFSCCode ? onBoardingDetails.bankIFSCCode : '',
+          accountHolderName: onBoardingDetails.accountHolderName ? onBoardingDetails.accountHolderName : '',
+          pancardUrl: '',
+          aadhaarUrl: '',
+          cancelledChequeUrl: '',
+          status: true,
+          createdBy: user
+        }).then((resp) => {
+          if (resp) {
+            return res.status(200).json({ message: "New Employee onboarded successfully!", _id: response.id, name: response.name, email: response.email });
+          } else {
+            return res.status(500).json({ message: "Failed to onboard employee" });
+          }
+        });
+      } else {
+        return res.status(500).json({ message: "Failed to onboard employee" });
+      }
+    })
+    .catch((err) => {
+      /* istanbul ignore else */
+      if (err.name === 'MongoError' && err.code === 11000) {
+        res.status(409).json({
+          valid: false,
+          param: 'email',
+          message: 'email already registered'
+        })
+      } else {
+        next(err)
+      }
+    })
+  } else if (onBoardingDetails.roleName == "Client Representative") {
+    userObject = {
+      email: onBoardingDetails.email ? onBoardingDetails.email : '',
+      name: onBoardingDetails.name ? onBoardingDetails.name : '',
+      role: role ? role : '',
+      roleId: roleId ? roleId : '',
+      password: onBoardingDetails.password ? onBoardingDetails.password : '',
+      phoneNumber: onBoardingDetails.phoneNumber ? onBoardingDetails.phoneNumber : '',
+      isUserApproved: false,
+      status: true
+    }
+    await User.create(userObject)
+    .then(async (response) => {
+      if (response) {
+        let userId = response.id;
+        await ClientRepresentatives.create({
+          userId: userId,
+          name: onBoardingDetails.name ? onBoardingDetails.name : '',
+          email: onBoardingDetails.email ? onBoardingDetails.email : '',
+          password: onBoardingDetails.password ? onBoardingDetails.password : '',
+          phoneNumber: onBoardingDetails.phoneNumber ? onBoardingDetails.phoneNumber : "",
+          companyId: onBoardingDetails.companyId ? onBoardingDetails.companyId : "",
+          authenticationLetterForClientUrl: '',
+          companyIdForClient: '',
+          status: true,
+          createdBy: user
+        });
+        return res.status(200).json({ message: "New Client Representative onboarded successfully!", _id: response.id, name: response.name, email: response.email });
+      } else {
+        return res.status(500).json({ message: "Failed to onboard client representative" });
+      }
+    })
+    .catch((err) => {
+      /* istanbul ignore else */
+      if (err.name === 'MongoError' && err.code === 11000) {
+        res.status(409).json({
+          valid: false,
+          param: 'email',
+          message: 'email already registered'
+        })
+      } else {
+        next(err)
+      }
+    })
+  } else if (onBoardingDetails.roleName == "Company Representative") {
+    userObject = {
+      email: onBoardingDetails.email ? onBoardingDetails.email : '',
+      name: onBoardingDetails.name ? onBoardingDetails.name : '',
+      role: role ? role : '',
+      roleId: roleId ? roleId : '',
+      password: onBoardingDetails.password ? onBoardingDetails.password : '',
+      phoneNumber: onBoardingDetails.phoneNumber ? onBoardingDetails.phoneNumber : '',
+      isUserApproved: false,
+      status: true
+    }
+    await User.create(userObject)
+    .then(async (response) => {
+      if (response) {
+        let userId = response.id;
+        await CompanyRepresentatives.create({
+          userId: userId,
+          name: onBoardingDetails.name ? onBoardingDetails.name : '',
+          email: onBoardingDetails.email ? onBoardingDetails.email : '',
+          password: onBoardingDetails.password ? onBoardingDetails.password : '',
+          phoneNumber: onBoardingDetails.phoneNumber ? onBoardingDetails.phoneNumber : "",
+          companiesList: onBoardingDetails.companiesList ? onBoardingDetails.companiesList : "",
+          authenticationLetterForCompanyUrl: '',
+          companyIdForCompany: '',
+          status: true,
+          createdBy: user
+        });
+        return res.status(200).json({ message: "New Company Representative onboarded successfully!", _id: response.id, name: response.name, email: response.email });
+      } else {
+        return res.status(500).json({ message: "Failed to onboard company representative" });
+      }
+    })
+    .catch((err) => {
+      /* istanbul ignore else */
+      if (err.name === 'MongoError' && err.code === 11000) {
+        res.status(409).json({
+          valid: false,
+          param: 'email',
+          message: 'email already registered'
+        })
+      } else {
+        next(err)
+      }
+    })
+  } else {
+    return res.status(500).json({ message: "Failed to onboard, invalid value for role or roleName" });
+  }
+}
 
 export const update = ({ bodymen: { body }, params, user }, res, next) =>
   User.findById(params.id === 'me' ? user.id : params.id)

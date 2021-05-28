@@ -2,13 +2,13 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { password as passwordAuth, master, token } from '../../services/passport'
-import { index, showMe, show, create, update, updatePassword, destroy, getUsersByRole,onBoardingEmpolyee,onBoardingClientRep,onBoardingCompanyRep } from './controller'
+import { index, showMe, show, create, update, updatePassword, destroy, getUsersByRole, onBoardNewUser } from './controller'
 import { schema } from './model'
 export User, { schema } from './model'
 
 const router = new Router()
-const { email, password, name, picture, role, roleId, otp, status ,firstName ,middleName,lastName,phoneNumber,PANCard,adharCard,bankAccountNumber,
-  bankIFSCCode,nameOfTheAccountHolder,authendicationLetter,companyIdCard,companyName, onboardingdetails, pancard,aadhar,cancelledcheque} = schema.tree
+const { email, password, name, picture, role, roleId, otp, phoneNumber, isUserApproved, status } = schema.tree
+const onBoardingDetails = '', userId = '', companyId = '', companiesList = '', firstName = '', middleName = '', lastName = '', panNumber = '', aadhaarNumber = '', bankAccountNumber = '', bankIFSCCode = '', accountHolderName = '', pancardUrl = '', aadhaarUrl = '', cancelledChequeUrl = '', authenticationLetterForClientUrl = '', companyIdForClient = '', authenticationLetterForCompanyUrl = '', companyIdForCompany = '';
 /**
  * @api {get} /users Retrieve users
  * @apiName RetrieveUsers
@@ -83,8 +83,30 @@ router.get('/:id',
  */
 router.post('/',
   master(),
-  body({ email, password, name, picture, role, roleId }),
+  body({ email, password, name, picture, role, roleId, phoneNumber }),
   create)
+
+/**
+ * @api {post} /users/new-onboard Onboard new user
+ * @apiName OnboardNewUser
+ * @apiGroup User
+ * @apiPermission user
+ * @apiParam {String} access_token User access_token.
+ * @apiParam {String} email User's email.
+ * @apiParam {String{6..}} password User's password.
+ * @apiParam {String} [name] User's name.
+ * @apiParam {String} [picture] User's picture.
+ * @apiParam {String} [roleId] User's roleId.
+ * @apiParam {String=user,admin} [role=user] User's role.
+ * @apiSuccess (Sucess 201) {Object} user User's data.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ * @apiError 401 User access only.
+ * @apiError 409 Email already registered.
+ */
+router.post('/new-onboard',
+  token({ required: true }),
+  body({onBoardingDetails}),
+  onBoardNewUser)
 
 /**
  * @api {put} /users/:id Update user
@@ -135,19 +157,5 @@ router.delete('/:id',
   token({ required: true, roles: ['admin'] }),
   destroy)
 
-router.post('/onBoardEmployee',
-token({required:true}),
-body({onboardingdetails,pancard,aadhar,cancelledcheque}),
-onBoardingEmpolyee)
-
-router.post('/onBoardClientRep',
-token({required:true}),
-body({onboardingdetails}),
-onBoardingClientRep)
-
-router.post('/onBoardCompanyRep',
-token({required:true}),
-body({onboardingdetails}),
-onBoardingCompanyRep)
 
 export default router
