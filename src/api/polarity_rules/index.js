@@ -2,8 +2,9 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { token } from '../../services/passport'
-import { create, index, show, update, destroy, percentileCalculation } from './controller'
+import { create, index, show, update, destroy, percentileCalculation} from './controller'
 import { schema } from './model'
+import { get } from 'mongoose'
 export PolarityRules, { schema } from './model'
 
 const router = new Router()

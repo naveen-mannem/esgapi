@@ -67,7 +67,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
     for (let index = 0; index < req.files.file.length; index++) {
       let parsedSheetObject = [];
       const filePath = req.files.file[index].path;
-      var workbook = XLSX.readFile(filePath, {sheetStubs: false, defval: ''});
+      var workbook = XLSX.readFile(filePath, { sheetStubs: false, defval: '' });
       var sheet_name_list = workbook.SheetNames;
 
       sheet_name_list.forEach(function (currentSheetName) {
@@ -75,12 +75,12 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
           //getting the complete sheet
           var worksheet = workbook.Sheets[currentSheetName];
           var idx, allColumnNames = [];
-          var rangeNum = worksheet['!ref'].split(':').map(function(val) {
+          var rangeNum = worksheet['!ref'].split(':').map(function (val) {
             return alphaToNum(val.replace(/[0-9]/g, ''));
           })
           var start = rangeNum[0];
           var end = rangeNum[1] + 1;
-          for (idx = start; idx < end ; idx++) {
+          for (idx = start; idx < end; idx++) {
             allColumnNames.push(numToAlpha(idx));
           }
           let headerRowsNumber = [];
@@ -107,15 +107,15 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
               var value = worksheet[cellId].v;
               //store header names
               if (row == 1) {
-                if(value != "Error types and definitions"){
-                  if(isNaN(value)) { 
+                if (value != "Error types and definitions") {
+                  if (isNaN(value)) {
                     headers[col] = value.replace('\r\n', ' ');
                   }
                 }
                 // storing the header names
                 continue;
               } else if (headerRowsNumber.includes(row) && row != 1) {
-                if(isNaN(value)) { 
+                if (isNaN(value)) {
                   headers1[col] = value.replace('\r\n', ' ');
                 }
                 // storing the header names
@@ -124,24 +124,24 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
               // if(headerRowsNumber.includes(row) && row != 1){
               if (row > headerRowsNumber[1] && row != 1) {
                 if (!data[row]) data[row] = {};
-                if(col != 'A'){
-                  if(headers1['A']){
-                    if(data[row][headers1['A']]){
+                if (col != 'A') {
+                  if (headers1['A']) {
+                    if (data[row][headers1['A']]) {
                       //take all column names in an array
                       let currentColumnIndex = allColumnNames.indexOf(col);
-                      let previousColumnIndex = currentColumnIndex-1;
-                      let nextColumnIndex = currentColumnIndex+1;
+                      let previousColumnIndex = currentColumnIndex - 1;
+                      let nextColumnIndex = currentColumnIndex + 1;
                       data[row][headers1[col]] = value;
-                      if(!data[row][headers1[allColumnNames[previousColumnIndex]]] && previousColumnIndex !=0){
+                      if (!data[row][headers1[allColumnNames[previousColumnIndex]]] && previousColumnIndex != 0) {
                         data[row][headers1[allColumnNames[previousColumnIndex]]] = '';
                       }
-                      if(!data[row][headers1[allColumnNames[nextColumnIndex]]]){
+                      if (!data[row][headers1[allColumnNames[nextColumnIndex]]]) {
                         data[row][headers1[allColumnNames[nextColumnIndex]]] = '';
                       }
                     }
                   }
                 } else {
-                  if(isNaN(value)) { 
+                  if (isNaN(value)) {
                     data[row][headers1[col]] = value.replace('\r\n', ' ');
                   } else {
                     data[row][headers1[col]] = value;
@@ -152,25 +152,25 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
                   data[row] = {};
                   data[row][headers[col]] = '';
                 }
-                
-                if(col != 'A'){
-                  if(headers['A']){
-                    if(data[row][headers['A']]){
+
+                if (col != 'A') {
+                  if (headers['A']) {
+                    if (data[row][headers['A']]) {
                       //take all column names in an array
                       let currentColumnIndex = allColumnNames.indexOf(col);
-                      let previousColumnIndex = currentColumnIndex-1;
-                      let nextColumnIndex = currentColumnIndex+1;
+                      let previousColumnIndex = currentColumnIndex - 1;
+                      let nextColumnIndex = currentColumnIndex + 1;
                       data[row][headers[col]] = value;
-                      if(!data[row][headers[allColumnNames[previousColumnIndex]]] && previousColumnIndex !=0){
+                      if (!data[row][headers[allColumnNames[previousColumnIndex]]] && previousColumnIndex != 0) {
                         data[row][headers[allColumnNames[previousColumnIndex]]] = '';
                       }
-                      if(!data[row][headers[allColumnNames[nextColumnIndex]]]){
+                      if (!data[row][headers[allColumnNames[nextColumnIndex]]]) {
                         data[row][headers[allColumnNames[nextColumnIndex]]] = '';
                       }
                     }
                   }
                 } else {
-                  if(isNaN(value)) { 
+                  if (isNaN(value)) {
                     data[row][headers[col]] = value.replace('\r\n', ' ');
                   } else {
                     data[row][headers[col]] = value;
@@ -198,18 +198,18 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
               }
 
               if (!data[row] && value) data[row] = {};
-              if(col != 'A'){
-                if(headers['A']){
-                  if(data[row][headers['A']]){
+              if (col != 'A') {
+                if (headers['A']) {
+                  if (data[row][headers['A']]) {
                     //take all column names in an array
                     let currentColumnIndex = allColumnNames.indexOf(col);
-                    let previousColumnIndex = currentColumnIndex-1;
-                    let nextColumnIndex = currentColumnIndex+1;
+                    let previousColumnIndex = currentColumnIndex - 1;
+                    let nextColumnIndex = currentColumnIndex + 1;
                     data[row][headers[col]] = value;
-                    if(!data[row][headers[allColumnNames[previousColumnIndex]]] && previousColumnIndex !=0){
+                    if (!data[row][headers[allColumnNames[previousColumnIndex]]] && previousColumnIndex != 0) {
                       data[row][headers[allColumnNames[previousColumnIndex]]] = '';
                     }
-                    if(!data[row][headers[allColumnNames[nextColumnIndex]]]){
+                    if (!data[row][headers[allColumnNames[nextColumnIndex]]]) {
                       data[row][headers[allColumnNames[nextColumnIndex]]] = '';
                     }
                   }
@@ -246,7 +246,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
         let noOfRowsInASheet = allFilesObject[allFilesArrayIndex][singleFileIndex].length;
         for (let rowIndex = 0; rowIndex < noOfRowsInASheet; rowIndex++) {
           if (singleFileIndex == 0 && rowIndex == 0) {
-            if(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex]){
+            if (allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex]) {
               allCompanyInfos.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex]);
               currentCompanyName = allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex]['CIN'];
             }
@@ -257,12 +257,12 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
                 allBoardMemberMatrixDetails.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex])
               } else if (singleFileIndex == 3) {
                 allKmpMatrixDetails.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex])
-              } else if(singleFileIndex == 1){
+              } else if (singleFileIndex == 1) {
                 allStandaloneDetails.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex])
               }
             }
           } else {
-            if(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex] && allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex]['DP Code']){
+            if (allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex] && allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex]['DP Code']) {
               allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex].CIN = currentCompanyName;
               allStandaloneDetails.push(allFilesObject[allFilesArrayIndex][singleFileIndex][rowIndex])
             }
@@ -380,20 +380,20 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
       let allKeyNamesList = Object.keys(item);
       const boardMembersNameList = _.filter(allKeyNamesList, function (keyName) {
         let trimmedKeyName = keyName.replace(/\s/g, "").replace('\r\n', '').toLowerCase();
-        return trimmedKeyName != "category" && trimmedKeyName != "keyissues" && trimmedKeyName != "dpcode" 
-        && trimmedKeyName != "indicator" && trimmedKeyName != "description" && trimmedKeyName != "datatype" 
-        && trimmedKeyName != "unit" && trimmedKeyName != "fiscalyear" && trimmedKeyName != "fiscalyearenddate" 
-        && trimmedKeyName != "cin" && trimmedKeyName != "sourcename" && trimmedKeyName != "url" 
-        && trimmedKeyName != "pagenumber" && trimmedKeyName != "publicationdate" && trimmedKeyName != "textsnippet" 
-        && trimmedKeyName != "screenshot(inpng)" && trimmedKeyName != "worddoc(.docx)" && trimmedKeyName != "excel(.xlsx)" 
-        && trimmedKeyName != "excel(.xlxsx)" && trimmedKeyName != "pdf" && trimmedKeyName != "filepathway(ifany)" 
-        && trimmedKeyName != "comments/calculations" && trimmedKeyName != "dataverification" 
-        && trimmedKeyName != "errortype" && trimmedKeyName != "errorcomments" && trimmedKeyName != "internalfilesource" 
-        && trimmedKeyName != "errorstatus" && trimmedKeyName != "analystcomments" && trimmedKeyName != "additionalcomments" 
-        && trimmedKeyName != "errortypesanddefinitions" && trimmedKeyName != "errortypesanddefinations" && trimmedKeyName != "count" && trimmedKeyName != "20" 
-        && trimmedKeyName != "t2.evidencenotsubstantive" && trimmedKeyName != "0" && trimmedKeyName != "7" 
-        && trimmedKeyName != "goodtohave" && trimmedKeyName != "t2.others/noerror" && trimmedKeyName != "percentile" 
-        && trimmedKeyName != "whenitisnotananalysterror/itisjustasuggestion" && trimmedKeyName != "undefined" && trimmedKeyName.length > 2;
+        return trimmedKeyName != "category" && trimmedKeyName != "keyissues" && trimmedKeyName != "dpcode"
+          && trimmedKeyName != "indicator" && trimmedKeyName != "description" && trimmedKeyName != "datatype"
+          && trimmedKeyName != "unit" && trimmedKeyName != "fiscalyear" && trimmedKeyName != "fiscalyearenddate"
+          && trimmedKeyName != "cin" && trimmedKeyName != "sourcename" && trimmedKeyName != "url"
+          && trimmedKeyName != "pagenumber" && trimmedKeyName != "publicationdate" && trimmedKeyName != "textsnippet"
+          && trimmedKeyName != "screenshot(inpng)" && trimmedKeyName != "worddoc(.docx)" && trimmedKeyName != "excel(.xlsx)"
+          && trimmedKeyName != "excel(.xlxsx)" && trimmedKeyName != "pdf" && trimmedKeyName != "filepathway(ifany)"
+          && trimmedKeyName != "comments/calculations" && trimmedKeyName != "dataverification"
+          && trimmedKeyName != "errortype" && trimmedKeyName != "errorcomments" && trimmedKeyName != "internalfilesource"
+          && trimmedKeyName != "errorstatus" && trimmedKeyName != "analystcomments" && trimmedKeyName != "additionalcomments"
+          && trimmedKeyName != "errortypesanddefinitions" && trimmedKeyName != "errortypesanddefinations" && trimmedKeyName != "count" && trimmedKeyName != "20"
+          && trimmedKeyName != "t2.evidencenotsubstantive" && trimmedKeyName != "0" && trimmedKeyName != "7"
+          && trimmedKeyName != "goodtohave" && trimmedKeyName != "t2.others/noerror" && trimmedKeyName != "percentile"
+          && trimmedKeyName != "whenitisnotananalysterror/itisjustasuggestion" && trimmedKeyName != "undefined" && trimmedKeyName.length > 2;
       });
       _.forEach(boardMembersNameList, function (value) {
         let memberDetail = {
@@ -410,10 +410,10 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
         boardMembersList.push(memberDetail);
         if (item['DP Code'] == 'BOIR018') {
           if ((item[value].toString().toLowerCase() != 'n' || item[value].toString().toLowerCase() != 'no') && item[value].toString() != '' && item[value] != undefined && item[value] != null) {
-            
+
             let cessaDate;
             try {
-              cessaDate = getJsDateFromExcel(item[value]);        
+              cessaDate = getJsDateFromExcel(item[value]);
             } catch (error) {
               return res.status(500).json({ message: `Found invalid date format in ${companyObject ? companyObject.companyName : 'a company'}, please correct and try again!` })
             }
@@ -446,20 +446,20 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
       let allKeyNamesList = Object.keys(item);
       const kmpMembersNameList = _.filter(allKeyNamesList, function (keyName) {
         let trimmedKeyName = keyName.replace(/\s/g, "").replace('\r\n', '').toLowerCase();
-        return trimmedKeyName != "category" && trimmedKeyName != "keyissues" && trimmedKeyName != "dpcode" 
-        && trimmedKeyName != "indicator" && trimmedKeyName != "description" && trimmedKeyName != "datatype" 
-        && trimmedKeyName != "unit" && trimmedKeyName != "fiscalyear" && trimmedKeyName != "fiscalyearenddate" 
-        && trimmedKeyName != "cin" && trimmedKeyName != "sourcename" && trimmedKeyName != "url" 
-        && trimmedKeyName != "pagenumber" && trimmedKeyName != "publicationdate" && trimmedKeyName != "textsnippet" 
-        && trimmedKeyName != "screenshot(inpng)" && trimmedKeyName != "worddoc(.docx)" && trimmedKeyName != "excel(.xlsx)" 
-        && trimmedKeyName != "excel(.xlxsx)" && trimmedKeyName != "pdf" && trimmedKeyName != "filepathway(ifany)" 
-        && trimmedKeyName != "comments/calculations" && trimmedKeyName != "dataverification" 
-        && trimmedKeyName != "errortype" && trimmedKeyName != "errorcomments" && trimmedKeyName != "internalfilesource" 
-        && trimmedKeyName != "errorstatus" && trimmedKeyName != "analystcomments" && trimmedKeyName != "additionalcomments" 
-        && trimmedKeyName != "errortypesanddefinitions" && trimmedKeyName != "errortypesanddefinations" && trimmedKeyName != "count" && trimmedKeyName != "20" 
-        && trimmedKeyName != "t2.evidencenotsubstantive" && trimmedKeyName != "0" && trimmedKeyName != "7" 
-        && trimmedKeyName != "goodtohave" && trimmedKeyName != "t2.others/noerror" && trimmedKeyName != "percentile" 
-        && trimmedKeyName != "whenitisnotananalysterror/itisjustasuggestion" && trimmedKeyName != "undefined" && trimmedKeyName.length > 2;
+        return trimmedKeyName != "category" && trimmedKeyName != "keyissues" && trimmedKeyName != "dpcode"
+          && trimmedKeyName != "indicator" && trimmedKeyName != "description" && trimmedKeyName != "datatype"
+          && trimmedKeyName != "unit" && trimmedKeyName != "fiscalyear" && trimmedKeyName != "fiscalyearenddate"
+          && trimmedKeyName != "cin" && trimmedKeyName != "sourcename" && trimmedKeyName != "url"
+          && trimmedKeyName != "pagenumber" && trimmedKeyName != "publicationdate" && trimmedKeyName != "textsnippet"
+          && trimmedKeyName != "screenshot(inpng)" && trimmedKeyName != "worddoc(.docx)" && trimmedKeyName != "excel(.xlsx)"
+          && trimmedKeyName != "excel(.xlxsx)" && trimmedKeyName != "pdf" && trimmedKeyName != "filepathway(ifany)"
+          && trimmedKeyName != "comments/calculations" && trimmedKeyName != "dataverification"
+          && trimmedKeyName != "errortype" && trimmedKeyName != "errorcomments" && trimmedKeyName != "internalfilesource"
+          && trimmedKeyName != "errorstatus" && trimmedKeyName != "analystcomments" && trimmedKeyName != "additionalcomments"
+          && trimmedKeyName != "errortypesanddefinitions" && trimmedKeyName != "errortypesanddefinations" && trimmedKeyName != "count" && trimmedKeyName != "20"
+          && trimmedKeyName != "t2.evidencenotsubstantive" && trimmedKeyName != "0" && trimmedKeyName != "7"
+          && trimmedKeyName != "goodtohave" && trimmedKeyName != "t2.others/noerror" && trimmedKeyName != "percentile"
+          && trimmedKeyName != "whenitisnotananalysterror/itisjustasuggestion" && trimmedKeyName != "undefined" && trimmedKeyName.length > 2;
       });
       let currentMemberStatus;
       _.forEach(kmpMembersNameList, function (value) {
@@ -497,21 +497,22 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
         for (let companyIndex = 0; companyIndex < insertedCompanyIds.length; companyIndex++) {
           const companyId = insertedCompanyIds[companyIndex];
           let executiveMembersList = _.filter(boardMembersList, function (object) {
-            if(object.datapointId == dpToFind.id && object.companyId == companyId && object.year == year && object.response == 'Yes' ){
+            if (object.datapointId == dpToFind.id && object.companyId == companyId && object.year == year && object.response == 'Yes') {
               return object;
             }
-          }); 
+          });
           if (executiveMembersList.length > 0) {
             for (let executiveMemberIndex = 0; executiveMemberIndex < executiveMembersList.length; executiveMemberIndex++) {
               const executiveMemberObject = executiveMembersList[executiveMemberIndex];
-              
+
               for (let findIndex = 0; findIndex < bmmDpsToFind.length; findIndex++) {
                 const bmmDpObject = bmmDpsToFind[findIndex];
-                let responseToUpdate = _.filter(boardMembersList, function(obj) { 
+                let responseToUpdate = _.filter(boardMembersList, function (obj) {
                   return obj.datapointId == bmmDpObject.id
-                  && obj.companyId == companyId
-                  && obj.year == year
-                  && obj.memberName == executiveMemberObject.memberName; });
+                    && obj.companyId == companyId
+                    && obj.year == year
+                    && obj.memberName == executiveMemberObject.memberName;
+                });
                 if (responseToUpdate.length > 0) {
                   let memberDetail = {
                     memberName: executiveMemberObject.memberName,
@@ -558,9 +559,9 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
           //  console.log('result', result);
         }
       });
-   // res.json({ message: "Files upload success", companies: structuredCompanyDetails, allStandaloneDetails: structuredStandaloneDetails, allBoardMemberMatrixDetails: boardMembersList, allKmpMatrixDetails: kmpMembersList, data: allFilesObject });
-    res.json({ message: "Files upload success", companies: structuredCompanyDetails})
-   });
+    // res.json({ message: "Files upload success", companies: structuredCompanyDetails, allStandaloneDetails: structuredStandaloneDetails, allBoardMemberMatrixDetails: boardMembersList, allKmpMatrixDetails: kmpMembersList, data: allFilesObject });
+    res.json({ message: "Files upload success", companies: structuredCompanyDetails })
+  });
 }
 
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>

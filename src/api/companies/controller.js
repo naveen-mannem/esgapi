@@ -19,6 +19,16 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
     .then(success(res))
     .catch(next)
 
+export const getAllNic = ({ querymen: { query, select, cursor } }, res, next) =>
+  Companies.distinct('nic')
+    .populate('createdBy')
+    .then((companies) => ({
+      rows: companies
+    })
+    )
+    .then(success(res))
+    .catch(next)
+
 export const show = ({ params }, res, next) =>
   Companies.findById(params.id)
     .populate('createdBy')
@@ -44,3 +54,4 @@ export const destroy = ({ user, params }, res, next) =>
     .then((companies) => companies ? companies.remove() : null)
     .then(success(res, 204))
     .catch(next)
+

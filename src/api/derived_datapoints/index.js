@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { token } from '../../services/passport'
-import { create, index, show, update, destroy, calculateForACompany } from './controller'
+import { create, index, show, update, destroy, calculateForACompany ,jsonGeneration } from './controller'
 import { schema } from './model'
 export DerivedDatapoints, { schema } from './model'
 
@@ -58,9 +58,9 @@ router.get('/',
  * @apiError 404 Derived datapoints not found.
  * @apiError 401 user access only.
  */
-router.get('/:id',
+router.get('/jsonGeneration/:companyId',
   token({ required: true }),
-  show)
+  jsonGeneration )
 
 /**
  * @api {get} /derived_datapoints/calculate/:companyId Calculate derived datapoints for a company

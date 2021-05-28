@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { token } from '../../services/passport'
-import { create, index, show, update, destroy } from './controller'
+import { create, index, show, update, destroy, getAllNic } from './controller'
 import { schema } from './model'
 export Companies, { schema } from './model'
 
@@ -50,6 +50,23 @@ router.get('/',
   token({ required: true }),
   query(),
   index)
+
+  /**
+ * @api {get} /companies/all_nic Retrieve NIC 
+ * @apiName Retrieve NIC
+ * @apiGroup Companies
+ * @apiPermission user
+ * @apiParam {String} access_token user access token.
+ * @apiUse listParams
+ * @apiSuccess {Number} count Total amount of companies.
+ * @apiSuccess {Object[]} rows List of companies.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ * @apiError 401 user access only.
+ */
+router.get('/all_nic',
+token({ required: true }),
+query(),
+getAllNic)
 
 /**
  * @api {get} /companies/:id Retrieve companies
