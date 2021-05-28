@@ -36,6 +36,8 @@ import ztables from './ztables'
 import employees from './employees'
 import clientRepresentatives from './client-representatives'
 import companyRepresentatives from './company-representatives'
+import masterTaxonomy from './masterTaxonomy'
+import clientTaxonomy from './clientTaxonomy'
 
 const router = new Router()
 
@@ -100,5 +102,7 @@ router.use('/ztables', ztables)
 router.use('/employees', employees)
 router.use('/client-representatives', clientRepresentatives)
 router.use('/company-representatives', companyRepresentatives)
+router.use('/clientTaxonomies', clientTaxonomy)
+router.use('/masterTaxonomies', masterTaxonomy)
 
 export default router
