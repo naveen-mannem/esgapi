@@ -33,6 +33,8 @@ import taskSlaLog from './taskSlaLog'
 import controversy from './controversy'
 import polarityRules from './polarity_rules'
 import ztables from './ztables'
+import masterTaxonomy from './masterTaxonomy'
+import clientTaxonomy from './clientTaxonomy'
 
 const router = new Router()
 
@@ -94,5 +96,7 @@ router.use('/taskSlaLogs', taskSlaLog)
 router.use('/controversies', controversy)
 router.use('/polarity_rules', polarityRules)
 router.use('/ztables', ztables)
+router.use('/clientTaxonomies', clientTaxonomy)
+router.use('/masterTaxonomies', masterTaxonomy)
 
 export default router
