@@ -43,7 +43,7 @@ export const login = ({ user }, res, next) => {
             from: 'testmailer09876@gmail.com',
             to: response.user.email,
             subject: 'ESG - OTP',
-            text: content.toString()
+            text: content
           });
           return res.send({ token: response.token, user: response.user });
         }
