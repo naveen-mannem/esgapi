@@ -105,6 +105,9 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
               // var row = parseInt(cellId.substring(1));  
               var row = parseInt(cellId.match(/(\d+)/));
               var value = worksheet[cellId].v;
+              if(cellId == 'J7'){
+                console.log('J7 value', value);
+              }
               //store header names
               if (row == 1) {
                 if (value != "Error types and definitions") {
@@ -132,8 +135,10 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
                       let previousColumnIndex = currentColumnIndex - 1;
                       let nextColumnIndex = currentColumnIndex + 1;
                       data[row][headers1[col]] = value;
-                      if (!data[row][headers1[allColumnNames[previousColumnIndex]]] && previousColumnIndex != 0) {
+                      if (!data[row][headers1[allColumnNames[previousColumnIndex]]] && data[row][headers1[allColumnNames[previousColumnIndex]]] !=0 && previousColumnIndex != 0) {
                         data[row][headers1[allColumnNames[previousColumnIndex]]] = '';
+                      } else if (data[row][headers1[allColumnNames[previousColumnIndex]]] == 0) {
+                        data[row][headers1[allColumnNames[previousColumnIndex]]] = 0;
                       }
                       if (!data[row][headers1[allColumnNames[nextColumnIndex]]]) {
                         data[row][headers1[allColumnNames[nextColumnIndex]]] = '';
@@ -161,8 +166,10 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
                       let previousColumnIndex = currentColumnIndex - 1;
                       let nextColumnIndex = currentColumnIndex + 1;
                       data[row][headers[col]] = value;
-                      if (!data[row][headers[allColumnNames[previousColumnIndex]]] && previousColumnIndex != 0) {
+                      if (!data[row][headers[allColumnNames[previousColumnIndex]]] && data[row][headers[allColumnNames[previousColumnIndex]]] !=0 && previousColumnIndex != 0) {
                         data[row][headers[allColumnNames[previousColumnIndex]]] = '';
+                      } else if (data[row][headers[allColumnNames[previousColumnIndex]]] == 0) {
+                        data[row][headers[allColumnNames[previousColumnIndex]]] = 0;
                       }
                       if (!data[row][headers[allColumnNames[nextColumnIndex]]]) {
                         data[row][headers[allColumnNames[nextColumnIndex]]] = '';
@@ -206,8 +213,10 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
                     let previousColumnIndex = currentColumnIndex - 1;
                     let nextColumnIndex = currentColumnIndex + 1;
                     data[row][headers[col]] = value;
-                    if (!data[row][headers[allColumnNames[previousColumnIndex]]] && previousColumnIndex != 0) {
+                    if (!data[row][headers[allColumnNames[previousColumnIndex]]] && data[row][headers[allColumnNames[previousColumnIndex]]] !=0 && previousColumnIndex != 0) {
                       data[row][headers[allColumnNames[previousColumnIndex]]] = '';
+                    } else if (data[row][headers[allColumnNames[previousColumnIndex]]] == 0) {
+                      data[row][headers[allColumnNames[previousColumnIndex]]] = 0;
                     }
                     if (!data[row][headers[allColumnNames[nextColumnIndex]]]) {
                       data[row][headers[allColumnNames[nextColumnIndex]]] = '';
@@ -428,7 +437,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
         datapointId: datapointObject[0] ? datapointObject[0].id : null,
         companyId: companyObject[0] ? companyObject[0].id : null,
         year: item['Fiscal Year'],
-        response: item['Response'] ? item['Response'] : '',
+        response: (item['Response'] == '0' || item['Response'] == 0 || item['Response']) ? item['Response'] : '',
         fiscalYearEndDate: item['Fiscal Year End Date'],
         status: true,
         createdBy: userDetail
@@ -481,7 +490,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
         datapointId: datapointObject[0] ? datapointObject[0].id : null,
         companyId: companyObject[0] ? companyObject[0].id : null,
         year: item['Fiscal Year'],
-        response: item['Response'] ? item['Response'] : '',
+        response: (item['Response'] == '0' || item['Response'] == 0 || item['Response']) ? item['Response'] : '',
         fiscalYearEndDate: item['Fiscal Year End Date'],
         status: true,
         createdBy: userDetail
@@ -489,6 +498,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
     });
 
     let dpToFind = await Datapoints.findOne({ code: "BOIP007" });
+    let dpMapping = [{ "BOCR013": "MACR023" }, { "BOCR014": "MACR024" }, { "BOCR015": "MACR025" }, { "BOCR016": "MACR026" }, { "BOCR018": "MACR029" }, { "BODR005": "MASR008" }, { "BOIR021": "MASR009" }, { "BOSP003": "MASP002" }, { "BOSP004": "MASP003" }, { "BOSR009": "MASR007" }];
     let bmmDpsToFind = await Datapoints.find({ code: { $in: ["BOCR013", "BOCR014", "BOCR015", "BOCR016", "BOCR018", "BODR005", "BOIR021", "BOSP003", "BOSP004", "BOSR009"] } });
     let kmpDpsToUpdate = await Datapoints.find({ code: { $in: ["MACR023", "MACR024", "MACR025", "MACR026", "MACR029", "MASR008", "MASR009", "MASP002", "MASP003", "MASR007"] } });
     if (dpToFind) {
@@ -507,6 +517,10 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
 
               for (let findIndex = 0; findIndex < bmmDpsToFind.length; findIndex++) {
                 const bmmDpObject = bmmDpsToFind[findIndex];
+                let kmpDatapointCode = dpMapping.find((obj)=> obj[bmmDpObject.code]);
+                console.log('kmpDatapointCode', kmpDatapointCode);
+                let matchingKmpObject = kmpDpsToUpdate.find((obj) => obj.code == kmpDatapointCode[bmmDpObject.code]);
+                console.log('matchingKmpObject', matchingKmpObject);
                 let responseToUpdate = _.filter(boardMembersList, function (obj) {
                   return obj.datapointId == bmmDpObject.id
                     && obj.companyId == companyId
@@ -516,9 +530,9 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
                 if (responseToUpdate.length > 0) {
                   let memberDetail = {
                     memberName: executiveMemberObject.memberName,
-                    response: responseToUpdate[0].response ? responseToUpdate[0].response : '',
+                    response: (responseToUpdate[0].response == '0' || responseToUpdate[0].response == 0 || responseToUpdate[0].response) ? responseToUpdate[0].response : '',
                     memberStatus: true,
-                    datapointId: kmpDpsToUpdate[findIndex] ? kmpDpsToUpdate[findIndex].id : null,
+                    datapointId: matchingKmpObject ? matchingKmpObject.id : null,
                     companyId: companyId,
                     year: year,
                     fiscalYearEndDate: executiveMemberObject.fiscalYearEndDate,

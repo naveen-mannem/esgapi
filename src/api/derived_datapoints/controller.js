@@ -269,7 +269,7 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
         //         if (polarityDetail.dataCollection.toLowerCase() == "yes" || polarityDetail.dataCollection.toLowerCase() == "y") {
 
         //           let foundResponse = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: polarityRuleDetails.datapointId, year: year });
-        //           if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response.toLowerCase() == 'na') {
+        //           if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA') {
         //             await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { response: 'NA', performanceResult: 'NA' } });
         //           } else {
         //             if (Number(foundResponse.response) >= Number(polarityRuleDetails.polarityValue)) {
@@ -303,7 +303,7 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
         //           }
         //         } else {
         //           let foundResponse = await DerivedDatapoints.findOne({ companyId: companyId, datapointId: polarityRuleDetails.datapointId, year: year });
-        //           if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response.toLowerCase() == 'na') {
+        //           if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA') {
         //             await DerivedDatapoints.updateOne({ _id: foundResponse.id }, { $set: { response: 'NA', performanceResult: 'NA' } });
         //           } else {
         //             if (Number(foundResponse.response) >= Number(polarityRuleDetails.polarityValue)) {
@@ -340,7 +340,7 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
         //         if (polarityDetail.dataCollection.toLowerCase() == "yes" || polarityDetail.dataCollection.toLowerCase() == "y") {
         //           let foundResponse = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: dataPointsIdList[dataPointIndex], year: year });
         //           if (foundResponse) {
-        //             if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response.toLowerCase() == 'na' || foundResponse.response.toLowerCase() == 'nan') {
+        //             if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA' || foundResponse.response.toLowerCase() == 'nan') {
         //               await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { response: 'NA', performanceResult: 'NA' } });
         //             } else {
         //               if (polarityDetail.code == 'BUSP009' || polarityDetail.code == 'BUSP008') {
@@ -379,7 +379,7 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
         //         } else if (polarityDetail.dataCollection.toLowerCase() == "no" || polarityDetail.dataCollection.toLowerCase() == "nc") {
         //           let foundResponse = await DerivedDatapoints.findOne({ companyId: companyId, datapointId: dataPointsIdList[dataPointIndex], year: year });
         //           if (foundResponse) {
-        //             if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response.toLowerCase() == 'na' || foundResponse.response.toLowerCase() == 'nan') {
+        //             if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA' || foundResponse.response.toLowerCase() == 'nan') {
         //               await DerivedDatapoints.updateOne({ _id: foundResponse.id }, { $set: { response: 'NA', performanceResult: 'NA' } });
         //             } else {
         //               if (polarityDetail.code == 'BUSP009' || polarityDetail.code == 'BUSP008') {
@@ -546,7 +546,7 @@ async function matrixPercentageCalculation(companyId, mergedDetails, distinctYea
             companyId: numeratorValues[j].companyId.id,
             datapointId: matrixPercentageRules[i].datapointId.id,
             year: numeratorValues[j].year,
-            response: derivedResponse,
+            response: derivedResponse ? derivedResponse.toString() : derivedResponse,
             memberName: numeratorValues[j].memberName ? numeratorValues[j].memberName.replace('\r\n', '') : '',
             memberStatus: true,
             status: true,
@@ -584,7 +584,7 @@ async function matrixPercentageCalculation(companyId, mergedDetails, distinctYea
             companyId: numeratorValues[j].companyId.id,
             datapointId: matrixPercentageRules[i].datapointId.id,
             year: numeratorValues[j].year,
-            response: derivedResponse,
+            response: derivedResponse ? derivedResponse.toString() : derivedResponse,
             memberName: '',
             memberStatus: true,
             status: true,
@@ -623,9 +623,9 @@ async function addCalculation(companyId, mergedDetails, distinctYears, allDatapo
           //perform calc
           if (numeratorValue.response == 0) {
             derivedResponse = 0;
-          } else if (numeratorValue.response == '' || numeratorValue.response == ' ' || numeratorValue.response.toLowerCase() == 'na') {
+          } else if (numeratorValue.response == '' || numeratorValue.response == ' ' || numeratorValue.response == 'NA') {
             derivedResponse = 'NA';
-          } else if (denominatorValue.response == 0 || denominatorValue.response == '' || denominatorValue.response == ' ' || denominatorValue.response.toLowerCase() == 'na') {
+          } else if (denominatorValue.response == 0 || denominatorValue.response == '' || denominatorValue.response == ' ' || denominatorValue.response == 'NA') {
             derivedResponse = 'NA';
           } else {
             derivedResponse = parseInt(numeratorValue.response) + parseInt(denominatorValue.response);
@@ -691,9 +691,9 @@ async function asPercentageCalculation(companyId, mergedDetails, distinctYears, 
           //perform calc
           if (numeratorValue.response == 0) {
             derivedResponse = 0;
-          } else if (numeratorValue.response == '' || numeratorValue.response == ' ' || numeratorValue.response.toLowerCase() == 'na') {
+          } else if (numeratorValue.response == '' || numeratorValue.response == ' ' || numeratorValue.response == 'NA') {
             derivedResponse = 'NA';
-          } else if (denominatorValue.response == 0 || denominatorValue.response == '' || denominatorValue.response == ' ' || denominatorValue.response.toLowerCase() == 'na') {
+          } else if (denominatorValue.response == 0 || denominatorValue.response == '' || denominatorValue.response == ' ' || denominatorValue.response == 'NA') {
             derivedResponse = 'NA';
           } else {
             derivedResponse = (parseInt(numeratorValue.response) / parseInt(denominatorValue.response)) * 100;
@@ -731,9 +731,9 @@ async function asRatioCalculation(companyId, mergedDetails, distinctYears, allDa
           //perform calc
           if (numeratorValue.response == 0) {
             derivedResponse = 0;
-          } else if (numeratorValue.response == '' || numeratorValue.response == ' ' || numeratorValue.response.toLowerCase() == 'na') {
+          } else if (numeratorValue.response == '' || numeratorValue.response == ' ' || numeratorValue.response == 'NA') {
             derivedResponse = 'NA';
-          } else if (denominatorValue.response == 0 || denominatorValue.response == '' || denominatorValue.response == ' ' || denominatorValue.response.toLowerCase() == 'na') {
+          } else if (denominatorValue.response == 0 || denominatorValue.response == '' || denominatorValue.response == ' ' || denominatorValue.response == 'NA') {
             derivedResponse = 'NA';
           } else {
             derivedResponse = parseInt(numeratorValue.response) / parseInt(denominatorValue.response)
@@ -814,7 +814,7 @@ async function minusCalculation(companyId, mergedDetails, distinctYears, allData
     if (numeratorValues.length > 0 && denominatorValues.length > 0 && numeratorValues.length == denominatorValues.length) {
       for (let j = 0; j < numeratorValues.length; j++) {
         let derivedResponse;
-        if (denominatorValues[j].response == ' ' || denominatorValues[j].response == '' || denominatorValues[j].response.toLowerCase() == 'na') {
+        if (denominatorValues[j].response == ' ' || denominatorValues[j].response == '' || denominatorValues[j].response == 'NA') {
           derivedResponse = 'NA';
         } else {
           let numeratorConvertedDate;
@@ -833,7 +833,7 @@ async function minusCalculation(companyId, mergedDetails, distinctYears, allData
           companyId: numeratorValues[j].companyId.id,
           datapointId: minusRules[i].datapointId.id,
           year: numeratorValues[j].year,
-          response: derivedResponse,
+          response: derivedResponse ? derivedResponse.toString() : derivedResponse,
           memberName: '',
           memberStatus: true,
           status: true,
@@ -930,24 +930,36 @@ async function percentageCalculation(companyId, mergedDetails, distinctYears, al
 
       for (let i = 0; i < distinctYears.length; i++) {
         const year = distinctYears[i];
-        //  let numberatorResponseValues = _.filter(mergedDetails, { datapointId: numeratorDpId, year: year, memberStatus: true });
+        _.filter(mergedDetails, (object, index) => {
+          if (object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year) {
+            numeratorValues.push(object)
+          } else if (object.datapointId.id == denominatorDpId && object.companyId.id == companyId && object.year == year) {
+            denominatorValues.push(object)
+          }
+        });
 
-
-        if (numberatorResponseValues.length > 0) {
-          numeratorSum = numberatorResponseValues.reduce(function (prev, next) {
-            return {
-              response: Number(prev.response.replace(/,/g, '').trim()) + Number(next.response.replace(/,/g, '').trim()),
-            };
+        if (numeratorValues.length > 0) {
+          numeratorSum = numeratorValues.reduce(function (prev, next) {
+            if (prev && next) {
+              if (prev.response && next.response) {
+                return {
+                  response: Number(prev.response.toString().replace(/,/g, '').trim()) + Number(next.response.toString().replace(/,/g, '').trim()),
+                };                
+              }
+            }
           });
         } else {
           numeratorSum = 0;
         }
-        let denominatorResponseValues = _.filter(mergedDetails, { datapointId: numeratorDpId, year: year, memberStatus: true });
-        if (denominatorResponseValues.length > 0) {
-          denominatorSum = denominatorResponseValues.reduce(function (prev, next) {
-            return {
-              response: Number(prev.response.replace(/,/g, '').trim()) + Number(next.response.replace(/,/g, '').trim()),
-            };
+        if (denominatorValues.length > 0) {
+          denominatorSum = denominatorValues.reduce(function (prev, next) {
+            if (prev && next) {
+              if (prev.response && next.response) {
+                return {
+                  response: Number(prev.response.toString().replace(/,/g, '').trim()) + Number(next.response.toString().replace(/,/g, '').trim()),
+                };
+              }
+            }
           });
         } else {
           denominatorSum = 0;
@@ -959,7 +971,7 @@ async function percentageCalculation(companyId, mergedDetails, distinctYears, al
           companyId: companyId,
           datapointId: percentageRules[i].datapointId.id,
           year: year,
-          response: derivedResponse,
+          response: derivedResponse ? derivedResponse.toString() : derivedResponse,
           memberName: '',
           memberStatus: true,
           status: true,
@@ -999,12 +1011,12 @@ async function percentageCalculation(companyId, mergedDetails, distinctYears, al
           let derivedResponse;
           console.log("\n\n\n\n\n", numeratorValues.length)
 
-          if (numeratorValues[j].response == ' ' || numeratorValues[j].response == '' || numeratorValues[j].response.toLowerCase() == 'na') {
+          if (numeratorValues[j].response == ' ' || numeratorValues[j].response == '' || numeratorValues[j].response == 'NA') {
             derivedResponse = 'NA';
           } else if (numeratorValues[j].response == '0' || numeratorValues[j].response == 0) {
             derivedResponse = '0';
           } else {
-            if (denominatorValues[j].response == ' ' || denominatorValues[j].response == '' || denominatorValues[j].response.toLowerCase() == 'na' || denominatorValues[j].response == '0') {
+            if (denominatorValues[j].response == ' ' || denominatorValues[j].response == '' || denominatorValues[j].response == 'NA' || denominatorValues[j].response == '0') {
               derivedResponse = 'NA';
             } else {
               derivedResponse = (parseInt(numeratorValues[j].response.replace(',', '')) / parseInt(denominatorValues[j].response.replace(',', ''))) * 100;
@@ -1014,7 +1026,7 @@ async function percentageCalculation(companyId, mergedDetails, distinctYears, al
             companyId: numeratorValues[j].companyId.id,
             datapointId: percentageRules[i].datapointId.id,
             year: numeratorValues[j].year,
-            response: derivedResponse,
+            response: derivedResponse ? derivedResponse.toString() : derivedResponse,
             memberName: '',
             memberStatus: true,
             status: true,
@@ -1054,7 +1066,7 @@ async function ratioAddCalculation(companyId, mergedDetails, distinctYears, allD
       } else {
         addResponse = Number(numeratorValue.response.replace(/,/g, '').trim()) + Number(denominatorValue.response.replace(/,/g, '').trim());
         //  = await percent(numeratorValue.response, addResponse);
-        if (numeratorValue.response === " " || numeratorValue.response.toLowerCase() == 'na') {
+        if (numeratorValue.response === " " || numeratorValue.response == 'NA') {
           percentResponse = 'NA';
         } else if (numeratorValue.response == 0) {
           resolve(0)
@@ -1074,7 +1086,7 @@ async function ratioAddCalculation(companyId, mergedDetails, distinctYears, allD
         companyId: companyId,
         datapointId: ruleDatapointId,
         year: year,
-        response: percentResponse,
+        response: percentResponse ? percentResponse.toString() : percentResponse,
         memberName: '',
         memberStatus: true,
         status: true,
@@ -1135,7 +1147,7 @@ async function sumCalculation(companyId, mergedDetails, distinctYears, allDatapo
         companyId: companyId,
         datapointId: ruleDatapointId,
         year: year,
-        response: sumValue,
+        response: sumValue ? sumValue.toString() : sumValue,
         memberName: '',
         memberStatus: true,
         status: true,
@@ -1258,7 +1270,7 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
               companyId: companyId,
               datapointId: ruleDatapointId,
               year: year,
-              response: count,
+              response: count ? count.toString() : count,
               memberName: '',
               memberStatus: true,
               status: true,
@@ -1287,7 +1299,7 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
             companyId: companyId,
             datapointId: ruleDatapointId,
             year: year,
-            response: total,
+            response: total ? total.toString() : total,
             memberName: '',
             memberStatus: true,
             status: true,
@@ -1355,25 +1367,13 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
             companyId: companyId,
             datapointId: ruleDatapointId,
             year: year,
-            response: finalResponse,
+            response: finalResponse ? finalResponse.toString() : finalResponse,
             memberName: '',
             memberStatus: true,
             status: true,
             createdBy: userDetail
           }
           allDerivedDatapoints.push(derivedDatapointsObject);
-        } else {
-          // let derivedDatapointsObject = {
-          //   companyId: companyId,
-          //   datapointId: ruleDatapointId,
-          //   year: year,
-          //   response: 'NA',
-          //   memberName: '',
-          //   memberStatus: true,
-          //   status: true,
-          //   createdBy: userDetail
-          // }
-          // allDerivedDatapoints.push(derivedDatapointsObject);
         }
       }
     }
@@ -1455,11 +1455,11 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
                 allDerivedDatapoints.push(derivedDatapointsObject);
               } else {
                 let derivedResponse;
-                if (sumValue === " " || sumValue.toLowerCase() == 'na') {
+                if (sumValue === " " || sumValue == 'NA') {
                   derivedResponse = 'NA';
                 } else if (sumValue == 0) {
                   derivedResponse = 0;
-                } else if (activeMemberValues.length == 0 || activeMemberValues.length === " " || activeMemberValues.length.toLowerCase() == 'na') {
+                } else if (activeMemberValues.length == 0 || activeMemberValues.length === " " || activeMemberValues.length == 'NA') {
                   derivedResponse = 'NA';
                 } else {
                   derivedResponse = Number(sumValue.replace(/,/g, '').trim()) / activeMemberValues.length;
@@ -1469,7 +1469,7 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
                   companyId: companyId,
                   datapointId: ruleDatapointId,
                   year: year,
-                  response: derivedResponse,
+                  response: derivedResponse ? derivedResponse.toString() : derivedResponse,
                   memberName: '',
                   memberStatus: true,
                   status: true,
@@ -1487,9 +1487,9 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
             if (numeratorResponse && denominatorResponse) {
               if (numeratorResponse.response == 0) {
                 derivedResponse = 0;
-              } else if (numeratorResponse.response == '' || numeratorResponse.response == ' ' || numeratorResponse.response.toLowerCase() == 'na') {
+              } else if (numeratorResponse.response == '' || numeratorResponse.response == ' ' || numeratorResponse.response == 'NA') {
                 derivedResponse = 'NA';
-              } else if (denominatorResponse.response == 0 || denominatorResponse.response == '' || denominatorResponse.response == ' ' || denominatorResponse.response.toLowerCase() == 'na') {
+              } else if (denominatorResponse.response == 0 || denominatorResponse.response == '' || denominatorResponse.response == ' ' || denominatorResponse.response == 'NA') {
                 derivedResponse = 'NA';
               } else {
                 // derivedResponse = parseInt(numeratorResponse.response)/parseInt(denominatorResponse.response)
@@ -1500,7 +1500,7 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
                 companyId: companyId,
                 datapointId: ruleDatapointId,
                 year: year,
-                response: derivedResponse,
+                response: derivedResponse ? derivedResponse.toString() : derivedResponse,
                 memberName: '',
                 memberStatus: true,
                 status: true,
@@ -1585,21 +1585,23 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
               allDerivedDatapoints.push(derivedDatapointsObject);
             } else {
               let derivedResponse;
-              if (sumValue === " " || sumValue.toString().toLowerCase() == 'na') {
+              if (sumValue === " " || sumValue == "" || sumValue == 'NA') {
                 derivedResponse = 'NA';
               } else if (sumValue == 0) {
                 derivedResponse = 0;
               } else if (activeMemberValues.length == 0) {
                 derivedResponse = 'NA';
               } else {
-                derivedResponse = Number(sumValue.toString().replace(/,/g, '').trim()) / activeMemberValues.length;
+                console.log("SUMVALUE ", sumValue, activeMemberValues)
+                let stringValue = sumValue ? sumValue.toString().replace(/,/g, '').trim() : 0
+                derivedResponse = Number(stringValue) / activeMemberValues.length;
               }
 
               let derivedDatapointsObject = {
                 companyId: companyId,
                 datapointId: ruleDatapointId,
                 year: year,
-                response: derivedResponse,
+                response: derivedResponse ? derivedResponse.toString() : derivedResponse,
                 memberName: '',
                 memberStatus: true,
                 status: true,
@@ -1628,12 +1630,12 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
             for (let j = 0; j < numeratorValues.length; j++) {
               let derivedResponse;
 
-              if (numeratorValues[j].response == ' ' || numeratorValues[j].response == '' || numeratorValues[j].response.toLowerCase() == 'na') {
+              if (numeratorValues[j].response == ' ' || numeratorValues[j].response == '' || numeratorValues[j].response == 'NA') {
                 derivedResponse = 'NA';
               } else if (numeratorValues[j].response == '0' || numeratorValues[j].response == 0) {
                 derivedResponse = '0';
               } else {
-                if (denominatorValues[j].response == ' ' || denominatorValues[j].response == '' || denominatorValues[j].response.toLowerCase() == 'na' || denominatorValues[j].response == '0') {
+                if (denominatorValues[j].response == ' ' || denominatorValues[j].response == '' || denominatorValues[j].response == 'NA' || denominatorValues[j].response == '0') {
                   derivedResponse = 'NA';
                 } else {
                   derivedResponse = (parseInt(numeratorValues[j].response.replace(',', '')) / parseInt(denominatorValues[j].response.replace(',', '')));
@@ -1643,7 +1645,7 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
                 companyId: companyId,
                 datapointId: ruleDatapointId,
                 year: numeratorValues[j].year,
-                response: derivedResponse,
+                response: derivedResponse ? derivedResponse.toString() : derivedResponse,
                 memberName: '',
                 memberStatus: true,
                 status: true,
