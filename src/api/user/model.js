@@ -46,6 +46,10 @@ const userSchema = new Schema({
     type: String,
     default: ''
   },
+  comments: {
+    type: String,
+    default: ''
+  },
   isUserApproved: {
     type: Boolean,
     default: false
@@ -86,7 +90,7 @@ userSchema.pre('save', function (next) {
 userSchema.methods = {
   view (full) {
     const view = {}
-    let fields = ['id', 'name', 'email', 'role', 'roleId', 'picture', 'phoneNumber', 'isUserApproved', 'status']
+    let fields = ['id', 'name', 'email', 'role', 'roleId', 'picture', 'phoneNumber', 'comments', 'isUserApproved', 'status']
 
     if (full) {
       fields = [...fields, 'email', 'createdAt']
