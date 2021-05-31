@@ -48,8 +48,8 @@ router.get('/',
   index)
 
 /**
- * @api {get} /derived_datapoints/:id Retrieve derived datapoints
- * @apiName RetrieveDerivedDatapoints
+ * @api {get} /derived_datapoints/generate-json/:companyId Generate JSON
+ * @apiName GenerateJSON
  * @apiGroup DerivedDatapoints
  * @apiPermission user
  * @apiParam {String} access_token user access token.
@@ -58,7 +58,7 @@ router.get('/',
  * @apiError 404 Derived datapoints not found.
  * @apiError 401 user access only.
  */
-router.get('/jsonGeneration/:companyId',
+router.get('/generate-json/:companyId',
   token({ required: true }),
   jsonGeneration )
 
