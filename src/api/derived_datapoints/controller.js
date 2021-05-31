@@ -1585,14 +1585,14 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
               allDerivedDatapoints.push(derivedDatapointsObject);
             } else {
               let derivedResponse;
-              if (sumValue === " " || sumValue.toLowerCase() == 'na') {
+              if (sumValue === " " || sumValue.toString().toLowerCase() == 'na') {
                 derivedResponse = 'NA';
               } else if (sumValue == 0) {
                 derivedResponse = 0;
-              } else if (activeMemberValues.length == 0 || activeMemberValues.length === " " || activeMemberValues.length.toLowerCase() == 'na') {
+              } else if (activeMemberValues.length == 0) {
                 derivedResponse = 'NA';
               } else {
-                derivedResponse = Number(sumValue.replace(/,/g, '').trim()) / activeMemberValues.length;
+                derivedResponse = Number(sumValue.toString().replace(/,/g, '').trim()) / activeMemberValues.length;
               }
 
               let derivedDatapointsObject = {
