@@ -125,6 +125,25 @@ router.post('/new-onboard',
   onBoardNewUser)
 
 /**
+ * @api {put} /users/update-status Update user status
+ * @apiName UpdateUserStatus
+ * @apiGroup User
+ * @apiPermission user
+ * @apiParam {String} access_token User access_token.
+ * @apiParam {String} [_id] User's userId.
+ * @apiParam {Boolean} [isUserApproved] User's isUserApproved.
+ * @apiParam {String} [comments] User's comments.
+ * @apiSuccess {Object} user User's data.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ * @apiError 401 Current user or admin access only.
+ * @apiError 404 User not found.
+ */
+router.put('/update-status',
+  token({ required: true }),
+  body({ userId, isUserApproved, comments }),
+  updateUserStatus)
+
+/**
  * @api {put} /users/:id Update user
  * @apiName UpdateUser
  * @apiGroup User
@@ -142,25 +161,6 @@ router.put('/:id',
   token({ required: true }),
   body({ name, roleId, picture }),
   update)
-
-/**
- * @api {put} /users/update-status Update user status
- * @apiName UpdateUserStatus
- * @apiGroup User
- * @apiPermission user
- * @apiParam {String} access_token User access_token.
- * @apiParam {String} [_id] User's userId.
- * @apiParam {Boolean} [isUserApproved] User's isUserApproved.
- * @apiParam {String} [comments] User's comments.
- * @apiSuccess {Object} user User's data.
- * @apiError {Object} 400 Some parameters may contain invalid values.
- * @apiError 401 Current user or admin access only.
- * @apiError 404 User not found.
- */
-router.put('/:id',
-  token({ required: true }),
-  body({ userId, isUserApproved, comments }),
-  updateUserStatus)
 
 /**
  * @api {put} /users/:id/password Update password

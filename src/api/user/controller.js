@@ -34,12 +34,13 @@ export const getUsersByRole = ({ params, querymen: { query, select, cursor } }, 
 }
 
 export const getUsersApprovals = ({ params, querymen: { query, select, cursor }, res, next }) => {
-  User.count({ isUserApproved: params.isUserApproved })
+  query.isUserApproved = params.isUserApproved;
+  User.count(query)
     .then(count => User.find(query, select, cursor)
     .populate('roleId')
       .then(users => ({
-        rows: users.map((user) => user.view()),
-        count
+        count,
+        rows: users.map((user) => user.view())
       }))
     )
     .then(success(res))
