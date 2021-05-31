@@ -33,6 +33,20 @@ export const getUsersByRole = ({ params, querymen: { query, select, cursor } }, 
     .catch(next)
 }
 
+export const getUsersApprovals = ({ params, querymen: { query, select, cursor }, res, next }) => {
+  query.isUserApproved = params.isUserApproved;
+  User.count(query)
+    .then(count => User.find(query, select, cursor)
+    .populate('roleId')
+      .then(users => ({
+        count,
+        rows: users.map((user) => user.view())
+      }))
+    )
+    .then(success(res))
+    .catch(next)
+}
+
 export const show = ({ params }, res, next) =>
   User.findById(params.id)
   .populate('roleId')
@@ -233,6 +247,26 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
   } else {
     return res.status(500).json({ message: "Failed to onboard, invalid value for role or roleName" });
   }
+}
+
+export const updateUserStatus = ({ bodymen: { body }, user }, res, next) =>{
+  User.findById(body.userId)
+  .populate('roleId')
+  .then((result) => {
+    if (result) {
+      User.updateOne({ _id: body.userId }, { $set: { isUserApproved: body.isUserApproved ? body.isUserApproved : false, comments: body.comments ? body.comments : '' } })
+      .then((updatedObject) => {
+        if (updatedObject) {
+          return res.status(200).json({ message: "User status updated" });
+        } else {
+          return res.status(500).json({ message: "Failed to update user status!" });
+        }
+      })
+    } else {
+      return res.status(400).json({ message: "Invalid UserId" });
+    }
+  })
+
 }
 
 export const update = ({ bodymen: { body }, params, user }, res, next) =>

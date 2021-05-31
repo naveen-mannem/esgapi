@@ -2,12 +2,12 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { password as passwordAuth, master, token } from '../../services/passport'
-import { index, showMe, show, create, update, updatePassword, destroy, getUsersByRole, onBoardNewUser } from './controller'
+import { index, showMe, show, create, update, updatePassword, destroy, getUsersByRole, onBoardNewUser, getUsersApprovals, updateUserStatus } from './controller'
 import { schema } from './model'
 export User, { schema } from './model'
 
 const router = new Router()
-const { email, password, name, picture, role, roleId, otp, phoneNumber, isUserApproved, status } = schema.tree
+const { email, password, name, picture, role, roleId, otp, phoneNumber, comments, isUserApproved, status } = schema.tree
 const onBoardingDetails = '', userId = '', companyId = '', companiesList = '', firstName = '', middleName = '', lastName = '', panNumber = '', aadhaarNumber = '', bankAccountNumber = '', bankIFSCCode = '', accountHolderName = '', pancardUrl = '', aadhaarUrl = '', cancelledChequeUrl = '', authenticationLetterForClientUrl = '', companyIdForClient = '', authenticationLetterForCompanyUrl = '', companyIdForCompany = '';
 /**
  * @api {get} /users Retrieve users
@@ -36,10 +36,26 @@ router.get('/',
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 401 user access only.
  */
-router.get('/:role/',
+router.get('/:role',
   token({ required: true }),
   query(),
   getUsersByRole)
+
+/**
+ * @api {get} /users/approvals/:isUserApproved Retrieve users approvals
+ * @apiName RetrieveUsersApprovals
+ * @apiGroup User
+ * @apiPermission user
+ * @apiParam {String} access_token User access_token.
+ * @apiUse listParams
+ * @apiSuccess {Object[]} users List of users.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ * @apiError 401 user access only.
+ */
+router.get('/approvals/:isUserApproved',
+  token({ required: true }),
+  query(),
+  getUsersApprovals)
 
 /**
  * @api {get} /users/me Retrieve current user
@@ -107,6 +123,25 @@ router.post('/new-onboard',
   token({ required: true }),
   body({onBoardingDetails}),
   onBoardNewUser)
+
+/**
+ * @api {put} /users/update-status Update user status
+ * @apiName UpdateUserStatus
+ * @apiGroup User
+ * @apiPermission user
+ * @apiParam {String} access_token User access_token.
+ * @apiParam {String} [_id] User's userId.
+ * @apiParam {Boolean} [isUserApproved] User's isUserApproved.
+ * @apiParam {String} [comments] User's comments.
+ * @apiSuccess {Object} user User's data.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ * @apiError 401 Current user or admin access only.
+ * @apiError 404 User not found.
+ */
+router.put('/update-status',
+  token({ required: true }),
+  body({ userId, isUserApproved, comments }),
+  updateUserStatus)
 
 /**
  * @api {put} /users/:id Update user
