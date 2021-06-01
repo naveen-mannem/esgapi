@@ -446,7 +446,22 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
 
     _.forEach(inactiveBoardMembersList, function (object) {
       let indexToUpdate = _.findIndex(boardMembersList, object);
-      boardMembersList[indexToUpdate].memberStatus = false;
+      if (indexToUpdate >= 0) {
+        boardMembersList[indexToUpdate].memberStatus = false;        
+      }
+      let matchingMembers = boardMembersList.filter((obj) => {
+        if(obj.memberName == object.memberName && obj.year == object.year){
+          return obj;
+        }
+      });
+      if (matchingMembers.length > 0) {
+        for (let idx = 0; idx < matchingMembers.length; idx++) {
+          let idxToUpdate = _.findIndex(boardMembersList, matchingMembers[idx]);
+          if (indexToUpdate >= 0) {
+            boardMembersList[idxToUpdate].memberStatus = false;
+          }
+        }
+      }
     });
 
     const structuredKmpMatrixDetails = filteredKmpMatrixDetails.map(function (item) {

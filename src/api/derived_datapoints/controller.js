@@ -97,7 +97,8 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
 
         console.log("Merged Details  ::::::::: ", mergedDetails.length)
         // let distinctRuleMethods = await Rules.distinct('methodName').populate('datapointId');
-        let distinctRuleMethods = ["MatrixPercentage", "Minus", "Sum", "count of", "Ratio", "Percentage", "YesNo", "RatioADD", "As", "ADD", "AsPercentage", "AsRatio", "Condition", "Multiply"];
+        let distinctRuleMethods = ['Minus'];
+        // ["MatrixPercentage", "Minus", "Sum", "count of", "Ratio", "Percentage", "YesNo", "RatioADD", "As", "ADD", "AsPercentage", "AsRatio", "Condition", "Multiply"];
         //Process all rules
         for (let ruleIndex = 0; ruleIndex < distinctRuleMethods.length; ruleIndex++) {
           switch (distinctRuleMethods[ruleIndex]) {
@@ -530,9 +531,9 @@ async function matrixPercentageCalculation(companyId, mergedDetails, distinctYea
       _.filter(mergedDetails, (object, index) => {
         for (let i = 0; i < distinctYears.length; i++) {
           const year = distinctYears[i];
-          if (object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year) {
+          if (object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year && object.memberStatus == true) {
             numeratorValues.push(object)
-          } else if (object.datapointId.id == denominatorDpId && object.companyId.id == companyId && object.year == year) {
+          } else if (object.datapointId.id == denominatorDpId && object.companyId.id == companyId && object.year == year && object.memberStatus == true) {
             denominatorValues.push(object)
           }
         }
@@ -568,7 +569,7 @@ async function matrixPercentageCalculation(companyId, mergedDetails, distinctYea
       _.filter(mergedDetails, (object, index) => {
         for (let i = 0; i < distinctYears.length; i++) {
           const year = distinctYears[i];
-          if (object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year) {
+          if (object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year && object.memberStatus == true) {
             numeratorValues.push(object)
           } else if (object.datapointId.id == denominatorDpId && object.companyId.id == companyId && object.year == year) {
             denominatorValues.push(object)
@@ -585,7 +586,7 @@ async function matrixPercentageCalculation(companyId, mergedDetails, distinctYea
             datapointId: matrixPercentageRules[i].datapointId.id,
             year: numeratorValues[j].year,
             response: derivedResponse ? derivedResponse.toString() : derivedResponse,
-            memberName: '',
+            memberName: numeratorValues[j].memberName ? numeratorValues[j].memberName.replace('\r\n', '') : '',
             memberStatus: true,
             status: true,
             createdBy: userDetail
@@ -595,6 +596,7 @@ async function matrixPercentageCalculation(companyId, mergedDetails, distinctYea
       }
     }
     if (i == matrixPercentageRules.length - 1) {
+      console.log(allDerivedDatapoints)
       return { allDerivedDatapoints: allDerivedDatapoints };
     }
   }
@@ -802,12 +804,10 @@ async function minusCalculation(companyId, mergedDetails, distinctYears, allData
     _.filter(mergedDetails, (object, index) => {
       for (let i = 0; i < distinctYears.length; i++) {
         const year = distinctYears[i];
-        if (object.memberStatus == true) {
-          if (object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year) {
-            numeratorValues.push(object);
-          } else if (object.datapointId.id == denominatorDpId && object.companyId.id == companyId && object.year == year) {
-            denominatorValues.push(object);
-          }
+        if (object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year && object.memberStatus == true) {
+          numeratorValues.push(object);
+        } else if (object.datapointId.id == denominatorDpId && object.companyId.id == companyId && object.year == year && object.memberStatus == true) {
+          denominatorValues.push(object);
         }
       }
     })
@@ -834,7 +834,7 @@ async function minusCalculation(companyId, mergedDetails, distinctYears, allData
           datapointId: minusRules[i].datapointId.id,
           year: numeratorValues[j].year,
           response: derivedResponse ? derivedResponse.toString() : derivedResponse,
-          memberName: '',
+          memberName: numeratorValues[j].memberName ? numeratorValues[j].memberName.replace('\r\n', '') : '',
           memberStatus: true,
           status: true,
           createdBy: userDetail
@@ -944,7 +944,7 @@ async function percentageCalculation(companyId, mergedDetails, distinctYears, al
               if (prev.response && next.response) {
                 return {
                   response: Number(prev.response.toString().replace(/,/g, '').trim()) + Number(next.response.toString().replace(/,/g, '').trim()),
-                };                
+                };
               }
             }
           });
