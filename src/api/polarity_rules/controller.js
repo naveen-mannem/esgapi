@@ -73,7 +73,7 @@ export const percentileCalculation = async ({ user, params }, res, next) => {
         for (let pdpIndex = 0; pdpIndex < percentileDatapointsList.length; pdpIndex++) {
           if (percentileDatapointsList[pdpIndex].dataCollection.toLowerCase() == "yes" || percentileDatapointsList[pdpIndex].dataCollection.toLowerCase() == "y") {
             //Find the datapoint response value in StandaloneDatapoints collection
-            let dpResponseOfNicCompanies = await StandaloneDatapoints.find({ companyId: { $in: nicCompaniesIds }, datapointId: percentileDatapointsList[pdpIndex].id, year: year }, { response: 1, _id: 0 });
+            let dpResponseOfNicCompanies = await StandaloneDatapoints.find({ companyId: { $in: nicCompaniesIds }, datapointId: percentileDatapointsList[pdpIndex].id, year: year, status: true }, { response: 1, _id: 0 });
             console.log('dpResponseOfNicCompanies', dpResponseOfNicCompanies);
             let filteredDpResponses = _.filter(dpResponseOfNicCompanies, function (currentObject) {
               return currentObject.response !== '' && currentObject.response !== ' ' && currentObject.response.toLowerCase() == "na";
@@ -92,7 +92,7 @@ export const percentileCalculation = async ({ user, params }, res, next) => {
             for (let companyIndex = 0; companyIndex < nicCompaniesList.length; companyIndex++) {
               const element = nicCompaniesList[companyIndex];
               // if (percentileDatapointsList[pdpIndex].dataCollection.toLowerCase() == "yes" || percentileDatapointsList[pdpIndex].dataCollection.toLowerCase() == "y") {
-              let foundResponse = await StandaloneDatapoints.findOne({ companyId: nicCompaniesList[companyIndex].id, datapointId: percentileDatapointsList[pdpIndex].id, year: year });
+              let foundResponse = await StandaloneDatapoints.findOne({ companyId: nicCompaniesList[companyIndex].id, datapointId: percentileDatapointsList[pdpIndex].id, year: year, status: true });
               if (foundResponse) {
                 if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response.toLowerCase() == 'na') {
                   await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { response: 'NA', performanceResult: 'NA' } });
@@ -198,7 +198,7 @@ export const percentileCalculation = async ({ user, params }, res, next) => {
   //         let polarityRuleDetails = await PolarityRules.findOne({ datapointId: polarityRulesList[dataPointIndex] })
   //         if (polarityDetail.dataCollection.toLowerCase() == "yes" || polarityDetail.dataCollection.toLowerCase() == "y") {
 
-  //           let foundResponse = await StandaloneDatapoints.findOne({ companyId: nicCompaniesList[companyIndex].id, datapointId: polarityRuleDetails.datapointId, year: year });
+  //           let foundResponse = await StandaloneDatapoints.findOne({ companyId: nicCompaniesList[companyIndex].id, datapointId: polarityRuleDetails.datapointId, year: year, status: true });
   //           if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response.toLowerCase() == 'na') {
   //             await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { response: 'NA', performanceResult: 'NA' } });
   //           } else {
@@ -267,7 +267,7 @@ export const percentileCalculation = async ({ user, params }, res, next) => {
   //       } else {
   //         let polarityDetail = await Datapoints.findOne({ _id: dataPointsIdList[dataPointIndex] })
   //         if (polarityDetail.dataCollection.toLowerCase() == "yes" || polarityDetail.dataCollection.toLowerCase() == "y") {
-  //           let foundResponse = await StandaloneDatapoints.findOne({ companyId: nicCompaniesList[companyIndex].id, datapointId: dataPointsIdList[dataPointIndex], year: year });
+  //           let foundResponse = await StandaloneDatapoints.findOne({ companyId: nicCompaniesList[companyIndex].id, datapointId: dataPointsIdList[dataPointIndex], year: year, status: true });
   //           if (foundResponse) {
   //             if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response.toLowerCase() == 'na' || foundResponse.response.toLowerCase() == 'nan') {
   //               await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { response: 'NA', performanceResult: 'NA' } });
