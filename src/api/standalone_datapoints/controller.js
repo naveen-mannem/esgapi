@@ -96,18 +96,24 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
           var headers1 = {};
           var data = [];
           if (currentSheetName.toLowerCase() == 'matrix-directors' || currentSheetName.toLowerCase() == 'matrix-kmp') {
-            for (const cellId in worksheet) {
+            // for (const [cellIndex, [key, cellId]] of Object.entries(Object.entries(worksheet))) {
+            // for (let cellId=0; cellId < worksheet.length; cellId++) {
+              for (const cellId in worksheet) {
+              let keys = Object.keys(worksheet);
+              let nextIndex = keys.indexOf(cellId) +1;
+              let nextItemKey = keys[nextIndex];
+              // let nextCellId = worksheet[Number(cellIndex)+1];
+              let nextCellId = nextItemKey;
               if (cellId[0] === "!") continue;
               //parse out the column, row, and value
               // var col = cellId.substring(0, 1);  
               var colStringName = cellId.replace(/[0-9]/g, '');
               var col = colStringName;
+              var nextColStringName = nextCellId.replace(/[0-9]/g, '');
+              var nextCol = nextColStringName;
               // var row = parseInt(cellId.substring(1));  
               var row = parseInt(cellId.match(/(\d+)/));
               var value = worksheet[cellId].v;
-              if(cellId == 'J7'){
-                console.log('J7 value', value);
-              }
               //store header names
               if (row == 1) {
                 if (value != "Error types and definitions") {
@@ -137,11 +143,23 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
                       data[row][headers1[col]] = value;
                       if (!data[row][headers1[allColumnNames[previousColumnIndex]]] && data[row][headers1[allColumnNames[previousColumnIndex]]] !=0 && previousColumnIndex != 0) {
                         data[row][headers1[allColumnNames[previousColumnIndex]]] = '';
-                      } else if (data[row][headers1[allColumnNames[previousColumnIndex]]] == 0) {
-                        data[row][headers1[allColumnNames[previousColumnIndex]]] = 0;
                       }
                       if (!data[row][headers1[allColumnNames[nextColumnIndex]]]) {
                         data[row][headers1[allColumnNames[nextColumnIndex]]] = '';
+                        let nextCellId = allColumnNames[nextColumnIndex] + row;
+                        if (nextCellId) {
+                          let expectedNextCol = allColumnNames[nextColumnIndex];
+                          if (nextCol != expectedNextCol) {
+                            let indexOfActualNextCol = allColumnNames.indexOf(nextCol);
+                            let indexOfExpectedNextCol = allColumnNames.indexOf(expectedNextCol);
+                            let difference = indexOfActualNextCol - indexOfExpectedNextCol;
+                            if (difference > 1) {
+                              for (let inx = indexOfExpectedNextCol; inx < indexOfActualNextCol; inx++) {
+                                data[row][headers1[allColumnNames[inx]]] = '';
+                              }
+                            }
+                          }
+                        }
                       }
                     }
                   }
@@ -168,11 +186,26 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
                       data[row][headers[col]] = value;
                       if (!data[row][headers[allColumnNames[previousColumnIndex]]] && data[row][headers[allColumnNames[previousColumnIndex]]] !=0 && previousColumnIndex != 0) {
                         data[row][headers[allColumnNames[previousColumnIndex]]] = '';
-                      } else if (data[row][headers[allColumnNames[previousColumnIndex]]] == 0) {
-                        data[row][headers[allColumnNames[previousColumnIndex]]] = 0;
                       }
                       if (!data[row][headers[allColumnNames[nextColumnIndex]]]) {
                         data[row][headers[allColumnNames[nextColumnIndex]]] = '';
+                        let nextCellId = allColumnNames[nextColumnIndex] + row;
+                        if (nextCellId) {
+                          let expectedNextCol = allColumnNames[nextColumnIndex];
+                          if (nextCol != expectedNextCol) {
+                            let indexOfActualNextCol = allColumnNames.indexOf(nextCol);
+                            let indexOfExpectedNextCol = allColumnNames.indexOf(expectedNextCol);
+                            let difference = indexOfActualNextCol - indexOfExpectedNextCol;
+                            if (difference > 1) {
+                              for (let inx = indexOfExpectedNextCol; inx < indexOfActualNextCol; inx++) {
+                                data[row][headers[allColumnNames[inx]]] = '';
+                              }
+                            }
+                          }
+                        }
+                        // if (!worksheet[nextCellId]) {
+                        //   worksheet[nextCellId] = { t: "", v: "", w: "" };                          
+                        // }
                       }
                     }
                   }
@@ -215,8 +248,6 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
                     data[row][headers[col]] = value;
                     if (!data[row][headers[allColumnNames[previousColumnIndex]]] && data[row][headers[allColumnNames[previousColumnIndex]]] !=0 && previousColumnIndex != 0) {
                       data[row][headers[allColumnNames[previousColumnIndex]]] = '';
-                    } else if (data[row][headers[allColumnNames[previousColumnIndex]]] == 0) {
-                      data[row][headers[allColumnNames[previousColumnIndex]]] = 0;
                     }
                     if (!data[row][headers[allColumnNames[nextColumnIndex]]]) {
                       data[row][headers[allColumnNames[nextColumnIndex]]] = '';
@@ -450,7 +481,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
         boardMembersList[indexToUpdate].memberStatus = false;        
       }
       let matchingMembers = boardMembersList.filter((obj) => {
-        if(obj.memberName == object.memberName && obj.year == object.year){
+        if(obj.memberName == object.memberName && obj.year == object.year && obj.companyId == object.companyId){
           return obj;
         }
       });
@@ -533,9 +564,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
               for (let findIndex = 0; findIndex < bmmDpsToFind.length; findIndex++) {
                 const bmmDpObject = bmmDpsToFind[findIndex];
                 let kmpDatapointCode = dpMapping.find((obj)=> obj[bmmDpObject.code]);
-                console.log('kmpDatapointCode', kmpDatapointCode);
                 let matchingKmpObject = kmpDpsToUpdate.find((obj) => obj.code == kmpDatapointCode[bmmDpObject.code]);
-                console.log('matchingKmpObject', matchingKmpObject);
                 let responseToUpdate = _.filter(boardMembersList, function (obj) {
                   return obj.datapointId == bmmDpObject.id
                     && obj.companyId == companyId
