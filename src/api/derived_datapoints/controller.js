@@ -96,7 +96,8 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
         mergedDetails = _.concat(allStandaloneDetails, allBoardMemberMatrixDetails, allKmpMatrixDetails);
 
         // let distinctRuleMethods = await Rules.distinct('methodName').populate('datapointId');
-        let distinctRuleMethods = ["MatrixPercentage", "Minus", "Sum", "count of", "Ratio", "Percentage", "YesNo", "RatioADD", "As", "ADD", "AsPercentage", "AsRatio", "Condition", "Multiply"];
+        let distinctRuleMethods = ["count of"];
+        // ["MatrixPercentage", "Minus", "Sum", "count of", "Ratio", "Percentage", "YesNo", "RatioADD", "As", "ADD", "AsPercentage", "AsRatio", "Condition", "Multiply"];
         //Process all rules
         for (let ruleIndex = 0; ruleIndex < distinctRuleMethods.length; ruleIndex++) {
           switch (distinctRuleMethods[ruleIndex]) {
@@ -266,7 +267,7 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
         //         let polarityRuleDetails = await PolarityRules.findOne({ datapointId: polarityRulesList[dataPointIndex] })
         //         if (polarityDetail.dataCollection.toLowerCase() == "yes" || polarityDetail.dataCollection.toLowerCase() == "y") {
 
-        //           let foundResponse = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: polarityRuleDetails.datapointId, year: year });
+        //           let foundResponse = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: polarityRuleDetails.datapointId, year: year, status: true });
         //           if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA') {
         //             await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { response: 'NA', performanceResult: 'NA' } });
         //           } else {
@@ -335,7 +336,7 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
         //       } else {
         //         let polarityDetail = await Datapoints.findOne({ _id: dataPointsIdList[dataPointIndex] })
         //         if (polarityDetail.dataCollection.toLowerCase() == "yes" || polarityDetail.dataCollection.toLowerCase() == "y") {
-        //           let foundResponse = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: dataPointsIdList[dataPointIndex], year: year });
+        //           let foundResponse = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: dataPointsIdList[dataPointIndex], year: year, status: true });
         //           if (foundResponse) {
         //             if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA' || foundResponse.response.toLowerCase() == 'nan') {
         //               await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { response: 'NA', performanceResult: 'NA' } });
@@ -430,7 +431,7 @@ export const jsonGeneration = async ({ user, params }, res, next) => {
   let companyID = params.companyId ? params.companyId : '';
   let responseList1 = [], responseList2 = [];
   let companyDetails = await Companies.find({ _id: companyID });
-  let distinctYears = await StandaloneDatapoints.find({ companyId: companyID }).distinct('year');
+  let distinctYears = await StandaloneDatapoints.find({ companyId: companyID, status: true }).distinct('year');
   for (let yearIndex = 0; yearIndex < distinctYears.length; yearIndex++) {
     await StandaloneDatapoints.aggregate([
       { "$match": { datapointId: { "$in": requiredDataPoints }, year: distinctYears[yearIndex], status: true } },
@@ -610,9 +611,9 @@ async function addCalculation(companyId, mergedDetails, distinctYears, allDatapo
     for (let j = 0; j < distinctYears.length; j++) {
       const year = distinctYears[j];
       let ruleDatapointId = addRules[i].datapointId.id;
-      let numeratorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: numeratorDpId, year: year });
-      let denominatorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: denominatorDpId, year: year });
-      let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year });
+      let numeratorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: numeratorDpId, year: year, status: true });
+      let denominatorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: denominatorDpId, year: year, status: true });
+      let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year, status: true });
       if (ruleResponseObject) {
         if (ruleResponseObject.response == '' || ruleResponseObject.response == ' ') {
           //perform calc
@@ -646,11 +647,11 @@ async function asCalculation(companyId, mergedDetails, distinctYears, allDatapoi
     for (let j = 0; j < distinctYears.length; j++) {
       const year = distinctYears[j];
       let ruleDatapointId = asRules[i].datapointId.id;
-      let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year });
+      let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year, status: true });
       if (ruleResponseObject) {
         if (ruleResponseObject.response == '' || ruleResponseObject.response == ' ') {
           //perform calc
-          let numeratorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: numeratorDpId, year: year });
+          let numeratorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: numeratorDpId, year: year, status: true });
           await StandaloneDatapoints.updateOne({ _id: ruleResponseObject.id }, { $set: { response: numeratorValue.response } });
         } else {
           await StandaloneDatapoints.updateOne({ _id: ruleResponseObject.id }, { $set: { response: ruleResponseObject.response } });
@@ -678,9 +679,9 @@ async function asPercentageCalculation(companyId, mergedDetails, distinctYears, 
     for (let j = 0; j < distinctYears.length; j++) {
       const year = distinctYears[j];
       let ruleDatapointId = asPercentageRules[i].datapointId.id;
-      let numeratorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: numeratorDpId, year: year });
-      let denominatorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: denominatorDpId, year: year });
-      let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year });
+      let numeratorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: numeratorDpId, year: year, status: true });
+      let denominatorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: denominatorDpId, year: year, status: true });
+      let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year, status: true });
       if (ruleResponseObject) {
         if (ruleResponseObject.response == '' || ruleResponseObject.response == ' ') {
           //perform calc
@@ -718,9 +719,9 @@ async function asRatioCalculation(companyId, mergedDetails, distinctYears, allDa
     for (let j = 0; j < distinctYears.length; j++) {
       const year = distinctYears[j];
       let ruleDatapointId = asRatioRules[i].datapointId.id;
-      let numeratorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: numeratorDpId, year: year });
-      let denominatorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: denominatorDpId, year: year });
-      let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year });
+      let numeratorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: numeratorDpId, year: year, status: true });
+      let denominatorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: denominatorDpId, year: year, status: true });
+      let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year, status: true });
       if (ruleResponseObject) {
         if (ruleResponseObject.response == '' || ruleResponseObject.response == ' ') {
           //perform calc
@@ -753,11 +754,11 @@ async function conditionCalculation(companyId, mergedDetails, distinctYears, all
     for (let j = 0; j < distinctYears.length; j++) {
       const year = distinctYears[j];
       let ruleDatapointId = asConditionRules[i].datapointId.id;
-      let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year });
+      let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year, status: true });
       if (ruleResponseObject) {
         if (ruleResponseObject.response == '' || ruleResponseObject.response == ' ') {
           //perform calc
-          let numeratorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: parameterDpId, year: year });
+          let numeratorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: parameterDpId, year: year, status: true });
 
           if (Number(numeratorValue.response) >= 50) {
             await StandaloneDatapoints.updateOne({ _id: ruleResponseObject.id }, { $set: { response: 'Y' } });
@@ -848,7 +849,7 @@ async function multiplyCalculation(companyId, mergedDetails, distinctYears, allD
     for (let j = 0; j < distinctYears.length; j++) {
       const year = distinctYears[j];
       let ruleDatapointId = asMultiplyRules[i].datapointId.id;
-      let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year });
+      let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year, status: true });
       if (ruleResponseObject) {
         if (ruleResponseObject.response == '' || ruleResponseObject.response == ' ') {
           //perform calc
@@ -859,8 +860,8 @@ async function multiplyCalculation(companyId, mergedDetails, distinctYears, allD
           let thirdParameterDpObject = _.filter(allDatapointsList, { code: parameters[2] });
           let thirdParameterDpId = thirdParameterDpObject[0] ? thirdParameterDpObject[0].id : '';
 
-          let firstParameterValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: firstParameterDpId, year: year });
-          let secondParameterValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: secondParameterDpId, year: year });
+          let firstParameterValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: firstParameterDpId, year: year, status: true });
+          let secondParameterValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: secondParameterDpId, year: year, status: true });
           let multipliedResponse;
           //multiply aidDPLogic
           if (firstParameterValue.response === " " || secondParameterValue.response == 0 || secondParameterValue.response === " ") {
@@ -883,7 +884,7 @@ async function multiplyCalculation(companyId, mergedDetails, distinctYears, allD
           }
           if (asMultiplyRules[i].methodType == "composite") {
             if (multipliedResponse == 'NA') {
-              let thirdParameterValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: thirdParameterDpId, year: year });
+              let thirdParameterValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: thirdParameterDpId, year: year, status: true });
               await StandaloneDatapoints.updateOne({ _id: ruleResponseObject.id }, { $set: { response: thirdParameterValue.response } });
             } else {
               await StandaloneDatapoints.updateOne({ _id: ruleResponseObject.id }, { $set: { response: multipliedResponse } });
@@ -1046,9 +1047,9 @@ async function ratioAddCalculation(companyId, mergedDetails, distinctYears, allD
     for (let j = 0; j < distinctYears.length; j++) {
       const year = distinctYears[j];
       let ruleDatapointId = ratioAddRules[i].datapointId.id;
-      let numeratorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: numeratorDpId, year: year });
-      let denominatorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: denominatorDpId, year: year });
-      let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year });
+      let numeratorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: numeratorDpId, year: year, status: true });
+      let denominatorValue = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: denominatorDpId, year: year, status: true });
+      let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year, status: true });
       let addResponse, percentResponse;
       if (numeratorValue.response === " " || denominatorValue.response === " ") {
         addResponse = 'NA';
@@ -1107,7 +1108,7 @@ async function sumCalculation(companyId, mergedDetails, distinctYears, allDatapo
       let sumValue;
       let ruleDatapointId = sumRules[i].datapointId.id;
 
-      let ruleResponseObject = await StandaloneDatapoints.find({ companyId: companyId, datapointId: ruleDatapointId, year: year });
+      let ruleResponseObject = await StandaloneDatapoints.find({ companyId: companyId, datapointId: ruleDatapointId, year: year, status: true });
       let activeMembers = []
       _.filter(mergedDetails, (object, index) => {
         if (object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year && object.memberStatus == true) {
@@ -1171,13 +1172,13 @@ async function yesNoCalculation(companyId, mergedDetails, distinctYears, allData
       const year = distinctYears[j];
       let sumValue;
       let ruleDatapointId = yesNoRules[i].datapointId.id;
-      let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year });
+      let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year, status: true });
 
       let count = 0;
       for (let k = 0; k < parameters.length; k++) {
         let parameterDpObject = _.filter(allDatapointsList, { code: parameters[k] });
         let parameterDpId = parameterDpObject[0] ? parameterDpObject[0].id : '';
-        let dpResponse = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: parameterDpId, year: year });
+        let dpResponse = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: parameterDpId, year: year, status: true });
         if (dpResponse.response) {
           if (dpResponse.response.equalsIgnoreCase('yes') || dpResponse.response.equalsIgnoreCase('y')) {
             count++;
@@ -1234,7 +1235,7 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
       const year = distinctYears[j];
       let sumValue;
       let ruleDatapointId = countOfRules[i].datapointId.id;
-      let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year });
+      let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year, status: true });
       if (countOfRules[i].methodType == 'composite') {
         let total = 0;
         let numeratorList = [], denominatorList = []
@@ -1242,13 +1243,10 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
           //  let numeratorList = _.filter(mergedDetails, { datapointId: numeratorDpObject[0], year: distinctYears[j], memberStatus: true })
           // let denominatorList = _.filter(mergedDetails, { datapointId: denominatorDpObject[0], year: distinctYears[j], memberStatus: true })
           _.filter(mergedDetails, (object, index) => {
-            for (let i = 0; i < distinctYears.length; i++) {
-              const year = distinctYears[i];
-              if (object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year && object.memberStatus == true) {
-                numeratorList.push(object)
-              } else if (object.datapointId.id == denominatorDpId && object.companyId.id == companyId && object.year == year && object.memberStatus == true) {
-                denominatorList.push(object)
-              }
+            if (object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year && object.memberStatus == true) {
+              numeratorList.push(object)
+            } else if (object.datapointId.id == denominatorDpId && object.companyId.id == companyId && object.year == year && object.memberStatus == true) {
+              denominatorList.push(object)
             }
           });
           if (numeratorList.length > 0 && denominatorList.length > 0) {
@@ -1259,7 +1257,7 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
               for (let ix = 0; ix < denominatorList.length; ix++) {
                 for (let jx = 0; jx < numeratorList.length; jx++) {
                   if (denominatorList[ix].dirName == numeratorList[jx].dirName) {
-                    if ((denominatorList[ix].value == 'Yes' && numeratorList[jx].value == 'Yes') || (denominatorList[ix].value == 'Y' && numeratorList[jx].value == 'Y')) {
+                    if ((denominatorList[ix].value.equalsIgnoreCase('Yes') && numeratorList[jx].value.equalsIgnoreCase('Yes')) || (denominatorList[ix].value.equalsIgnoreCase('Y') && numeratorList[jx].value.equalsIgnoreCase('Y'))) {
                       count++;
                     }
                   }
@@ -1282,10 +1280,10 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
 
           for (let kx = 0; kx < parameters.length; kx++) {
             let parameterDatapointObject = await Datapoints.findOne({ code: parameters[kx].trim() });
-            await StandaloneDatapoints.findOne({ companyId: companyId, year: distinctYears[j], datapointId: parameterDatapointObject.id }).populate('updatedBy').populate('keyIssueId').populate('functionId')
+            await StandaloneDatapoints.findOne({ companyId: companyId, year: year, datapointId: parameterDatapointObject.id, status: true }).populate('updatedBy').populate('keyIssueId').populate('functionId')
               .then((resp) => {
                 if (resp) {
-                  if (resp.response == 'Yes' || resp.response == 'Y') {
+                  if (resp.response.equalsIgnoreCase('Yes') || resp.response.equalsIgnoreCase('Y')) {
                     total++;
                   } else {
                     total;
@@ -1311,19 +1309,16 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
         //let values = _.filter(mergedDetails, { year: '2018-2019', datapointId: numeratorDpId, memberStatus: true });
 
         _.filter(mergedDetails, (object, index) => {
-          for (let i = 0; i < distinctYears.length; i++) {
-            const year = distinctYears[i];
-            if (object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year && object.memberStatus == true) {
-              values.push(object)
-            }
+          if (object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year && object.memberStatus == true) {
+            values.push(object.response);
           }
         });
         if (values.length > 0) {
           // let countValue = await count(arr, ruleValue.criteria)
           let finalResponse;
 
-          values = values.filter(e => String(e.response).trim());
-          values = values.filter(e => e.response.toLowerCase() != 'na')
+          values = values.filter(e => String(e).trim());
+          values = values.filter(e => e.toLowerCase() != 'na')
           if (countOfRules[i].criteria == '2') {
             if (values.length > 0) {
               finalResponse = values.filter(item => item >= countOfRules[i].criteria).length;
@@ -1339,9 +1334,7 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
           } else if (countOfRules[i].criteria.toLowerCase() == 'y' || countOfRules[i].criteria.toLowerCase() == 'yes') {
             if (values.length > 0) {
               if (values.includes('Yes') || values.includes('yes') || values.includes('Y') || values.includes('y')) {
-                finalResponse = values.filter(item => item == 'Yes').length;
-              } else {
-                finalResponse = values.filter(item => item == 'Y').length;
+                finalResponse = values.filter(item => item == 'Yes' || item == 'Y').length;
               }
             } else {
               finalResponse = 'NA';
@@ -1391,7 +1384,7 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
         for (let j = 0; j < distinctYears.length; j++) {
           const year = distinctYears[j];
           let ruleDatapointId = ratioRules[i].datapointId.id;
-          let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year });
+          let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year, status: true });
           if (ratioRules[i].methodType == "IF") {
             //let activeMemberValues = _.filter(mergedDetails, { year: year, datapointId: numeratorDpObject, memberStatus: true });
             _.filter(mergedDetails, (object, index) => {
@@ -1471,8 +1464,8 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
               sumValue = 0;
             }
           } else {
-            let numeratorResponse = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: numeratorDpId, year: year });
-            let denominatorResponse = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: denominatorDpId, year: year });
+            let numeratorResponse = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: numeratorDpId, year: year, status: true });
+            let denominatorResponse = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: denominatorDpId, year: year, status: true });
             let derivedResponse;
             if (numeratorResponse && denominatorResponse) {
               if (numeratorResponse.response == 0) {
@@ -1520,7 +1513,7 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
       for (let j = 0; j < distinctYears.length; j++) {
         const year = distinctYears[j];
         let ruleDatapointId = ratioRules[i].datapointId.id;
-        let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year });
+        let ruleResponseObject = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: ruleDatapointId, year: year, status: true });
         if (ratioRules[i].methodType == "IF") {
           let activeMemberValues = [];
           _.filter(mergedDetails, (object, index) => {
@@ -1606,7 +1599,6 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
               const year = distinctYears[i];
               if (object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year) {
                 numeratorValues.push(object)
-
               } else if (object.datapointId.id == denominatorDpId && object.companyId.id == companyId && object.year == year) {
                 denominatorValues.push(object)
               }
