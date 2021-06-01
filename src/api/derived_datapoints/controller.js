@@ -1058,7 +1058,7 @@ async function ratioAddCalculation(companyId, mergedDetails, distinctYears, allD
         if (numeratorValue.response === " " || numeratorValue.response == 'NA') {
           percentResponse = 'NA';
         } else if (numeratorValue.response == 0) {
-          resolve(0)
+          percentResponse = 0;
         } else if (percentResponse == 0 || percentResponse == "" || percentResponse == " ") {
           percentResponse = "NA";
         } else {
@@ -1178,8 +1178,10 @@ async function yesNoCalculation(companyId, mergedDetails, distinctYears, allData
         let parameterDpObject = _.filter(allDatapointsList, { code: parameters[k] });
         let parameterDpId = parameterDpObject[0] ? parameterDpObject[0].id : '';
         let dpResponse = await StandaloneDatapoints.findOne({ companyId: companyId, datapointId: parameterDpId, year: year });
-        if (dpResponse.response.toLowerCase().trim() == 'yes' || dpResponse.response.toLowerCase() == 'y') {
-          count++;
+        if (dpResponse.response) {
+          if (dpResponse.response.equalsIgnoreCase('yes') || dpResponse.response.equalsIgnoreCase('y')) {
+            count++;
+          }          
         }
       }
       if (count > 0) {
