@@ -18,7 +18,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
     .then(count => Controversy.find(query, select, cursor)
       .populate('createdBy')
       .populate('companyId')
-      .populate('dpCodeId')
+      .populate('datapointId')
       .then((controversies) => ({
         count,
         rows: controversies.map((controversy) => controversy.view())
@@ -31,7 +31,7 @@ export const show = ({ params }, res, next) =>
   Controversy.findById(params.id)
     .populate('createdBy')
     .populate('companyId')
-    .populate('dpCodeId')
+    .populate('datapointId')
     .then(notFound(res))
     .then((controversy) => controversy ? controversy.view() : null)
     .then(success(res))
@@ -41,7 +41,7 @@ export const update = ({ user, bodymen: { body }, params }, res, next) =>
   Controversy.findById(params.id)
     .populate('createdBy')
     .populate('companyId')
-    .populate('dpCodeId')
+    .populate('datapointId')
     .then(notFound(res))
     .then(authorOrAdmin(res, user, 'createdBy'))
     .then((controversy) => controversy ? Object.assign(controversy, body).save() : null)
@@ -186,7 +186,7 @@ export const uploadControversies = async (req, res, next) => {
                     createdBy: userDetail
                   }
                 }
-                let isDpValueExist = controversyDetails.findIndex(obj => obj.companyId == currentCompanyName && obj.datapointId == controversyObject.datapointId)
+                let isDpValueExist = controversyDetails.findIndex(obj => obj.companyId == currentCompanyName && obj.datapointId == controversyObject.datapointId && obj.year == controversyObject.year)
                 if (isDpValueExist > -1) {
                   if (!controversyDetails[isDpValueExist].controversyDetails && controversyList[0]) {
                     controversyDetails[isDpValueExist].controversyDetails = [controversyList[0]]; 
@@ -207,7 +207,19 @@ export const uploadControversies = async (req, res, next) => {
                   }
                 } else {
                   controversyDetails.push(controversyObject);
-                }                
+                }
+              } else {
+                let controversyObject = {
+                  companyId: currentCompanyName,
+                  datapointId: allFilesObject[index][rowIndex]['DP Code'] ? allFilesObject[index][rowIndex]['DP Code'] : '',
+                  year: allFilesObject[index][rowIndex]['Fiscal Year'] ? allFilesObject[index][rowIndex]['Fiscal Year'] : '',
+                  response: allFilesObject[index][rowIndex]['Response'] ? allFilesObject[index][rowIndex]['Response'].toString() : '',
+                  responseValue: responseValue,
+                  submittedDate: new Date(),
+                  status: true,
+                  createdBy: userDetail
+                }
+                controversyDetails.push(controversyObject);
               }
             }
           }
@@ -259,5 +271,47 @@ export const uploadControversies = async (req, res, next) => {
       message: error.message ? error.message : 'Failed to upload controversy files',
       status: 403
     });   
+  }
+}
+
+export const generateJson = async({params, user}, res, next) => {
+  let companyDetails = await Companies.findOne({ _id: params.companyId, status: true });
+  if (companyDetails) {
+    let companyControversyYears = await Controversy.find({ companyId: params.companyId, status: true }).distinct('year');
+    let responseObject = {
+      companyName: companyDetails.companyName,
+      CIN: companyDetails.cin,
+      data: [],
+      status: 200
+    };
+    if (companyControversyYears.length > 0) {
+      for (let yearIndex = 0; yearIndex < companyControversyYears.length; yearIndex++) {
+        const year = companyControversyYears[yearIndex];
+        let yearwiseData = {
+          year: year,
+          Data: []
+        };
+        let companyControversiesYearwise = await Controversy.find({ companyId: params.companyId, year: year, status: true })
+        .populate('createdBy')
+        .populate('companyId')
+        .populate('datapointId');
+        if (companyControversiesYearwise.length > 0) {
+          for (let index = 0; index < companyControversiesYearwise.length; index++) {
+            const element = companyControversiesYearwise[index];
+            let dataObject = {
+              Year: element.year,
+              DPCode: element.datapointId.code,
+              Response: element.response,
+              controversy: element.controversyDetails
+            }
+            yearwiseData.Data.push(dataObject);
+          }
+        }
+        responseObject.data.push(yearwiseData)
+      }
+    }
+    return res.status(200).json({ message: "Successfully retrieved!", data: responseObject });
+  } else {
+    return res.status(500).json({ message: "Failed to fetch details", data: [] });
   }
 }
