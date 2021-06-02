@@ -28,7 +28,7 @@ const userSchema = new Schema({
   roleId: {
     type: Schema.ObjectId,
     ref: 'Role',
-    required: true
+    required: false
   },
   otp: {
     type: String,
