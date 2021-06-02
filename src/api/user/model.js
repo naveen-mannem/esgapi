@@ -57,6 +57,18 @@ const userSchema = new Schema({
   status: {
     type: Boolean,
     default: true
+  },companyId:{
+    type: Schema.ObjectId,
+    ref: 'Companies',
+    required: false
+  },
+  authenticationLetterForClientUrl:{
+    type: String,
+    default: ''
+  },
+  companyIdForClient:{
+    type: String,
+    default: ''
   }
 }, {
   timestamps: true
