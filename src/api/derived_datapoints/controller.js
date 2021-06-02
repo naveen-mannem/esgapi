@@ -1256,8 +1256,10 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
               for (let ix = 0; ix < denominatorList.length; ix++) {
                 for (let jx = 0; jx < numeratorList.length; jx++) {
                   if (denominatorList[ix].dirName == numeratorList[jx].dirName) {
-                    if ((denominatorList[ix].value.equalsIgnoreCase('Yes') && numeratorList[jx].value.equalsIgnoreCase('Yes')) || (denominatorList[ix].value.equalsIgnoreCase('Y') && numeratorList[jx].value.equalsIgnoreCase('Y'))) {
-                      count++;
+                    if (denominatorList[ix].value && numeratorList[jx].value) {
+                      if ((denominatorList[ix].value.equalsIgnoreCase('Yes') && numeratorList[jx].value.equalsIgnoreCase('Yes')) || (denominatorList[ix].value.equalsIgnoreCase('Y') && numeratorList[jx].value.equalsIgnoreCase('Y'))) {
+                        count++;
+                      }                      
                     }
                   }
                 }
