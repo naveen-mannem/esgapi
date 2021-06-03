@@ -266,7 +266,7 @@ export const uploadControversies = async (req, res, next) => {
             //  console.log('result', result);
           }
         });
-        return res.json({ message: "Files upload success", data: controversyDetails });
+        return res.json({ message: "Files upload success", companies: insertedCompanies, data: controversyDetails });
     });    
   } catch (error) {
     return res.status(403).json({
