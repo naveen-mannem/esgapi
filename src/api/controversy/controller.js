@@ -84,7 +84,7 @@ export const uploadControversies = async (req, res, next) => {
   const userDetail = req.user;
   try {
     upload(req, res, async function (err) {
-      console.log(new Error(err));
+      console.log(err);
       if (err) {
         res.status('400').json({ error_code: 1, err_desc: err });
         return;
