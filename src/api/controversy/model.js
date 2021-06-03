@@ -6,7 +6,7 @@ const controversySchema = new Schema({
     ref: 'User',
     required: true
   },
-  dpCodeId: {
+  datapointId: {
    type: Schema.ObjectId,
     ref: 'Datapoints',
     required: true
@@ -19,26 +19,16 @@ const controversySchema = new Schema({
   year: {
     type: String
   },
-  sourceName: {
-    type: String
-  },
-  sourceUrl: {
-    type: String
-  },
-  sourcePublicationDate: {
-    type: String
-  },
-  activeStatus: {
-    type: String
-  },
-  submittedBy: {
-    type: String
-  },
-  submittedDate: {
-    type: String
+  controversyDetails: {
+    type: Object,
+    default: []
   },
   response: {
     type: String
+  },
+  submittedDate: {
+    type: Date,
+    default: Date.now()
   },
   status:{
     type:Boolean,
@@ -58,16 +48,13 @@ controversySchema.methods = {
       // simple view
       id: this.id,
       createdBy: this.createdBy ? this.createdBy.view(full) : null,
-      dpCodeId: this.dpCodeId ? this.dpCodeId.view(full) : null ,
+      datapointId: this.datapointId ? this.datapointId.view(full) : null ,
       companyId: this.companyId ? this.companyId.view(full) : null,
       year: this.year,
-      sourceName: this.sourceName,
-      sourceUrl: this.sourceUrl,
-      sourcePublicationDate: this.sourcePublicationDate,
-      activeStatus: this.activeStatus,
-      submittedBy: this.submittedBy,
-      submittedDate: this.submittedDate,
       response: this.response,
+      controversyDetails: this.controversyDetails ? this.controversyDetails : [],
+      status: this.status,
+      submittedDate: this.submittedDate ? this.submittedDate : '',
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }

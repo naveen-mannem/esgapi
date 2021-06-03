@@ -79,14 +79,13 @@ export const create = ({ bodymen: { body } }, res, next) =>
     })
 
 export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, next ) => {
-  console.log("onBoardNewUser API called");
-  console.log(body);
-  console.log(Buffer.from(body.onBoardingDetails, 'base64'));
+  
   let bodyData = Buffer.from(body.onBoardingDetails, 'base64');
   let bodyDetails = bodyData.toString('ascii');
   let onBoardingDetails =JSON.parse(bodyDetails);
-  console.log('onBoardingDetails', onBoardingDetails);
+  
   let roleDetails = await Role.find({ roleName: { $in: ["Employee", "Client Representative", "Company Representative"] } });
+  console.log(roleDetails);
   let role, roleId, userObject;
   if (roleDetails.length > 0) {
     for (let index = 0; index < roleDetails.length; index++) {

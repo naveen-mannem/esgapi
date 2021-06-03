@@ -2,12 +2,12 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { token } from '../../services/passport'
-import { create, index, show, update, destroy } from './controller'
+import { create, index, show, update, destroy, uploadControversies, generateJson } from './controller'
 import { schema } from './model'
 export Controversy, { schema } from './model'
 
 const router = new Router()
-const { dpCodeId, companyId, year, sourceName, sourceUrl, sourcePublicationDate, activeStatus, submittedBy, submittedDate, response,status } = schema.tree
+const { datapointId, companyId, year, controversyDetails, submittedDate, response,status } = schema.tree
 
 /**
  * @api {post} /controversies Create controversy
@@ -15,14 +15,10 @@ const { dpCodeId, companyId, year, sourceName, sourceUrl, sourcePublicationDate,
  * @apiGroup Controversy
  * @apiPermission user
  * @apiParam {String} access_token user access token.
- * @apiParam dpCodeId Controversy's dpCodeId.
+ * @apiParam datapointId Controversy's datapointId.
  * @apiParam companyId Controversy's companyId.
  * @apiParam year Controversy's year.
- * @apiParam sourceName Controversy's sourceName.
- * @apiParam sourceUrl Controversy's sourceUrl.
- * @apiParam sourcePublicationDate Controversy's sourcePublicationDate.
- * @apiParam activeStatus Controversy's activeStatus.
- * @apiParam submittedBy Controversy's submittedBy.
+ * @apiParam controversyDetails Controversy's controversyDetails.
  * @apiParam submittedDate Controversy's submittedDate.
  * @apiParam response Controversy's response.
  * @apiSuccess {Object} controversy Controversy's data.
@@ -32,8 +28,24 @@ const { dpCodeId, companyId, year, sourceName, sourceUrl, sourcePublicationDate,
  */
 router.post('/',
   token({ required: true }),
-  body({ dpCodeId, companyId, year, sourceName, sourceUrl, sourcePublicationDate, activeStatus, submittedBy, submittedDate, response }),
+  body({ datapointId, companyId, year, controversyDetails, submittedDate, response }),
   create)
+
+/**
+ * @api {post} /controversies/upload Upload controversy
+ * @apiName UploadControversy
+ * @apiGroup Controversy
+ * @apiPermission user
+ * @apiParam {String} access_token user access token.
+ * @apiSuccess {Object} controversy Controversy's data.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ * @apiError 404 Controversy not found.
+ * @apiError 401 user access only.
+ */
+ router.post('/upload',
+ token({ required: true }),
+ query(),
+ uploadControversies)
 
 /**
  * @api {get} /controversies Retrieve controversies
@@ -68,19 +80,30 @@ router.get('/:id',
   show)
 
 /**
+ * @api {get} /controversies/json/:companyId Generate controversy JSON
+ * @apiName GenerateControversyJSON
+ * @apiGroup Controversy
+ * @apiPermission user
+ * @apiParam {String} access_token user access token.
+ * @apiSuccess {Object} controversy Controversy's data.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ * @apiError 404 Controversy not found.
+ * @apiError 401 user access only.
+ */
+router.get('/json/:companyId',
+  token({ required: true }),
+  generateJson)
+
+/**
  * @api {put} /controversies/:id Update controversy
  * @apiName UpdateControversy
  * @apiGroup Controversy
  * @apiPermission user
  * @apiParam {String} access_token user access token.
- * @apiParam dpCodeId Controversy's dpCodeId.
+ * @apiParam datapointId Controversy's datapointId.
  * @apiParam companyId Controversy's companyId.
  * @apiParam year Controversy's year.
- * @apiParam sourceName Controversy's sourceName.
- * @apiParam sourceUrl Controversy's sourceUrl.
- * @apiParam sourcePublicationDate Controversy's sourcePublicationDate.
- * @apiParam activeStatus Controversy's activeStatus.
- * @apiParam submittedBy Controversy's submittedBy.
+ * @apiParam controversyDetails Controversy's controversyDetails.
  * @apiParam submittedDate Controversy's submittedDate.
  * @apiParam response Controversy's response.
  * @apiSuccess {Object} controversy Controversy's data.
@@ -90,7 +113,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ dpCodeId, companyId, year, sourceName, sourceUrl, sourcePublicationDate, activeStatus, submittedBy, submittedDate, response ,status}),
+  body({ datapointId, companyId, year, controversyDetails, submittedDate, response ,status}),
   update)
 
 /**
