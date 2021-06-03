@@ -1,6 +1,7 @@
 import multer from 'multer'
 import XLSX from 'xlsx'
 import _ from 'lodash'
+import moment from 'moment'
 import { getJsDateFromExcel } from 'excel-date-to-js'
 import { success, notFound, authorOrAdmin } from '../../services/response/'
 import { Controversy } from '.'
@@ -136,13 +137,14 @@ export const uploadControversies = async (req, res, next) => {
                     currentSourcePublicationDate = allFilesObject[index][rowIndex]['Source Publication Date'].toString();
                     // currentSourcePublicationDate = allFilesObject[index][rowIndex]['Source Publication Date'].replace("/", "-");
                     currentSourcePublicationDate = allFilesObject[index][rowIndex]['Source Publication Date'].replace(/\//g, '-');
-                    sourcePublicationDate = new Date(currentSourcePublicationDate);
+                    sourcePublicationDate = new Date(moment(currentSourcePublicationDate.split('/').reverse().join('-'), "DD-MM-YYYY").toString()).toLocaleDateString();
                   } else {
                     currentSourcePublicationDate = allFilesObject[index][rowIndex]['Source Publication Date'];
                   }
                   if (!sourcePublicationDate) {
                     try {
                       sourcePublicationDate = getJsDateFromExcel(currentSourcePublicationDate);
+                      sourcePublicationDate = new Date(sourcePublicationDate).toLocaleDateString();
                     } catch (error) {
                       console.log(error.message);
                       return res.status(500).json({ message: `Found invalid date format in ${currentCompanyName}, please correct and try again!` })
