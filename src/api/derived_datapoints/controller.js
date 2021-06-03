@@ -96,9 +96,8 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
         mergedDetails = _.concat(allStandaloneDetails, allBoardMemberMatrixDetails, allKmpMatrixDetails);
 
         // let distinctRuleMethods = await Rules.distinct('methodName').populate('datapointId');
-        let distinctRuleMethods = ["MatrixPercentage", "Minus", "Sum", "count of"]
-        //,"Percentage"]
-        //"Ratio", "Percentage", "YesNo", "RatioADD", "As", "ADD", "AsPercentage", "AsRatio", "Condition", "Multiply"];
+        let distinctRuleMethods = ["MatrixPercentage", "Minus", "Sum", "count of", "Ratio"];
+        // , "Percentage", "YesNo", "RatioADD", "As", "ADD", "AsPercentage", "AsRatio", "Condition", "Multiply"];
         //Process all rules
         for (let ruleIndex = 0; ruleIndex < distinctRuleMethods.length; ruleIndex++) {
           switch (distinctRuleMethods[ruleIndex]) {
@@ -188,7 +187,7 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
                 })
               break;
             case "Ratio":
-              await ratioCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, userDetail)
+              await ratioCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, allDerivedDatapoints, userDetail)
                 .then((result) => {
                   if (result) {
                     if (result.allDerivedDatapoints) {
@@ -1389,7 +1388,7 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
   }
 }
 
-async function ratioCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, userDetail) {
+async function ratioCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, derivedDatapointsList, userDetail) {
   let allDerivedDatapoints = [];
   let priorityDatapoints = ['MACR002', 'MACR007', 'MACR010'];
   let priorityDatapointObjects = await Datapoints.find({ code: { $in: priorityDatapoints } });
@@ -1439,7 +1438,7 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
   }
   let ratioRules = await Rules.find({ methodName: "Ratio", datapointId: { $nin: priorityDatapointObjectIds } }).populate('datapointId');
   console.log('ratio Calculation');
-  mergedDetails = _.concat(mergedDetails, allDerivedDatapoints);
+  mergedDetails = _.concat(mergedDetails, allDerivedDatapoints, derivedDatapointsList);
   if (ratioRules.length > 0) {
     for (let i = 0; i < ratioRules.length; i++) {
       let parameters = ratioRules[i].parameter.split(",");
@@ -1449,7 +1448,7 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
       let denominatorDpObject = _.filter(allDatapointsList, { code: denominator });
       let numeratorDpId = numeratorDpObject[0] ? numeratorDpObject[0].id : '';
       let denominatorDpId = denominatorDpObject[0] ? denominatorDpObject[0].id : '';
-      let numeratorValues = [], denominatorValues = []
+      let numeratorValues = '', denominatorValues = '';
       for (let j = 0; j < distinctYears.length; j++) {
         const year = distinctYears[j];
         let ruleDatapointId = ratioRules[i].datapointId.id;
@@ -1457,39 +1456,34 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
           let activeMemberValues = [];
           _.filter(mergedDetails, (object, index) => {
             if (object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year && object.memberStatus == true) {
-              activeMemberValues.push(object)
+              activeMemberValues.push(object.response ? object.response.toString() : object.response);
+            }
+            if (object.datapointId.id == denominatorDpId && object.companyId.id == companyId && object.year == year) {
+              denominatorValues = object.response;
+            }
+            if (object.datapointId == numeratorDpId && object.companyId == companyId && object.year == year) {
+              numeratorValues = object.response;
+            }
+            if (object.datapointId == denominatorDpId && object.companyId == companyId && object.year == year) {
+              denominatorValues = object.response;
             }
           });
           let sumValue;
           if (activeMemberValues.length > 0) {
-            activeMemberValues = activeMemberValues.filter(e => String(e.response).trim());
-            activeMemberValues = activeMemberValues.filter(e => e.response.toLowerCase() != "na");
-            sumValue = activeMemberValues.reduce(function (prev, next) {
-              if (prev && next) {
-                if (prev.response && next.response) {
-                  let prevResponse = prev.response.toString().replace(/,/g, '').trim();
-                  let nextResponse = next.response.toString().replace(/,/g, '').trim();
-                  return {
-                    response: Number(prevResponse) + Number(nextResponse)
-                  };
+            activeMemberValues = activeMemberValues.filter(e => e.trim());
+            activeMemberValues = activeMemberValues.filter(e => e.toLowerCase() != "na");
+            if (activeMemberValues.length > 0) {
+              sumValue = activeMemberValues.reduce(function (prev, next) {
+                if (prev && next) {
+                  let prevResponse = prev.replace(/,/g, '');
+                  let nextResponse = next.replace(/,/g, '');
+                  let sum = Number(prevResponse) + Number(nextResponse);
+                  return sum.toString();
                 }
-              }
-            });
-            let percentValue = 0.5 * Number(denominatorDpObject.response);
-            if (isNaN(activeMemberValues.length) || denominatorDpObject.response == " ") {
-              let derivedDatapointsObject = {
-                companyId: companyId,
-                datapointId: ruleDatapointId,
-                year: year,
-                response: 'NA',
-                memberName: '',
-                memberStatus: true,
-                status: true,
-                createdBy: userDetail
-              }
-              allDerivedDatapoints.push(derivedDatapointsObject);
-            } else if (activeMemberValues.length < percentValue) {
-
+              });              
+            }
+            let percentValue = 0.5 * Number(denominatorValues ? denominatorValues : '0');
+            if (activeMemberValues.length < percentValue || denominatorValues == " ") {
               let derivedDatapointsObject = {
                 companyId: companyId,
                 datapointId: ruleDatapointId,
@@ -1513,7 +1507,6 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
                 let stringValue = sumValue ? sumValue.toString().replace(/,/g, '').trim() : 0
                 derivedResponse = Number(stringValue) / activeMemberValues.length;
               }
-
               let derivedDatapointsObject = {
                 companyId: companyId,
                 datapointId: ruleDatapointId,
@@ -1527,45 +1520,62 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
               allDerivedDatapoints.push(derivedDatapointsObject);
             }
           } else {
-            sumValue = 0;
+            let derivedDatapointsObject = {
+              companyId: companyId,
+              datapointId: ruleDatapointId,
+              year: year,
+              response: 'NA',
+              memberName: '',
+              memberStatus: true,
+              status: true,
+              createdBy: userDetail
+            }
+            allDerivedDatapoints.push(derivedDatapointsObject);
           }
         } else {
           _.filter(mergedDetails, (object, index) => {
             if (object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year) {
-              numeratorValues.push(object)
+              numeratorValues = object.response;
             } else if (object.datapointId.id == denominatorDpId && object.companyId.id == companyId && object.year == year) {
-              denominatorValues.push(object)
+              denominatorValues = object.response
+            }
+            if (object.datapointId == numeratorDpId && object.companyId == companyId && object.year == year) {
+              numeratorValues = object.response;
+            }
+            if (object.datapointId == denominatorDpId && object.companyId == companyId && object.year == year) {
+              denominatorValues = object.response;
             }
           });
 
-          if (numeratorValues.length > 0 && denominatorValues.length > 0 && numeratorValues.length == denominatorValues.length) {
-            for (let k = 0; k < numeratorValues.length; k++) {
-              let derivedResponse;
-
-              if (numeratorValues[k].response == ' ' || numeratorValues[k].response == '' || numeratorValues[k].response == 'NA') {
-                derivedResponse = 'NA';
-              } else if (numeratorValues[k].response == '0' || numeratorValues[k].response == 0) {
-                derivedResponse = '0';
-              } else {
-                if (denominatorValues[k].response == ' ' || denominatorValues[k].response == '' || denominatorValues[k].response == 'NA' || denominatorValues[k].response == '0') {
-                  derivedResponse = 'NA';
-                } else {
-                  derivedResponse = (parseInt(numeratorValues[k].response.replace(',', '')) / parseInt(denominatorValues[k].response.replace(',', '')));
-                }
+          let derivedResponse;
+          if (numeratorValues == ' ' || numeratorValues == '' || numeratorValues == 'NA') {
+            derivedResponse = 'NA';
+          } else if (numeratorValues == '0' || numeratorValues == 0) {
+            derivedResponse = '0';
+          } else {
+            if (denominatorValues == ' ' || denominatorValues == '' || denominatorValues == 'NA' || denominatorValues == '0') {
+              derivedResponse = 'NA';
+            } else {
+              if (numeratorValues.includes(',')) {
+                numeratorValues = numeratorValues.replace(',', '');
               }
-              let derivedDatapointsObject = {
-                companyId: companyId,
-                datapointId: ruleDatapointId,
-                year: year,
-                response: derivedResponse ? derivedResponse.toString() : derivedResponse,
-                memberName: '',
-                memberStatus: true,
-                status: true,
-                createdBy: userDetail
+              if (denominatorValues.includes(',')) {
+                denominatorValues = denominatorValues.replace(',', '');
               }
-              allDerivedDatapoints.push(derivedDatapointsObject);
+              derivedResponse = (parseInt(numeratorValues) / parseInt(denominatorValues));
             }
           }
+          let derivedDatapointsObject = {
+            companyId: companyId,
+            datapointId: ruleDatapointId,
+            year: year,
+            response: derivedResponse ? derivedResponse.toString() : derivedResponse,
+            memberName: '',
+            memberStatus: true,
+            status: true,
+            createdBy: userDetail
+          }
+          allDerivedDatapoints.push(derivedDatapointsObject);
         }
       }
       if (i == ratioRules.length - 1) {
