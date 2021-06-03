@@ -96,8 +96,8 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
         mergedDetails = _.concat(allStandaloneDetails, allBoardMemberMatrixDetails, allKmpMatrixDetails);
 
         // let distinctRuleMethods = await Rules.distinct('methodName').populate('datapointId');
-        let distinctRuleMethods = ["MatrixPercentage"]
-        //, "Minus", "Sum", "count of", "Percentage"]
+        let distinctRuleMethods = ["MatrixPercentage", "Minus", "Sum", "count of"]
+        //,"Percentage"]
         //"Ratio", "Percentage", "YesNo", "RatioADD", "As", "ADD", "AsPercentage", "AsRatio", "Condition", "Multiply"];
         //Process all rules
         for (let ruleIndex = 0; ruleIndex < distinctRuleMethods.length; ruleIndex++) {
@@ -228,7 +228,7 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
                 })
               break;
             case "count of":
-              await countOfCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, userDetail)
+              await countOfCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, allDerivedDatapoints,userDetail)
                 .then((result) => {
                   if (result) {
                     if (result.allDerivedDatapoints) {
@@ -1235,10 +1235,11 @@ async function yesNoCalculation(companyId, mergedDetails, distinctYears, allData
   }
 }
 
-async function countOfCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, userDetail) {
+async function countOfCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, derivedDatapointsList,userDetail) {
   let allDerivedDatapoints = [];
   let countOfRules = await Rules.find({ methodName: "count of" }).populate('datapointId');
   console.log('count of Calculation', countOfRules.length);
+  mergedDetails = _.concat(mergedDetails,derivedDatapointsList)
   for (let i = 0; i < countOfRules.length; i++) {
     let parameters = countOfRules[i].parameter.split(",");
     let numerator = parameters[0] ? parameters[0] : '';
@@ -1327,18 +1328,19 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
       } else {
 
         //let values = _.filter(mergedDetails, { year: '2018-2019', datapointId: numeratorDpId, memberStatus: true });
-
         _.filter(mergedDetails, (object, index) => {
           if (object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year && object.memberStatus == true) {
-            values.push(object.response);
-          }
+            values.push(object.response ? object.response.toString().toLowerCase() : object.response);
+          } else if (object.datapointId == numeratorDpId && object.companyId == companyId && object.year == year) {
+            values.push(object.response ? object.response.toString().toLowerCase() : object.response);
+          } 
         });
         if (values.length > 0) {
           // let countValue = await count(arr, ruleValue.criteria)
           let finalResponse;
 
           values = values.filter(e => String(e).trim());
-          values = values.filter(e => e.toLowerCase() != 'na')
+          values = values.filter(e => e != 'na');
           if (countOfRules[i].criteria == '2') {
             if (values.length > 0) {
               finalResponse = values.filter(item => item >= countOfRules[i].criteria).length;
@@ -1381,6 +1383,7 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
       }
     }
     if (i == countOfRules.length - 1) {
+      console.log(allDerivedDatapoints);
       return { allDerivedDatapoints: allDerivedDatapoints };
     }
   }
