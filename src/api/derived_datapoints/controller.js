@@ -1020,7 +1020,7 @@ async function percentageCalculation(companyId, mergedDetails, distinctYears, al
         } else {
           denominatorSum = 0;
         }
-        derivedResponse = isNaN((numeratorSum.response / denominatorSum.response) * 100) ? 0 : (numeratorSum.response / denominatorSum.response) * 100;
+        derivedResponse = isNaN((numeratorSum / denominatorSum) * 100) ? 0 : (numeratorSum / denominatorSum) * 100;
         let derivedDatapointsObject = {
           companyId: companyId,
           datapointId: percentageRules[i].datapointId.id,
