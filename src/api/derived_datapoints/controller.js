@@ -96,7 +96,9 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
         mergedDetails = _.concat(allStandaloneDetails, allBoardMemberMatrixDetails, allKmpMatrixDetails);
 
         // let distinctRuleMethods = await Rules.distinct('methodName').populate('datapointId');
-        let distinctRuleMethods = ["MatrixPercentage", "Minus", "Sum", "count of", "Ratio", "Percentage", "YesNo", "RatioADD", "As", "ADD", "AsPercentage", "AsRatio", "Condition", "Multiply"];
+        let distinctRuleMethods = ["MatrixPercentage"]
+        //, "Minus", "Sum", "count of", "Percentage"]
+        //"Ratio", "Percentage", "YesNo", "RatioADD", "As", "ADD", "AsPercentage", "AsRatio", "Condition", "Multiply"];
         //Process all rules
         for (let ruleIndex = 0; ruleIndex < distinctRuleMethods.length; ruleIndex++) {
           switch (distinctRuleMethods[ruleIndex]) {
