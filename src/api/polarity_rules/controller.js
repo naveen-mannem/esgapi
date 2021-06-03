@@ -56,13 +56,13 @@ export const destroy = ({ user, params }, res, next) =>
 
 export const percentileCalculation = async ({ user, params }, res, next) => {
   let nic = params.nic ? params.nic : '';
-  let nicCompaniesList = await Companies.find({ "nic": nic }).populate('createdBy');
+  let nicCompaniesList = await Companies.find({ "nic": nic, status: true }).populate('createdBy');
   let nicCompaniesIds = [];
   for (let companyIndex = 0; companyIndex < nicCompaniesList.length; companyIndex++) {
     nicCompaniesIds.push(nicCompaniesList[companyIndex].id);
   }
   console.log(nicCompaniesIds);
-  let distinctYears = await StandaloneDatapoints.distinct('year', { companyId: { $in: nicCompaniesIds } });
+  let distinctYears = await StandaloneDatapoints.distinct('year', { companyId: { $in: nicCompaniesIds }, status: true });
   if (distinctYears.length > 0) {
     for (let yearIndex = 0; yearIndex < distinctYears.length; yearIndex++) {
       const year = distinctYears[yearIndex];
@@ -75,23 +75,29 @@ export const percentileCalculation = async ({ user, params }, res, next) => {
             //Find the datapoint response value in StandaloneDatapoints collection
             let dpResponseOfNicCompanies = await StandaloneDatapoints.find({ companyId: { $in: nicCompaniesIds }, datapointId: percentileDatapointsList[pdpIndex].id, year: year, status: true }, { response: 1, _id: 0 });
             console.log('dpResponseOfNicCompanies', dpResponseOfNicCompanies);
-            let filteredDpResponses = _.filter(dpResponseOfNicCompanies, function (currentObject) {
-              return currentObject.response !== '' && currentObject.response !== ' ' && currentObject.response.toLowerCase() == "na";
+            let filteredDpResponses = [];
+            _.filter(dpResponseOfNicCompanies, (currentObject, index) => {
+              if (currentObject.response !== '' && currentObject.response !== ' ' && currentObject.response.toLowerCase() == "na") {
+                filteredDpResponses.push(currentObject.response ? currentObject.response.toString() : currentObject.response);
+              }
             });
             let stdDeviation;
             if (filteredDpResponses.length > 1) {
               //calculate average and SD
-              filteredDpResponses = filteredDpResponses.filter(e => String(e.response).trim());
-              filteredDpResponses = filteredDpResponses.map(e => Number(e.response));
-              const averageValue = filteredDpResponses.reduce((prev, next) => prev + next) / filteredDpResponses.length;
-              stdDeviation = Math.sqrt(filteredDpResponses.map(x => Math.pow(x - averageValue, 2)).reduce((a, b) => a + b) / (filteredDpResponses.length - 1))
+              filteredDpResponses = filteredDpResponses.filter(e => e.trim());
+              filteredDpResponses = filteredDpResponses.map(e => Number(e));
+              if (filteredDpResponses.length > 1) {
+                const averageValue = filteredDpResponses.reduce((prev, next) => prev + next) / filteredDpResponses.length;
+                stdDeviation = Math.sqrt(filteredDpResponses.map(x => Math.pow(x - averageValue, 2)).reduce((a, b) => a + b) / (filteredDpResponses.length - 1));                
+              } else {
+                stdDeviation = 'NA'; 
+              }
             } else {
               stdDeviation = 'NA';
             }
             console.log('stdDeviation', stdDeviation);
             for (let companyIndex = 0; companyIndex < nicCompaniesList.length; companyIndex++) {
               const element = nicCompaniesList[companyIndex];
-              // if (percentileDatapointsList[pdpIndex].dataCollection.toLowerCase() == "yes" || percentileDatapointsList[pdpIndex].dataCollection.toLowerCase() == "y") {
               let foundResponse = await StandaloneDatapoints.findOne({ companyId: nicCompaniesList[companyIndex].id, datapointId: percentileDatapointsList[pdpIndex].id, year: year, status: true });
               if (foundResponse) {
                 if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response.toLowerCase() == 'na') {
@@ -131,24 +137,34 @@ export const percentileCalculation = async ({ user, params }, res, next) => {
             }
           } else {
             //Find the datapoint response value in DerivedDatapoints collection
-            let dpResponseOfNicCompanies = await DerivedDatapoints.find({ companyId: { $in: nicCompaniesIds }, datapointId: percentileDatapointsList[pdpIndex].id, year: year }, { response: 1, _id: 0 });
+            let dpResponseOfNicCompanies = await DerivedDatapoints.find({ companyId: { $in: nicCompaniesIds }, datapointId: percentileDatapointsList[pdpIndex].id, year: year, status: true }, { response: 1, _id: 0 });
             console.log('dpResponseOfNicCompanies', dpResponseOfNicCompanies);
-            let filteredDpResponses = _.filter(dpResponseOfNicCompanies, function (currentObject) {
-              return currentObject.response !== '' && currentObject.response !== ' ' && currentObject.response.toLowerCase() == "na";
+            // let filteredDpResponses = _.filter(dpResponseOfNicCompanies, function (currentObject) {
+            //   return currentObject.response !== '' && currentObject.response !== ' ' && currentObject.response.toLowerCase() == "na";
+            // });
+            let filteredDpResponses = [];
+            _.filter(dpResponseOfNicCompanies, (currentObject, index) => {
+              if (currentObject.response !== '' && currentObject.response !== ' ' && currentObject.response.toLowerCase() == "na") {
+                filteredDpResponses.push(currentObject.response ? currentObject.response.toString() : currentObject.response);
+              }
             });
             let stdDeviation;
             if (filteredDpResponses.length > 1) {
               //calculate average and SD
-              filteredDpResponses = filteredDpResponses.filter(e => String(e.response).trim());
-              filteredDpResponses = filteredDpResponses.map(e => Number(e.response));
-              const averageValue = filteredDpResponses.reduce((prev, next) => prev + next) / filteredDpResponses.length;
-              stdDeviation = Math.sqrt(filteredDpResponses.map(x => Math.pow(x - averageValue, 2)).reduce((a, b) => a + b) / (filteredDpResponses.length - 1))
+              filteredDpResponses = filteredDpResponses.filter(e => e.trim());
+              filteredDpResponses = filteredDpResponses.map(e => Number(e));
+              if (filteredDpResponses.length > 1) {
+                const averageValue = filteredDpResponses.reduce((prev, next) => prev + next) / filteredDpResponses.length;
+                stdDeviation = Math.sqrt(filteredDpResponses.map(x => Math.pow(x - averageValue, 2)).reduce((a, b) => a + b) / (filteredDpResponses.length - 1));                
+              } else {
+                stdDeviation = 'NA';
+              }
             } else {
               stdDeviation = 'NA';
             }
             for (let companyIndex = 0; companyIndex < nicCompaniesList.length; companyIndex++) {
               const element = nicCompaniesList[companyIndex];
-              let foundResponse = await DerivedDatapoints.findOne({ companyId: nicCompaniesList[companyIndex].id, datapointId: percentileDatapointsList[pdpIndex].id, year: year });
+              let foundResponse = await DerivedDatapoints.findOne({ companyId: nicCompaniesList[companyIndex].id, datapointId: percentileDatapointsList[pdpIndex].id, year: year, status: true });
               if (foundResponse) {
                 if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response.toLowerCase() == 'na') {
                   await DerivedDatapoints.updateOne({ _id: foundResponse.id }, { $set: { response: 'NA', performanceResult: 'NA' } });
