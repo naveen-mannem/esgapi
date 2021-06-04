@@ -626,7 +626,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
               }
             });
           // res.json({ message: "Files upload success", companies: structuredCompanyDetails, allStandaloneDetails: structuredStandaloneDetails, allBoardMemberMatrixDetails: boardMembersList, allKmpMatrixDetails: kmpMembersList, data: allFilesObject });
-          res.json({ message: "Files upload success", companies: structuredCompanyDetails, nicList: distinctNics });
+          res.json({ message: "Files upload success", companies: insertedCompanies, nicList: distinctNics });
         } else {
           return res.status(400).json({ message: "Some files are missing!, Please upload all files Environment, Social and Governance for a company" });
         }
