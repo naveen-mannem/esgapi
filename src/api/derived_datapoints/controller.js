@@ -305,33 +305,36 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
                     }
                   }
                 } else {
-                  let foundResponse = await DerivedDatapoints.findOne({ companyId: companyId, datapointId: polarityRuleDetails.datapointId.id, year: year, status: true });
-                  if (foundResponse) {
-                    if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA') {
-                      await DerivedDatapoints.updateOne({ _id: foundResponse.id }, { $set: { response: 'NA', performanceResult: 'NA' } });
-                    } else {
-                      if (Number(foundResponse.response) >= Number(polarityRuleDetails.polarityValue)) {
-                        if (polarityRuleDetails.condition == 'greater' || polarityRuleDetails.condition == 'atleast' || polarityRuleDetails.condition == 'lesserthan') {
-                          await DerivedDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'Positive' } });
-                        }
-                        else if (polarityRuleDetails.condition == 'greaterthan' || polarityRuleDetails.condition == 'lesser') {
-                          await DerivedDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'Negative' } });
-
-                        }
-                      } else if (Number(foundResponse.response) <= Number(polarityRuleDetails.polarityValue)) {
-                        if (polarityRuleDetails.condition == 'greater' || polarityRuleDetails.condition == 'atleast' || polarityRuleDetails.condition == 'lesserthan') {
-                          await DerivedDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'Negative' } });
-                        }
-                        else if (polarityRuleDetails.condition == 'greaterthan' || polarityRuleDetails.condition == 'lesser') {
-                          await DerivedDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'Positive' } });
-                        }
+                  let foundResponseIndex = allDerivedDatapoints.findIndex((object, index) => object.companyId == companyId && object.datapointId == polarityRuleDetailsdatapointId.id && object.year == year );
+                  if (foundResponseIndex > -1) {
+                    let foundResponse = allDerivedDatapoints[foundResponseIndex];
+                    if (foundResponse) {
+                      if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA') {
+                        allDerivedDatapoints[foundResponseIndex].response = 'NA';
+                        allDerivedDatapoints[foundResponseIndex].performanceResult = 'NA';
                       } else {
-                        if (polarityRuleDetails.condition == 'range') {
-                          let param = polarityRuleDetails.polarityValue.split(',');
-                          if (Number(foundResponse.response) >= Number(param[0]) && Number(foundResponse.response) <= Number(param[1])) {
-                            await DerivedDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'Positive' } });
-                          } else {
-                            await DerivedDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'Negative' } });
+                        if (Number(foundResponse.response) >= Number(polarityRuleDetails.polarityValue)) {
+                          if (polarityRuleDetails.condition == 'greater' || polarityRuleDetails.condition == 'atleast' || polarityRuleDetails.condition == 'lesserthan') {
+                            allDerivedDatapoints[foundResponseIndex].performanceResult = 'Positive';
+                          }
+                          else if (polarityRuleDetails.condition == 'greaterthan' || polarityRuleDetails.condition == 'lesser') {
+                            allDerivedDatapoints[foundResponseIndex].performanceResult = 'Negative';
+                          }
+                        } else if (Number(foundResponse.response) <= Number(polarityRuleDetails.polarityValue)) {
+                          if (polarityRuleDetails.condition == 'greater' || polarityRuleDetails.condition == 'atleast' || polarityRuleDetails.condition == 'lesserthan') {
+                            allDerivedDatapoints[foundResponseIndex].performanceResult = 'Negative';
+                          }
+                          else if (polarityRuleDetails.condition == 'greaterthan' || polarityRuleDetails.condition == 'lesser') {
+                            allDerivedDatapoints[foundResponseIndex].performanceResult = 'Positive';
+                          }
+                        } else {
+                          if (polarityRuleDetails.condition == 'range') {
+                            let param = polarityRuleDetails.polarityValue.split(',');
+                            if (Number(foundResponse.response) >= Number(param[0]) && Number(foundResponse.response) <= Number(param[1])) {
+                              allDerivedDatapoints[foundResponseIndex].performanceResult = 'Positive';
+                            } else {
+                              allDerivedDatapoints[foundResponseIndex].performanceResult = 'Negative';
+                            }
                           }
                         }
                       }
@@ -879,7 +882,8 @@ async function minusCalculation(companyId, mergedDetails, distinctYears, allData
             denominatorConvertedDate = getJsDateFromExcel(denominatorValues[j].response);
           } catch (error) {
             let companyDetail = await Companies.findOne({ _id: companyId }).distinct('companyName');
-            return res.status(500).json({ message: `Found invalid date format in ${companyDetail ? companyDetail : 'a company'}, please correct and try again!` })
+            return;
+            // return res.status(500).json({ message: `Found invalid date format in ${companyDetail ? companyDetail : 'a company'}, please correct and try again!` })
           }
           derivedResponse = moment([numeratorConvertedDate.getUTCFullYear(), numeratorConvertedDate.getUTCMonth(), numeratorConvertedDate.getUTCDate()])
             .diff(moment([denominatorConvertedDate.getUTCFullYear(), denominatorConvertedDate.getUTCMonth(), denominatorConvertedDate.getUTCDate()]), 'years', true)
