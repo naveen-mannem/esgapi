@@ -294,6 +294,7 @@ export const generateJson = async({params, user}, res, next) => {
         const year = companyControversyYears[yearIndex];
         let yearwiseData = {
           year: year,
+          companyName: companyDetails.companyName,
           Data: []
         };
         let companyControversiesYearwise = await Controversy.find({ companyId: params.companyId, year: year, status: true })
