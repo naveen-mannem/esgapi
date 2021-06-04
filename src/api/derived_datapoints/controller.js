@@ -384,7 +384,7 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
                   }
                 } else if (polarityDetail.dataCollection.toLowerCase() == "no" || polarityDetail.dataCollection.toLowerCase() == "nc") {
                   // let foundResponse = await DerivedDatapoints.findOne({ companyId: companyId, datapointId: dataPointsIdList[dataPointIndex].id, year: year, status: true });
-                  let foundResponseIndex = allDerivedDatapoints.findIndex((object, index) => object.companyId == companyId && object.datapointId == dataPointsIdList[dataPointIndex].id && object.year == year );
+                  let foundResponseIndex = allDerivedDatapoints.findIndex((object, index) => object.companyId == companyId && object.datapointId == dataPointsIdList[dataPointIndex].id && object.year == year);
                   if (foundResponseIndex > -1) {
                     let foundResponse = allDerivedDatapoints[foundResponseIndex];
                     if (foundResponse) {
@@ -465,7 +465,7 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
               }
             }
           }
-          if (distinctYears.length-1 == yearIndex) {
+          if (distinctYears.length - 1 == yearIndex) {
             await DerivedDatapoints.updateMany({
               "companyId": companyId,
               "year": { $in: distinctYears }
@@ -473,13 +473,13 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
 
             await DerivedDatapoints.insertMany(allDerivedDatapoints)
               .then((err, result) => {
-              if (err) {
-                console.log('error', err);
-              } else {
-                //  console.log('result', result);
-                return res.status(200).json({ message: "Calculation completed successfuly!", derivedDatapoints: allDerivedDatapoints });
-              }
-            });
+                if (err) {
+                  console.log('error', err);
+                } else {
+                  //  console.log('result', result);
+                  return res.status(200).json({ message: "Calculation completed successfuly!", derivedDatapoints: allDerivedDatapoints });
+                }
+              });
           }
         }
         return res.status(200).json({ message: "Retrieved successfully!", allDerivedDatapoints: allDerivedDatapoints })
@@ -1421,6 +1421,8 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
             if (values.length > 0) {
               if (values.includes('Yes') || values.includes('yes') || values.includes('Y') || values.includes('y')) {
                 finalResponse = values.filter(item => item == 'Yes' || item == 'Y').length;
+              } else {
+                finalResponse = '0'
               }
             } else {
               finalResponse = 'NA';
@@ -1600,15 +1602,15 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
         } else {
           _.filter(mergedDetails, (object, index) => {
             if (object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year) {
-              numeratorValues = object.response;
+              numeratorValues = object.response ? object.response.toString() : object.response;
             } else if (object.datapointId.id == denominatorDpId && object.companyId.id == companyId && object.year == year) {
-              denominatorValues = object.response
+              denominatorValues = object.response ? object.response.toString() : object.response;
             }
             if (object.datapointId == numeratorDpId && object.companyId == companyId && object.year == year) {
-              numeratorValues = object.response;
+              numeratorValues = object.response ? object.response.toString() : object.response;
             }
             if (object.datapointId == denominatorDpId && object.companyId == companyId && object.year == year) {
-              denominatorValues = object.response;
+              denominatorValues = object.response ? object.response.toString() : object.response;
             }
           });
 
