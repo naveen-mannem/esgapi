@@ -84,7 +84,7 @@ export const uploadControversies = async (req, res, next) => {
   const userDetail = req.user;
   try {
     upload(req, res, async function (err) {
-      console.log(err);
+      console.log(new Error(err));
       if (err) {
         res.status('400').json({ error_code: 1, err_desc: err });
         return;
@@ -98,9 +98,12 @@ export const uploadControversies = async (req, res, next) => {
         sheet_name_list.forEach(function (currentSheetName) {
           console.log('currentSheetName', currentSheetName);
           var worksheet = workbook.Sheets[currentSheetName];
-          var sheetAsJson = XLSX.utils.sheet_to_json(worksheet,{defval:" "});
-          console.log('sheetAsJson', sheetAsJson);
-          allFilesObject.push(sheetAsJson);
+          try {
+            var sheetAsJson = XLSX.utils.sheet_to_json(worksheet,{defval:" "});
+            allFilesObject.push(sheetAsJson);            
+          } catch (error) {
+            return res.status(400).json({ message: error.message })
+          }
         })
       }
       let companyDetails = [], controversyDetails = [];
