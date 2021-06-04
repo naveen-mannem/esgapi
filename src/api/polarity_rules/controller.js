@@ -88,9 +88,9 @@ export const percentileCalculation = async ({ user, params }, res, next) => {
               filteredDpResponses = filteredDpResponses.map(e => Number(e));
               if (filteredDpResponses.length > 1) {
                 const averageValue = filteredDpResponses.reduce((prev, next) => prev + next) / filteredDpResponses.length;
-                stdDeviation = Math.sqrt(filteredDpResponses.map(x => Math.pow(x - averageValue, 2)).reduce((a, b) => a + b) / (filteredDpResponses.length - 1));                
+                stdDeviation = Math.sqrt(filteredDpResponses.map(x => Math.pow(x - averageValue, 2)).reduce((a, b) => a + b) / (filteredDpResponses.length - 1));
               } else {
-                stdDeviation = 'NA'; 
+                stdDeviation = 'NA';
               }
             } else {
               stdDeviation = 'NA';
@@ -108,9 +108,9 @@ export const percentileCalculation = async ({ user, params }, res, next) => {
                   if (stdDeviation == 'NA') {
                     await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'NA' } });
                   } else {
-                    if (Number(polarityDetail.polarityValue) > 0) {
+                    if (polarityDetail.polarity == 'Positive') {
                       zscoreValue = (Number(foundResponse.response) - Number(averageValue)) / Number(stdDeviation);
-                    } else if (Number(polarityDetail.polarityValue) < 0) {
+                    } else if (polarityDetail.polarity == 'Negative') {
                       zscoreValue = (Number(averageValue) - Number(foundResponse.response)) / Number(stdDeviation);
                     }
                     // Using zscore value we need to find out percentile value
@@ -128,11 +128,13 @@ export const percentileCalculation = async ({ user, params }, res, next) => {
                         let ztableValue = await Ztables.findOne({ zScore: zscoreValue.toFixed(1) });
                         let zScore = ztableValue.values[Number(lastDigit)]
                         let percentile = zScore * 100;
-                        await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: percentile } });                        
+                        await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: percentile } });
+                      } else {
+                        await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'NA' } });
                       }
                     }
                   }
-                }                
+                }
               }
             }
           } else {
@@ -149,13 +151,14 @@ export const percentileCalculation = async ({ user, params }, res, next) => {
               }
             });
             let stdDeviation;
+            let averageValue;
             if (filteredDpResponses.length > 1) {
               //calculate average and SD
               filteredDpResponses = filteredDpResponses.filter(e => e.trim());
               filteredDpResponses = filteredDpResponses.map(e => Number(e));
               if (filteredDpResponses.length > 1) {
-                const averageValue = filteredDpResponses.reduce((prev, next) => prev + next) / filteredDpResponses.length;
-                stdDeviation = Math.sqrt(filteredDpResponses.map(x => Math.pow(x - averageValue, 2)).reduce((a, b) => a + b) / (filteredDpResponses.length - 1));                
+                averageValue = filteredDpResponses.reduce((prev, next) => prev + next) / filteredDpResponses.length;
+                stdDeviation = Math.sqrt(filteredDpResponses.map(x => Math.pow(x - averageValue, 2)).reduce((a, b) => a + b) / (filteredDpResponses.length - 1));
               } else {
                 stdDeviation = 'NA';
               }
@@ -171,9 +174,9 @@ export const percentileCalculation = async ({ user, params }, res, next) => {
                 } else {
                   let polarityDetail = await Datapoints.findOne({ _id: percentileDatapointsList[pdpIndex].id });
                   let zscoreValue;
-                  if (Number(polarityDetail.polarityValue) > 0) {
+                  if (polarityDetail.polarity == 'Positive') {
                     zscoreValue = (Number(foundResponse.response) - Number(averageValue)) / Number(stdDeviation);
-                  } else if (Number(polarityDetail.polarityValue) < 0) {
+                  } else if (polarityDetail.polarity == 'Negative') {
                     zscoreValue = (Number(averageValue) - Number(foundResponse.response)) / Number(stdDeviation);
                   }
                   // Using zscore value we need to find out percentile value
@@ -191,10 +194,12 @@ export const percentileCalculation = async ({ user, params }, res, next) => {
                       let ztableValue = await Ztables.findOne({ zScore: zscoreValue.toFixed(1) });
                       let zScore = ztableValue.values[Number(lastDigit)]
                       let percentile = zScore * 100;
-                      await DerivedDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: percentile } });                    
+                      await DerivedDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: percentile } });
+                    } else {
+                      await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'NA' } });
                     }
                   }
-                }                
+                }
               }
             }
           }
@@ -371,4 +376,3 @@ export const percentileCalculation = async ({ user, params }, res, next) => {
 
 
 
- 

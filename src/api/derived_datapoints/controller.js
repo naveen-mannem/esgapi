@@ -495,7 +495,7 @@ export const jsonGeneration = async ({ user, params }, res, next) => {
   let distinctYears = await StandaloneDatapoints.find({ companyId: companyID, status: true }).distinct('year');
   for (let yearIndex = 0; yearIndex < distinctYears.length; yearIndex++) {
     await StandaloneDatapoints.aggregate([
-      { "$match": { datapointId: { "$in": requiredDataPoints }, year: distinctYears[yearIndex], status: true } },
+      { "$match": { datapointId: { "$in": requiredDataPoints }, year: distinctYears[yearIndex], status: true, companyId:companyID} },
       {
         $lookup:
         {
@@ -518,7 +518,7 @@ export const jsonGeneration = async ({ user, params }, res, next) => {
       }
     });
     await DerivedDatapoints.aggregate([
-      { "$match": { datapointId: { "$in": requiredDataPoints }, year: distinctYears[yearIndex], status: true } },
+      { "$match": { datapointId: { "$in": requiredDataPoints }, year: distinctYears[yearIndex], status: true, companyId:companyID } },
       {
         $lookup:
         {
