@@ -399,7 +399,7 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
                 if (foundResponseIndex > -1) {
                   let foundResponse = allDerivedDatapoints[foundResponseIndex];
                   if (foundResponse) {
-                    if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA' || foundResponse.response.toLowerCase() == 'nan') {
+                    if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA' || foundResponse.response == 'NaN') {
                       allDerivedDatapoints[foundResponseIndex].response = 'NA';
                       allDerivedDatapoints[foundResponseIndex].performanceResult = 'NA';
                     } else {
