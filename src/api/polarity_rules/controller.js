@@ -77,17 +77,18 @@ export const percentileCalculation = async ({ user, params }, res, next) => {
             console.log('dpResponseOfNicCompanies', dpResponseOfNicCompanies);
             let filteredDpResponses = [];
             _.filter(dpResponseOfNicCompanies, (currentObject, index) => {
-              if (currentObject.response !== '' && currentObject.response !== ' ' && currentObject.response.toLowerCase() == "na") {
+              if (currentObject.response !== '' && currentObject.response !== ' ' && currentObject.response.toLowerCase() != "na") {
                 filteredDpResponses.push(currentObject.response ? currentObject.response.toString() : currentObject.response);
               }
             });
-            let stdDeviation;
+            let stdDeviation, averageValue;
             if (filteredDpResponses.length > 1) {
               //calculate average and SD
+              filteredDpResponses = filteredDpResponses.filter(e => e != "NA");
               filteredDpResponses = filteredDpResponses.filter(e => e.trim());
               filteredDpResponses = filteredDpResponses.map(e => Number(e));
               if (filteredDpResponses.length > 1) {
-                const averageValue = filteredDpResponses.reduce((prev, next) => prev + next) / filteredDpResponses.length;
+                averageValue = filteredDpResponses.reduce((prev, next) => prev + next) / filteredDpResponses.length;
                 stdDeviation = Math.sqrt(filteredDpResponses.map(x => Math.pow(x - averageValue, 2)).reduce((a, b) => a + b) / (filteredDpResponses.length - 1));
               } else {
                 stdDeviation = 'NA';
@@ -126,7 +127,8 @@ export const percentileCalculation = async ({ user, params }, res, next) => {
                         let twoDigitZscoreValue = zscoreValue.toFixed(2) + 0.01;
                         var lastDigit = twoDigitZscoreValue.toString().slice(-1);
                         let ztableValue = await Ztables.findOne({ zScore: zscoreValue.toFixed(1) });
-                        let zScore = ztableValue.values[Number(lastDigit)]
+                        let zValues = ztableValue.values[0].split(",");
+                        let zScore = zValues[Number(lastDigit)]
                         let percentile = zScore * 100;
                         await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: percentile } });
                       } else {
@@ -140,20 +142,18 @@ export const percentileCalculation = async ({ user, params }, res, next) => {
           } else {
             //Find the datapoint response value in DerivedDatapoints collection
             let dpResponseOfNicCompanies = await DerivedDatapoints.find({ companyId: { $in: nicCompaniesIds }, datapointId: percentileDatapointsList[pdpIndex].id, year: year, status: true }, { response: 1, _id: 0 });
-            console.log('dpResponseOfNicCompanies', dpResponseOfNicCompanies);
-            // let filteredDpResponses = _.filter(dpResponseOfNicCompanies, function (currentObject) {
-            //   return currentObject.response !== '' && currentObject.response !== ' ' && currentObject.response.toLowerCase() == "na";
-            // });
             let filteredDpResponses = [];
-            _.filter(dpResponseOfNicCompanies, (currentObject, index) => {
-              if (currentObject.response !== '' && currentObject.response !== ' ' && currentObject.response.toLowerCase() == "na") {
+            for (let resIndex = 0; resIndex < dpResponseOfNicCompanies.length; resIndex++) {
+              const currentObject = dpResponseOfNicCompanies[resIndex];
+              if (currentObject.response != "NA" && currentObject.response != "" && currentObject.response != " ") {
                 filteredDpResponses.push(currentObject.response ? currentObject.response.toString() : currentObject.response);
               }
-            });
+            }
             let stdDeviation;
             let averageValue;
             if (filteredDpResponses.length > 1) {
               //calculate average and SD
+              filteredDpResponses = filteredDpResponses.filter(e => e != "NA");
               filteredDpResponses = filteredDpResponses.filter(e => e.trim());
               filteredDpResponses = filteredDpResponses.map(e => Number(e));
               if (filteredDpResponses.length > 1) {
@@ -192,11 +192,12 @@ export const percentileCalculation = async ({ user, params }, res, next) => {
                       let twoDigitZscoreValue = zscoreValue.toFixed(2) + 0.01;
                       var lastDigit = twoDigitZscoreValue.toString().slice(-1);
                       let ztableValue = await Ztables.findOne({ zScore: zscoreValue.toFixed(1) });
-                      let zScore = ztableValue.values[Number(lastDigit)]
+                      let zValues = ztableValue.values[0].split(",");
+                      let zScore = zValues[Number(lastDigit)]
                       let percentile = zScore * 100;
                       await DerivedDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: percentile } });
                     } else {
-                      await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'NA' } });
+                      await DerivedDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'NA' } });
                     }
                   }
                 }
