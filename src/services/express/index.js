@@ -36,8 +36,6 @@ export default (apiRoot, routes) => {
     // }
   });
 
-  app.use(bodyParser.urlencoded({ extended: false }))
-  app.use(bodyParser.json())
   app.use(apiRoot, routes)
   app.use(queryErrorHandler())
   app.use(bodyErrorHandler())
