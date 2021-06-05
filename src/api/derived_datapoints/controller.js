@@ -466,8 +466,24 @@ export const jsonGeneration = async ({ user, params }, res, next) => {
   let requiredDataPoints = await Datapoints.find({ relevantForIndia: "Yes", standaloneOrMatrix: { "$ne": "Matrix" }, functionId: { "$ne": '609bcceb1d64cd01eeda092c' } }).distinct('_id')
   let companyID = params.companyId ? params.companyId : '';
   let responseList1 = [], responseList2 = [];
-  let companyDetails = await Companies.find({ _id: companyID });
+  let companyDetails = await Companies.findOne({ _id: companyID });
   let distinctYears = await StandaloneDatapoints.find({ companyId: companyID, status: true }).distinct('year');
+  let jsonResponseObject = {
+    companyName: companyDetails.companyName ? companyDetails.companyName : '',
+    companyID: companyDetails.cin ? companyDetails.cin : '',
+    NIC_CODE: companyDetails.nicCode ? companyDetails.nicCode : '',
+    NIC_industry: companyDetails.nicIndustry ? companyDetails.nicIndustry : '',
+    fiscalYear: [
+      {
+        year: distinctYears[0],
+        Data: []
+      },
+      {
+        year: distinctYears[1],
+        Data: []
+      }
+    ]
+  }
   for (let yearIndex = 0; yearIndex < distinctYears.length; yearIndex++) {
     await StandaloneDatapoints.find({ datapointId: { "$in": requiredDataPoints }, year: distinctYears[yearIndex], status: true, companyId:companyID})
     .populate('datapointId')
@@ -477,24 +493,22 @@ export const jsonGeneration = async ({ user, params }, res, next) => {
           const element = result[index];
           if (yearIndex == 0) {
             let objectToPush = {
-              dpCode: element.datapointId.code,
-              datapointId: element.datapointId.id,
-              year: element.year,
-              response: element.response,
-              performanceResult: element.performanceResult
+              Year: element.year,
+              DPCode: element.datapointId.code,
+              Response: element.response,
+              PerformanceResponse: element.performanceResult
             }
             // responseList1 = _.concat(responseList1, result);
-            responseList1.push(objectToPush);
+            jsonResponseObject.fiscalYear[0].Data.push(objectToPush);
           } else {
             let objectToPush = {
-              dpCode: element.datapointId.code,
-              datapointId: element.datapointId.id,
-              year: element.year,
-              response: element.response,
-              performanceResult: element.performanceResult
+              Year: element.year,
+              DPCode: element.datapointId.code,
+              Response: element.response,
+              PerformanceResponse: element.performanceResult
             }
             // responseList2 = _.concat(responseList2, result);
-            responseList2.push(objectToPush);
+            jsonResponseObject.fiscalYear[1].Data.push(objectToPush);
           }
         }
       }
@@ -507,24 +521,22 @@ export const jsonGeneration = async ({ user, params }, res, next) => {
           const element = result[index];
           if (yearIndex == 0) {
             let objectToPush = {
-              dpCode: element.datapointId.code,
-              datapointId: element.datapointId.id,
-              year: element.year,
-              response: element.response,
-              performanceResult: element.performanceResult
+              Year: element.year,
+              DPCode: element.datapointId.code,
+              Response: element.response,
+              PerformanceResponse: element.performanceResult
             }
             // responseList1 = _.concat(responseList1, result);
-            responseList1.push(objectToPush);
+            jsonResponseObject.fiscalYear[0].Data.push(objectToPush);
           } else {
             let objectToPush = {
-              dpCode: element.datapointId.code,
-              datapointId: element.datapointId.id,
-              year: element.year,
-              response: element.response,
-              performanceResult: element.performanceResult
+              Year: element.year,
+              DPCode: element.datapointId.code,
+              Response: element.response,
+              PerformanceResponse: element.performanceResult
             }
             // responseList2 = _.concat(responseList2, result);
-            responseList2.push(objectToPush);
+            jsonResponseObject.fiscalYear[1].Data.push(objectToPush);
           }
         }
       }
@@ -580,7 +592,7 @@ export const jsonGeneration = async ({ user, params }, res, next) => {
   }
   // [ year:20{} ,{}]
 
-  return res.status(200).json({ message: "Retrieved successfully!", companyDetails: companyDetails, year1: responseList1, year2: responseList2 })
+  return res.status(200).json({ message: "Retrieved successfully!", data: jsonResponseObject })
 
 }
 
