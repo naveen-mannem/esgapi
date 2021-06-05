@@ -367,13 +367,23 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
           const structuredStandaloneDetails = allStandaloneDetails.map(function (item) {
             let companyObject = companiesList.filter(obj => obj.cin === item['CIN']);
             let datapointObject = datapointList.filter(obj => obj.code === item['DP Code']);
+            let responseValue;
+            if (item['Response'] == "" || item['Response'] == " " || item['Response'] == undefined) {
+              responseValue = "NA";
+            } else {
+              if (item['Response'] == 0 || item['Response'] == '0' ) {
+                responseValue = item['Response'];                
+              } else {
+                responseValue = "NA";
+              }
+            }
             return {
               categoryName: item['Category'],
               keyIssueName: item['Key Issues'],
               datapointId: datapointObject[0] ? datapointObject[0].id : null,
               year: item['Fiscal Year'],
               fiscalYearEndDate: item['Fiscal Year End Date'],
-              response: item['Response'],
+              response: responseValue,
               companyId: companyObject[0] ? companyObject[0].id : null,
               performanceResult: '',
               standaloneStatus: '',
