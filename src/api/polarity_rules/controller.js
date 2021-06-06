@@ -97,9 +97,9 @@ export const percentileCalculation = async ({ user, params }, res, next) => {
               stdDeviation = 'NA';
             }
             console.log('stdDeviation', stdDeviation);
-            for (let companyIndex = 0; companyIndex < nicCompaniesList.length; companyIndex++) {
-              const element = nicCompaniesList[companyIndex];
-              let foundResponse = await StandaloneDatapoints.findOne({ companyId: nicCompaniesList[companyIndex].id, datapointId: percentileDatapointsList[pdpIndex].id, year: year, status: true });
+            for (let cmpIndex = 0; cmpIndex < nicCompaniesList.length; cmpIndex++) {
+              const element = nicCompaniesList[cmpIndex];
+              let foundResponse = await StandaloneDatapoints.findOne({ companyId: nicCompaniesList[cmpIndex].id, datapointId: percentileDatapointsList[pdpIndex].id, year: year, status: true });
               if (foundResponse) {
                 if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response.toLowerCase() == 'na') {
                   await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { response: 'NA', performanceResult: 'NA' } });
@@ -165,9 +165,9 @@ export const percentileCalculation = async ({ user, params }, res, next) => {
             } else {
               stdDeviation = 'NA';
             }
-            for (let companyIndex = 0; companyIndex < nicCompaniesList.length; companyIndex++) {
-              const element = nicCompaniesList[companyIndex];
-              let foundResponse = await DerivedDatapoints.findOne({ companyId: nicCompaniesList[companyIndex].id, datapointId: percentileDatapointsList[pdpIndex].id, year: year, status: true });
+            for (let compIndex = 0; compIndex < nicCompaniesList.length; compIndex++) {
+              const element = nicCompaniesList[compIndex];
+              let foundResponse = await DerivedDatapoints.findOne({ companyId: nicCompaniesList[compIndex].id, datapointId: percentileDatapointsList[pdpIndex].id, year: year, status: true });
               if (foundResponse) {
                 if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response.toLowerCase() == 'na') {
                   await DerivedDatapoints.updateOne({ _id: foundResponse.id }, { $set: { response: 'NA', performanceResult: 'NA' } });

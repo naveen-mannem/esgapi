@@ -282,7 +282,7 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
                   if (foundResponseIndex > -1) {
                     let foundResponse = fullStandaloneDetails[foundResponseIndex];
                     if (foundResponse) {
-                      if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA') {
+                      if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA' || foundResponse.response != 0 || foundResponse.response != "0") {
                         await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { response: 'NA', performanceResult: 'NA' } });
                       } else {
                         if (Number(foundResponse.response) >= Number(polarityRuleDetails.polarityValue)) {
@@ -363,7 +363,7 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
                 if (foundResponseIndex > -1) {
                   let foundResponse = fullStandaloneDetails[foundResponseIndex];
                   if (foundResponse) {
-                    if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA' || foundResponse.response.toLowerCase() == 'nan') {
+                    if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA' || foundResponse.response.toLowerCase() == 'nan' || foundResponse.response != 0 || foundResponse.response != "0") {
                       await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { response: 'NA', performanceResult: 'NA' } });
                     } else {
                       if (datapointDetail.code == 'BUSP009' || datapointDetail.code == 'BUSP008') {
@@ -839,7 +839,7 @@ async function asPercentageCalculation(companyId, mergedDetails, distinctYears, 
       if (ruleResponseObject) {
         if (ruleResponseObject.response == '' || ruleResponseObject.response == ' ') {
           //perform calc
-          if (numeratorValue.response == 0) {
+          if (numeratorValue.response == 0 || numeratorValue.response == '0') {
             derivedResponse = 0;
           } else if (numeratorValue.response == '' || numeratorValue.response == ' ' || numeratorValue.response == 'NA') {
             derivedResponse = 'NA';
@@ -1085,9 +1085,9 @@ async function percentageCalculation(companyId, mergedDetails, distinctYears, al
         let derivedResponse;
 
         _.filter(mergedDetails, (object, index) => {
-          if (object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year) {
+          if (object.datapointId.id == numeratorDpId && object.companyId.id == companyId && object.year == year && object.memberStatus == true) {
             numeratorValues.push(object.response)
-          } else if (object.datapointId.id == denominatorDpId && object.companyId.id == companyId && object.year == year) {
+          } else if (object.datapointId.id == denominatorDpId && object.companyId.id == companyId && object.year == year && object.memberStatus == true) {
             denominatorValues.push(object.response)
           }
         });
@@ -1095,9 +1095,10 @@ async function percentageCalculation(companyId, mergedDetails, distinctYears, al
         if (numeratorValues.length > 0) {
           numeratorSum = numeratorValues.reduce(function (prev, next) {
             if (prev && next) {
-              return {
-                response: Number(prev.toString().replace(/,/g, '').trim()) + Number(next.toString().replace(/,/g, '').trim()),
-              };
+              let prevResponse = prev.replace(/,/g, '');
+              let nextResponse = next.replace(/,/g, '');
+              let sum = Number(prevResponse) + Number(nextResponse);
+              return sum.toString();
             }
           });
         } else {
@@ -1106,9 +1107,10 @@ async function percentageCalculation(companyId, mergedDetails, distinctYears, al
         if (denominatorValues.length > 0) {
           denominatorSum = denominatorValues.reduce(function (prev, next) {
             if (prev && next) {
-              return {
-                response: Number(prev.toString().replace(/,/g, '').trim()) + Number(next.toString().replace(/,/g, '').trim()),
-              };
+              let prevResponse = prev.replace(/,/g, '');
+              let nextResponse = next.replace(/,/g, '');
+              let sum = Number(prevResponse) + Number(nextResponse);
+              return sum.toString();
             }
           });
         } else {
@@ -1398,9 +1400,9 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
     let denominatorDpObject = _.filter(allDatapointsList, { code: denominator });
     let numeratorDpId = numeratorDpObject[0] ? numeratorDpObject[0].id : '';
     let denominatorDpId = denominatorDpObject[0] ? denominatorDpObject[0].id : '';
-    let values = [];
     let derivedResponse;
     for (let j = 0; j < distinctYears.length; j++) {
+      let values = [];
       const year = distinctYears[j];
       let sumValue;
       let ruleDatapointId = countOfRules[i].datapointId.id;
@@ -1425,7 +1427,7 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
                 for (let jx = 0; jx < numeratorList.length; jx++) {
                   if (denominatorList[ix].dirName == numeratorList[jx].dirName) {
                     if (denominatorList[ix].value && numeratorList[jx].value) {
-                      if ((denominatorList[ix].value == 'Yes' && numeratorList[jx].value == 'Yes') || (denominatorList[ix].value == 'Y' && numeratorList[jx].value == 'Y')) {
+                      if ((denominatorList[ix].value.toLowerCase() == 'yes' && numeratorList[jx].value.toLowerCase() == 'yes') || (denominatorList[ix].value.toLowerCase() == 'y' && numeratorList[jx].value.toLowerCase() == 'y')) {
                         count++;
                       }
                     }
@@ -1504,16 +1506,20 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
           } else if (countOfRules[i].criteria.toLowerCase() == 'y' || countOfRules[i].criteria.toLowerCase() == 'yes') {
             if (values.length > 0) {
               if (values.includes('Yes') || values.includes('yes') || values.includes('Y') || values.includes('y')) {
-                finalResponse = values.filter(item => item == 'Yes' || item == 'Y').length;
+                finalResponse = values.filter(item => item == 'Yes' || item == 'Y' || item == 'yes' || item == 'y').length;
               } else {
-                finalResponse = '0'
+                finalResponse = '0';
               }
             } else {
               finalResponse = 'NA';
             }
           } else {
             if (values.length > 0) {
-              finalResponse = values.filter(item => Number(item) == Number(countOfRules[i].criteria)).length;
+              if (values.includes('F') || values.includes('f')) {
+                finalResponse = values.filter(item => item == 'F' || item == 'f').length;
+              } else {
+                finalResponse = '0';
+              }
             } else {
               finalResponse = 'NA';
             }
@@ -1647,22 +1653,25 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
               }
               allDerivedDatapoints.push(derivedDatapointsObject);
             } else {
-              let derivedResponse;
+              let resValue;
               if (sumValue === " " || sumValue == "" || sumValue == 'NA') {
-                derivedResponse = 'NA';
+                resValue = 'NA';
               } else if (sumValue == 0) {
-                derivedResponse = 0;
+                resValue = 0;
               } else if (activeMemberValues.length == 0) {
-                derivedResponse = 'NA';
+                resValue = 'NA';
               } else {
-                let stringValue = sumValue ? sumValue.toString().replace(/,/g, '').trim() : 0
-                derivedResponse = Number(stringValue) / activeMemberValues.length;
+                let stringValue = sumValue ? sumValue.toString().replace(/,/g, '').trim() : 0;
+                let divisor = Number(stringValue);
+                let dividend = activeMemberValues.length;
+                let answer = divisor / dividend;
+                resValue = answer ? answer.toString() : answer;
               }
               let derivedDatapointsObject = {
                 companyId: companyId,
                 datapointId: ruleDatapointId,
                 year: year,
-                response: derivedResponse ? derivedResponse.toString() : derivedResponse,
+                response: resValue ? resValue.toString() : resValue,
                 memberName: '',
                 memberStatus: true,
                 status: true,
@@ -1699,10 +1708,10 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
           });
 
           let derivedResponse;
-          if (numeratorValues == ' ' || numeratorValues == '' || numeratorValues == 'NA') {
-            derivedResponse = 'NA';
-          } else if (numeratorValues == '0' || numeratorValues == 0) {
+          if (numeratorValues == '0' || numeratorValues == 0) {
             derivedResponse = '0';
+          } else if (numeratorValues == ' ' || numeratorValues == '' || numeratorValues == 'NA') {
+            derivedResponse = 'NA';
           } else {
             if (denominatorValues == ' ' || denominatorValues == '' || denominatorValues == 'NA' || denominatorValues == '0' || denominatorValues == 0) {
               derivedResponse = 'NA';
