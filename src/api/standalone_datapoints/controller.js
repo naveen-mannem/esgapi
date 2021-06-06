@@ -370,12 +370,10 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
             let responseValue;
             if (item['Response'] == "" || item['Response'] == " " || item['Response'] == undefined) {
               responseValue = "NA";
+            } else if (item['Response'] == 0 || item['Response'] == '0' ) {
+              responseValue = item['Response'];
             } else {
-              if (item['Response'] == 0 || item['Response'] == '0' ) {
-                responseValue = item['Response'];                
-              } else {
-                responseValue = "NA";
-              }
+              responseValue = item['Response'];
             }
             return {
               categoryName: item['Category'],
