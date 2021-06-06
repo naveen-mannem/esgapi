@@ -368,10 +368,10 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
             let companyObject = companiesList.filter(obj => obj.cin === item['CIN']);
             let datapointObject = datapointList.filter(obj => obj.code === item['DP Code']);
             let responseValue;
-            if (item['Response'] == "" || item['Response'] == " " || item['Response'] == undefined) {
-              responseValue = "NA";
-            } else if (item['Response'] == 0 || item['Response'] == '0' ) {
+            if (item['Response'] == 0 || item['Response'] == '0' ) {
               responseValue = item['Response'];
+            } else if (item['Response'] == "" || item['Response'] == " " || item['Response'] == undefined) {
+              responseValue = "NA";
             } else {
               responseValue = item['Response'];
             }
