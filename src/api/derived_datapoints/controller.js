@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import moment from 'moment'
+import {performance, PerformanceObserver} from 'perf_hooks';
 import { getJsDateFromExcel } from 'excel-date-to-js'
 import { success, notFound, authorOrAdmin } from '../../services/response/'
 import { DerivedDatapoints } from '.'
@@ -42,6 +43,8 @@ export const show = ({ params }, res, next) =>
     .catch(next)
 
 export const calculateForACompany = async ({ user, params }, res, next) => {
+  let timingDetails = [];
+  let overAll1 = performance.now();
   const userDetail = user;
   const companyId = params.companyId ? params.companyId : null;
 
@@ -51,7 +54,7 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
     .populate('companyId')
     .populate('taskId')
     .then(async (companySADPDetails) => {
-      //get distrinc year from companySADPDetails
+      //get distinct year from companySADPDetails
       let distinctYears = _.uniq(_.map(companySADPDetails, 'year'));
       if (distinctYears.length > 0) {
         let allStandaloneDetails = [];
@@ -267,93 +270,98 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
         .populate('companyId')
         .populate('taskId')
         for (let yearIndex = 0; yearIndex < distinctYears.length; yearIndex++) {
+          let polarityTime1 = performance.now();
           const year = distinctYears[yearIndex];
           // for (let companyIndex = 0; companyIndex < nicCompaniesList.length; companyIndex++) {
           let dataPointsIdList = await Datapoints.find({ standaloneOrMatrix: { "$ne": "Matrix" }, percentile: { "$ne": "Yes" }, relevantForIndia: "Yes" })
           let polarityRulesList = await PolarityRules.find({}).populate('datapointId')
-          for (let dataPointIndex = 0; dataPointIndex < dataPointsIdList.length; dataPointIndex++) {
-            for (let polarityRulesIndex = 0; polarityRulesIndex < polarityRulesList.length; polarityRulesIndex++) {
-              let existingIndex = dataPointsIdList.findIndex((object, index) => object.id == polarityRulesList[polarityRulesIndex].datapointId.id);
-              if (existingIndex > -1) {
-                let datapointDetail = dataPointsIdList[existingIndex];
-                let polarityRuleDetails = polarityRulesList[polarityRulesIndex];
-                if (datapointDetail.dataCollection.toLowerCase() == "yes" || datapointDetail.dataCollection.toLowerCase() == "y") {
-                  let foundResponseIndex = fullStandaloneDetails.findIndex((object, index) => object.companyId.id == companyId && object.datapointId.id == polarityRuleDetails.datapointId.id && object.year == year);
-                  if (foundResponseIndex > -1) {
-                    let foundResponse = fullStandaloneDetails[foundResponseIndex];
-                    if (foundResponse) {
-                      if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA' || foundResponse.response != 0 || foundResponse.response != "0") {
-                        await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { response: 'NA', performanceResult: 'NA' } });
-                      } else {
-                        if (Number(foundResponse.response) >= Number(polarityRuleDetails.polarityValue)) {
-                          if (polarityRuleDetails.condition == 'greater' || polarityRuleDetails.condition == 'atleast' || polarityRuleDetails.condition == 'lesserthan') {
-                            await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'Positive' } });
-                          } else if (polarityRuleDetails.condition == 'greaterthan' || polarityRuleDetails.condition == 'lesser') {
-                            await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'Negative' } });    
-                          }
-                        } else if (Number(foundResponse.response) <= Number(polarityRuleDetails.polarityValue)) {
-                          if (polarityRuleDetails.condition == 'greater' || polarityRuleDetails.condition == 'atleast' || polarityRuleDetails.condition == 'lesserthan') {
-                            await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'Negative' } });
-                          }
-                          else if (polarityRuleDetails.condition == 'greaterthan' || polarityRuleDetails.condition == 'lesser') {
-                            await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'Positive' } });
-                          }
-                        } else {
-                          if (polarityRuleDetails.condition == 'range') {
-                            let param = polarityRuleDetails.polarityValue.split(',');
-                            if (Number(foundResponse.response) >= Number(param[0]) && Number(foundResponse.response) <= Number(param[1])) {
-                              await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'Positive' } });
-                            } else {
-                              await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'Negative' } });
-                            }
-                          }
+
+          for (let polarityRulesIndex = 0; polarityRulesIndex < polarityRulesList.length; polarityRulesIndex++) {
+            let datapointDetail = polarityRulesList[polarityRulesIndex].datapointId;
+            if (datapointDetail.relevantForIndia == "Yes") {
+              let polarityRuleDetails = polarityRulesList[polarityRulesIndex];
+              if (datapointDetail.dataCollection.toLowerCase() == "yes" || datapointDetail.dataCollection.toLowerCase() == "y") {
+                let foundResponseIndex = fullStandaloneDetails.findIndex((object, index) => object.companyId.id == companyId && object.datapointId.id == polarityRuleDetails.datapointId.id && object.year == year);
+                if (foundResponseIndex > -1) {
+                  let foundResponse = fullStandaloneDetails[foundResponseIndex];
+                  if (foundResponse) {
+                    if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA') {
+                      await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { response: 'NA', performanceResult: 'NA' } });
+                    } else {
+                      if (Number(foundResponse.response) >= Number(polarityRuleDetails.polarityValue)) {
+                        if (polarityRuleDetails.condition == 'greater' || polarityRuleDetails.condition == 'atleast' || polarityRuleDetails.condition == 'lesserthan') {
+                          await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'Positive' } });
+                        } else if (polarityRuleDetails.condition == 'greaterthan' || polarityRuleDetails.condition == 'lesser') {
+                          await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'Negative' } });    
                         }
-                      }
-                    }                      
-                  } else {
-                    return res.status(500).json({ message: `No value present for ${polarityRuleDetails.datapointId.code} of ${year} year` });
-                  }
-                } else {
-                  let foundResponseIndex = allDerivedDatapoints.findIndex((object, index) => object.companyId == companyId && object.datapointId == polarityRuleDetails.datapointId.id && object.year == year );
-                  if (foundResponseIndex > -1) {
-                    let foundResponse = allDerivedDatapoints[foundResponseIndex];
-                    if (foundResponse) {
-                      if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA') {
-                        allDerivedDatapoints[foundResponseIndex].response = 'NA';
-                        allDerivedDatapoints[foundResponseIndex].performanceResult = 'NA';
+                      } else if (Number(foundResponse.response) <= Number(polarityRuleDetails.polarityValue)) {
+                        if (polarityRuleDetails.condition == 'greater' || polarityRuleDetails.condition == 'atleast' || polarityRuleDetails.condition == 'lesserthan') {
+                          await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'Negative' } });
+                        }
+                        else if (polarityRuleDetails.condition == 'greaterthan' || polarityRuleDetails.condition == 'lesser') {
+                          await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'Positive' } });
+                        }
                       } else {
-                        if (Number(foundResponse.response) >= Number(polarityRuleDetails.polarityValue)) {
-                          if (polarityRuleDetails.condition == 'greater' || polarityRuleDetails.condition == 'atleast' || polarityRuleDetails.condition == 'lesserthan') {
-                            allDerivedDatapoints[foundResponseIndex].performanceResult = 'Positive';
-                          }
-                          else if (polarityRuleDetails.condition == 'greaterthan' || polarityRuleDetails.condition == 'lesser') {
-                            allDerivedDatapoints[foundResponseIndex].performanceResult = 'Negative';
-                          }
-                        } else if (Number(foundResponse.response) <= Number(polarityRuleDetails.polarityValue)) {
-                          if (polarityRuleDetails.condition == 'greater' || polarityRuleDetails.condition == 'atleast' || polarityRuleDetails.condition == 'lesserthan') {
-                            allDerivedDatapoints[foundResponseIndex].performanceResult = 'Negative';
-                          }
-                          else if (polarityRuleDetails.condition == 'greaterthan' || polarityRuleDetails.condition == 'lesser') {
-                            allDerivedDatapoints[foundResponseIndex].performanceResult = 'Positive';
-                          }
-                        } else {
-                          if (polarityRuleDetails.condition == 'range') {
-                            let param = polarityRuleDetails.polarityValue.split(',');
-                            if (Number(foundResponse.response) >= Number(param[0]) && Number(foundResponse.response) <= Number(param[1])) {
-                              allDerivedDatapoints[foundResponseIndex].performanceResult = 'Positive';
-                            } else {
-                              allDerivedDatapoints[foundResponseIndex].performanceResult = 'Negative';
-                            }
+                        if (polarityRuleDetails.condition == 'range') {
+                          let param = polarityRuleDetails.polarityValue.split(',');
+                          if (Number(foundResponse.response) >= Number(param[0]) && Number(foundResponse.response) <= Number(param[1])) {
+                            await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'Positive' } });
+                          } else {
+                            await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { performanceResult: 'Negative' } });
                           }
                         }
                       }
                     }
-                  } else {
+                  }                      
+                } else {
+                  if (polarityRuleDetails.datapointId.relevantForIndia == "Yes" && polarityRuleDetails.datapointId.standaloneOrMatrix != "Matrix" && polarityRuleDetails.datapointId.percentile != "Yes") {
                     return res.status(500).json({ message: `No value present for ${polarityRuleDetails.datapointId.code} of ${year} year` });
                   }
                 }
-              }
+              } else {
+                let foundResponseIndex = allDerivedDatapoints.findIndex((object, index) => object.companyId == companyId && object.datapointId == polarityRuleDetails.datapointId.id && object.year == year );
+                if (foundResponseIndex > -1) {
+                  let foundResponse = allDerivedDatapoints[foundResponseIndex];
+                  if (foundResponse) {
+                    if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA') {
+                      allDerivedDatapoints[foundResponseIndex].response = 'NA';
+                      allDerivedDatapoints[foundResponseIndex].performanceResult = 'NA';
+                    } else {
+                      if (Number(foundResponse.response) >= Number(polarityRuleDetails.polarityValue)) {
+                        if (polarityRuleDetails.condition == 'greater' || polarityRuleDetails.condition == 'atleast' || polarityRuleDetails.condition == 'lesserthan') {
+                          allDerivedDatapoints[foundResponseIndex].performanceResult = 'Positive';
+                        }
+                        else if (polarityRuleDetails.condition == 'greaterthan' || polarityRuleDetails.condition == 'lesser') {
+                          allDerivedDatapoints[foundResponseIndex].performanceResult = 'Negative';
+                        }
+                      } else if (Number(foundResponse.response) <= Number(polarityRuleDetails.polarityValue)) {
+                        if (polarityRuleDetails.condition == 'greater' || polarityRuleDetails.condition == 'atleast' || polarityRuleDetails.condition == 'lesserthan') {
+                          allDerivedDatapoints[foundResponseIndex].performanceResult = 'Negative';
+                        }
+                        else if (polarityRuleDetails.condition == 'greaterthan' || polarityRuleDetails.condition == 'lesser') {
+                          allDerivedDatapoints[foundResponseIndex].performanceResult = 'Positive';
+                        }
+                      } else {
+                        if (polarityRuleDetails.condition == 'range') {
+                          let param = polarityRuleDetails.polarityValue.split(',');
+                          if (Number(foundResponse.response) >= Number(param[0]) && Number(foundResponse.response) <= Number(param[1])) {
+                            allDerivedDatapoints[foundResponseIndex].performanceResult = 'Positive';
+                          } else {
+                            allDerivedDatapoints[foundResponseIndex].performanceResult = 'Negative';
+                          }
+                        }
+                      }
+                    }
+                  }
+                } else {
+                  if (polarityRuleDetails.datapointId.relevantForIndia == "Yes" && polarityRuleDetails.datapointId.standaloneOrMatrix != "Matrix" && polarityRuleDetails.datapointId.percentile != "Yes") {
+                    return res.status(500).json({ message: `No value present for ${polarityRuleDetails.datapointId.code} of ${year} year` });                  
+                  }
+                }
+              }              
             }
+          }
+          for (let dataPointIndex = 0; dataPointIndex < dataPointsIdList.length; dataPointIndex++) {
             
             let isDpExistInPolarityRule = polarityRulesList.findIndex((object, index) => object.datapointId.id == dataPointsIdList[dataPointIndex].id);
             if (isDpExistInPolarityRule <= -1) {
@@ -363,7 +371,7 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
                 if (foundResponseIndex > -1) {
                   let foundResponse = fullStandaloneDetails[foundResponseIndex];
                   if (foundResponse) {
-                    if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA' || foundResponse.response.toLowerCase() == 'nan' || foundResponse.response != 0 || foundResponse.response != "0") {
+                    if (foundResponse.response == '' || foundResponse.response == ' ' || foundResponse.response == 'NA' || foundResponse.response.toLowerCase() == 'nan') {
                       await StandaloneDatapoints.updateOne({ _id: foundResponse.id }, { $set: { response: 'NA', performanceResult: 'NA' } });
                     } else {
                       if (datapointDetail.code == 'BUSP009' || datapointDetail.code == 'BUSP008') {
@@ -437,7 +445,8 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
             }
           }
           if (distinctYears.length - 1 == yearIndex) {
-            console.log('before insert allDerivedDatapoints', allDerivedDatapoints);
+            let polarityTime2 = performance.now();
+            timingDetails.push({ action: "polarity", timeTaken: polarityTime2-polarityTime1})
             await DerivedDatapoints.updateMany({
               "companyId": companyId,
               "year": { $in: distinctYears }
@@ -449,12 +458,15 @@ export const calculateForACompany = async ({ user, params }, res, next) => {
                   console.log('error', err);
                 } else {
                   //  console.log('result', result);
-                  return res.status(200).json({ message: "Calculation completed successfuly!", derivedDatapoints: allDerivedDatapoints });
+                  let overAll2 = performance.now();
+                  console.log('overall time taken=', overAll2-overAll1);
+                  timingDetails.push({ action: "overall", timeTaken: overAll2-overAll1})
+                  return res.status(200).json({ message: "Calculation completed successfuly!", timingDetails: timingDetails, derivedDatapoints: allDerivedDatapoints });
                 }
             });
           }
         }
-        return res.status(200).json({ message: "Retrieved successfully!", allDerivedDatapoints: allDerivedDatapoints })
+        return res.status(200).json({ message: "Retrieved successfully!", timingDetails: timingDetails, allDerivedDatapoints: allDerivedDatapoints })
       } else {
         return res.status(500).json({ message: "No year wise data present for this company!" })
       }
@@ -617,6 +629,7 @@ export const destroy = ({ user, params }, res, next) =>
     .catch(next)
 
 async function matrixPercentageCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, userDetail) {
+  let matrixPercentageT1 = performance.now();
   let allDerivedDatapoints = [];
   let matrixPercentageRules = await Rules.find({ methodName: "MatrixPercentage" }).populate('datapointId');
   console.log(" matrixPercentageRules.length ", matrixPercentageRules.length)
@@ -743,12 +756,15 @@ async function matrixPercentageCalculation(companyId, mergedDetails, distinctYea
     }
     if (i == matrixPercentageRules.length - 1) {
       mergedDetails = _.concat(mergedDetails, allDerivedDatapoints)
+      let matrixPercentageT2 = performance.now();
+      console.log("MatrixPercentage", matrixPercentageT2-matrixPercentageT1);
       return { allDerivedDatapoints: allDerivedDatapoints };
     }
   }
 }
 
 async function addCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, userDetail) {
+  let addT1 = performance.now();
   let addRules = await Rules.find({ methodName: "ADD" }).populate('datapointId');
   console.log('add Calculation');
   for (let i = 0; i < addRules.length; i++) {
@@ -784,12 +800,15 @@ async function addCalculation(companyId, mergedDetails, distinctYears, allDatapo
     }
     if (i == addRules.length - 1) {
       console.log('before add rule');
+      let addT2 = performance.now();
+      console.log("Add", addT2-addT1);
       return true;
     }
   }
 }
 
 async function asCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, userDetail) {
+  let asT1 = performance.now();
   let asRules = await Rules.find({ methodName: "As" }).populate('datapointId');
   console.log('as Calculation');
   for (let i = 0; i < asRules.length; i++) {
@@ -813,12 +832,15 @@ async function asCalculation(companyId, mergedDetails, distinctYears, allDatapoi
     }
     if (i == asRules.length - 1) {
       console.log('before As calculation');
+      let asT2 = performance.now();
+      console.log("As", asT2-asT1);
       return true;
     }
   }
 }
 
 async function asPercentageCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, userDetail) {
+  let asPercentageT1 = performance.now();
   let asPercentageRules = await Rules.find({ methodName: "AsPercentage" }).populate('datapointId');
   console.log('asPercentage Calculation');
   for (let i = 0; i < asPercentageRules.length; i++) {
@@ -854,12 +876,15 @@ async function asPercentageCalculation(companyId, mergedDetails, distinctYears, 
     }
     if (i == asPercentageRules.length - 1) {
       console.log('before asPercentageRules');
+      let asPercentageT2 = performance.now();
+      console.log("AsPercentage", asPercentageT2-asPercentageT1);
       return true;
     }
   }
 }
 
 async function asRatioCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, userDetail) {
+  let asRatioT1 = performance.now();
   let asRatioRules = await Rules.find({ methodName: "AsRatio" }).populate('datapointId');
   console.log('asRatio Calculation');
   for (let i = 0; i < asRatioRules.length; i++) {
@@ -895,12 +920,15 @@ async function asRatioCalculation(companyId, mergedDetails, distinctYears, allDa
     }
     if (i == asRatioRules.length - 1) {
       console.log('before asRatioRules');
+      let asRatioT2 = performance.now();
+      console.log("AsRatio", asRatioT2-asRatioT1);
       return true;
     }
   }
 }
 
 async function conditionCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, userDetail) {
+  let conditionT1 = performance.now();
   let asConditionRules = await Rules.find({ methodName: "Condition" }).populate('datapointId');
   console.log('condition Calculation');
   for (let i = 0; i < asConditionRules.length; i++) {
@@ -930,12 +958,15 @@ async function conditionCalculation(companyId, mergedDetails, distinctYears, all
     }
     if (i == asConditionRules.length - 1) {
       console.log('before asConditionRules');
+      let conditionT2 = performance.now();
+      console.log("Condition", conditionT2-conditionT1);
       return true;
     }
   }
 }
 
 async function minusCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, userDetail) {
+  let minusT1 = performance.now();
   let allDerivedDatapoints = [];
   console.log('minus Calculation');
   let minusRules = await Rules.find({ methodName: "Minus" }).populate('datapointId');
@@ -995,12 +1026,15 @@ async function minusCalculation(companyId, mergedDetails, distinctYears, allData
     }
     if (i == minusRules.length - 1) {
       mergedDetails = _.concat(mergedDetails, allDerivedDatapoints)
+      let minusT2 = performance.now();
+      console.log("Minus", minusT2-minusT1);
       return { allDerivedDatapoints: allDerivedDatapoints };
     }
   }
 }
 
 async function multiplyCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, userDetail) {
+  let multiplyT1 = performance.now();
   let asMultiplyRules = await Rules.find({ methodName: "Multiply" }).populate('datapointId');
   console.log('multiply Calculation');
   for (let i = 0; i < asMultiplyRules.length; i++) {
@@ -1057,12 +1091,15 @@ async function multiplyCalculation(companyId, mergedDetails, distinctYears, allD
     }
     if (i == asMultiplyRules.length - 1) {
       console.log('before asMultiplyRules');
+      let multiplyT2 = performance.now();
+      console.log("Multiply", multiplyT2-multiplyT1);
       return true;
     }
   }
 }
 
 async function percentageCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, allDerivedDatapointsList, userDetail) {
+  let percentageT1 = performance.now();
   console.log('percentage Calculation');
   let allDerivedDatapoints = [];
   let percentageRules = await Rules.find({ methodName: "Percentage" }).populate('datapointId');
@@ -1129,7 +1166,6 @@ async function percentageCalculation(companyId, mergedDetails, distinctYears, al
 
         }
         allDerivedDatapoints.push(derivedDatapointsObject);
-        console.log(allDerivedDatapoints)
       }
 
     } else {
@@ -1185,20 +1221,21 @@ async function percentageCalculation(companyId, mergedDetails, distinctYears, al
             status: true,
             createdBy: userDetail
           }
-          console.log(allDerivedDatapoints)
           allDerivedDatapoints.push(derivedDatapointsObject);
         }
       }
     }
 
     if (i == percentageRules.length - 1) {
-      console.log(allDerivedDatapoints)
+      let percentageT2 = performance.now();
+      console.log("Percentage", percentageT2-percentageT1);
       return { allDerivedDatapoints: allDerivedDatapoints };
     }
   }
 }
 
 async function ratioAddCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, userDetail) {
+  let ratioAddT1 = performance.now();
   let allDerivedDatapoints = [];
   let ratioAddRules = await Rules.find({ methodName: "RatioADD" }).populate('datapointId');
   console.log('ratio add Calculation', ratioAddRules.length);
@@ -1252,12 +1289,15 @@ async function ratioAddCalculation(companyId, mergedDetails, distinctYears, allD
     }
     if (i == ratioAddRules.length - 1) {
       console.log('before ratioAddRules');
+      let ratioAddT2 = performance.now();
+      console.log("RatioAdd", ratioAddT2-ratioAddT1);
       return { allDerivedDatapoints: allDerivedDatapoints };
     }
   }
 }
 
 async function sumCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, userDetail) {
+  let sumT1 = performance.now();
   let allDerivedDatapoints = [];
   let sumRules = await Rules.find({ methodName: "Sum" }).populate('datapointId');
   console.log('sum Calculation', sumRules.length);
@@ -1325,12 +1365,15 @@ async function sumCalculation(companyId, mergedDetails, distinctYears, allDatapo
     }
     if (i == sumRules.length - 1) {
       mergedDetails = _.concat(mergedDetails, allDerivedDatapoints)
+      let sumT2 = performance.now();
+      console.log("Sum", sumT2-sumT1);
       return { allDerivedDatapoints: allDerivedDatapoints };
     }
   }
 }
 
 async function yesNoCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, userDetail) {
+  let yesNoT1 = performance.now();
   let allDerivedDatapoints = [];
   let yesNoRules = await Rules.find({ methodName: "YesNo" }).populate('datapointId');
   console.log('yes no Calculation', yesNoRules.length);
@@ -1382,12 +1425,15 @@ async function yesNoCalculation(companyId, mergedDetails, distinctYears, allData
     }
     if (i == yesNoRules.length - 1) {
       console.log('before yesNoRules');
+      let yesNoT2 = performance.now();
+      console.log("YesNo", yesNoT2-yesNoT1);
       return { allDerivedDatapoints: allDerivedDatapoints };
     }
   }
 }
 
 async function countOfCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, derivedDatapointsList, userDetail) {
+  let countOfT1 = performance.now();
   let allDerivedDatapoints = [];
   let countOfRules = await Rules.find({ methodName: "count of" }).populate('datapointId');
   console.log('count of Calculation', countOfRules.length);
@@ -1539,13 +1585,15 @@ async function countOfCalculation(companyId, mergedDetails, distinctYears, allDa
       }
     }
     if (i == countOfRules.length - 1) {
-      console.log(allDerivedDatapoints);
+      let countOfT2 = performance.now();
+      console.log("CountOf", countOfT2-countOfT1);
       return { allDerivedDatapoints: allDerivedDatapoints };
     }
   }
 }
 
 async function ratioCalculation(companyId, mergedDetails, distinctYears, allDatapointsList, derivedDatapointsList, userDetail) {
+  let ratioT1 = performance.now();
   let allDerivedDatapoints = [];
   let priorityDatapoints = ['MACR002', 'MACR007', 'MACR010'];
   let priorityDatapointObjects = await Datapoints.find({ code: { $in: priorityDatapoints } });
@@ -1716,10 +1764,10 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
             if (denominatorValues == ' ' || denominatorValues == '' || denominatorValues == 'NA' || denominatorValues == '0' || denominatorValues == 0) {
               derivedResponse = 'NA';
             } else {
-              if (numeratorValues.includes(',')) {
+              if (numeratorValues) {
                 numeratorValues = numeratorValues.replace(',', '');
               }
-              if (denominatorValues.includes(',')) {
+              if (denominatorValues) {
                 denominatorValues = denominatorValues.replace(',', '');
               }
               derivedResponse = (parseInt(numeratorValues) / parseInt(denominatorValues));
@@ -1740,6 +1788,8 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
       }
       if (i == ratioRules.length - 1) {
         console.log('before ratioRules');
+        let ratioT2 = performance.now();
+        console.log("MatrixPercentage", ratioT2-ratioT1);
         return { allDerivedDatapoints: allDerivedDatapoints };
       }
     }
