@@ -1764,10 +1764,10 @@ async function ratioCalculation(companyId, mergedDetails, distinctYears, allData
             if (denominatorValues == ' ' || denominatorValues == '' || denominatorValues == 'NA' || denominatorValues == '0' || denominatorValues == 0) {
               derivedResponse = 'NA';
             } else {
-              if (numeratorValues.includes(',')) {
+              if (numeratorValues) {
                 numeratorValues = numeratorValues.replace(',', '');
               }
-              if (denominatorValues.includes(',')) {
+              if (denominatorValues) {
                 denominatorValues = denominatorValues.replace(',', '');
               }
               derivedResponse = (parseInt(numeratorValues) / parseInt(denominatorValues));
