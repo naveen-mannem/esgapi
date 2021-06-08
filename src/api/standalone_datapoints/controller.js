@@ -9,6 +9,7 @@ import { Companies } from '../companies'
 import { Datapoints } from '../datapoints'
 import { BoardMembersMatrixDataPoints } from '../boardMembersMatrixDataPoints'
 import { KmpMatrixDataPoints } from '../kmpMatrixDataPoints'
+import { object } from 'mongoose/lib/utils'
 
 export const create = ({ user, bodymen: { body } }, res, next) =>
   StandaloneDatapoints.create({ ...body, createdBy: user })
@@ -72,7 +73,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
             const filePath = req.files.file[index].path;
             var workbook = XLSX.readFile(filePath, { sheetStubs: false, defval: '' });
             var sheet_name_list = workbook.SheetNames;
-      
+
             sheet_name_list.forEach(function (currentSheetName) {
               if (currentSheetName != 'Sheet3') {
                 //getting the complete sheet
@@ -101,9 +102,9 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
                 if (currentSheetName.toLowerCase() == 'matrix-directors' || currentSheetName.toLowerCase() == 'matrix-kmp') {
                   // for (const [cellIndex, [key, cellId]] of Object.entries(Object.entries(worksheet))) {
                   // for (let cellId=0; cellId < worksheet.length; cellId++) {
-                    for (const cellId in worksheet) {
+                  for (const cellId in worksheet) {
                     let keys = Object.keys(worksheet);
-                    let nextIndex = keys.indexOf(cellId) +1;
+                    let nextIndex = keys.indexOf(cellId) + 1;
                     let nextItemKey = keys[nextIndex];
                     // let nextCellId = worksheet[Number(cellIndex)+1];
                     let nextCellId = nextItemKey;
@@ -144,7 +145,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
                             let previousColumnIndex = currentColumnIndex - 1;
                             let nextColumnIndex = currentColumnIndex + 1;
                             data[row][headers1[col]] = value;
-                            if (!data[row][headers1[allColumnNames[previousColumnIndex]]] && data[row][headers1[allColumnNames[previousColumnIndex]]] !=0 && previousColumnIndex != 0) {
+                            if (!data[row][headers1[allColumnNames[previousColumnIndex]]] && data[row][headers1[allColumnNames[previousColumnIndex]]] != 0 && previousColumnIndex != 0) {
                               data[row][headers1[allColumnNames[previousColumnIndex]]] = '';
                             }
                             if (!data[row][headers1[allColumnNames[nextColumnIndex]]]) {
@@ -178,7 +179,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
                         data[row] = {};
                         data[row][headers[col]] = '';
                       }
-      
+
                       if (col != 'A') {
                         if (headers['A']) {
                           if (data[row][headers['A']]) {
@@ -187,7 +188,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
                             let previousColumnIndex = currentColumnIndex - 1;
                             let nextColumnIndex = currentColumnIndex + 1;
                             data[row][headers[col]] = value;
-                            if (!data[row][headers[allColumnNames[previousColumnIndex]]] && data[row][headers[allColumnNames[previousColumnIndex]]] !=0 && previousColumnIndex != 0) {
+                            if (!data[row][headers[allColumnNames[previousColumnIndex]]] && data[row][headers[allColumnNames[previousColumnIndex]]] != 0 && previousColumnIndex != 0) {
                               data[row][headers[allColumnNames[previousColumnIndex]]] = '';
                             }
                             if (!data[row][headers[allColumnNames[nextColumnIndex]]]) {
@@ -225,7 +226,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
                   data.shift();
                   data.shift();
                   parsedSheetObject.push(data);
-      
+
                 } else {
                   for (const cellId in worksheet) {
                     if (cellId[0] === "!") continue;
@@ -239,7 +240,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
                       // storing the header names
                       continue;
                     }
-      
+
                     if (!data[row] && value) data[row] = {};
                     if (col != 'A') {
                       if (headers['A']) {
@@ -249,7 +250,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
                           let previousColumnIndex = currentColumnIndex - 1;
                           let nextColumnIndex = currentColumnIndex + 1;
                           data[row][headers[col]] = value;
-                          if (!data[row][headers[allColumnNames[previousColumnIndex]]] && data[row][headers[allColumnNames[previousColumnIndex]]] !=0 && previousColumnIndex != 0) {
+                          if (!data[row][headers[allColumnNames[previousColumnIndex]]] && data[row][headers[allColumnNames[previousColumnIndex]]] != 0 && previousColumnIndex != 0) {
                             data[row][headers[allColumnNames[previousColumnIndex]]] = '';
                           }
                           if (!data[row][headers[allColumnNames[nextColumnIndex]]]) {
@@ -270,9 +271,9 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
             });
             allFilesObject.push(parsedSheetObject)
           }
-      
+
           //processing the extracted json from excel sheets start
-      
+
           let allCompanyInfos = [];
           let allStandaloneDetails = [];
           let allBoardMemberMatrixDetails = [];
@@ -281,7 +282,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
           for (let allFilesArrayIndex = 0; allFilesArrayIndex < allFilesObject.length; allFilesArrayIndex++) {
             //iterate each file
             let noOfSheetsInAnFile = allFilesObject[allFilesArrayIndex].length;
-      
+
             //loop no of sheets in a file
             let currentCompanyName = '';
             for (let singleFileIndex = 0; singleFileIndex < noOfSheetsInAnFile; singleFileIndex++) {
@@ -315,9 +316,10 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
           }
           const companiesToBeAdded = _.uniqBy(allCompanyInfos, 'CIN');
           const structuredCompanyDetails = [];
+          let companyNameForMissedDPs = '';
           for (let index = 0; index < companiesToBeAdded.length; index++) {
             const item = companiesToBeAdded[index];
-      
+
             let companyObject = {
               companyName: item['Company Name'],
               cin: item['CIN'],
@@ -332,17 +334,9 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
               createdBy: userDetail
             }
             await Companies.updateOne({ cin: item['CIN'] }, { $set: companyObject }, { upsert: true });
+            companyNameForMissedDPs = item['Company Name'];
             structuredCompanyDetails.push(companyObject);
           }
-          // await Companies.insertMany(structuredCompanyDetails)
-          // .then((err, result) => {
-          //   if(err){
-          //     console.log('error', err);
-          //   } else {
-          //     console.log('result', result);
-          //   }
-          // });
-      
           const datapointList = await Datapoints.find({ status: true }).populate('updatedBy').populate('keyIssueId').populate('functionId');
           const companiesList = await Companies.find({ status: true }).populate('createdBy');
           let filteredBoardMemberMatrixDetails = _.filter(allBoardMemberMatrixDetails, (x) => {
@@ -354,7 +348,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
               }
             }
           });
-      
+
           let filteredKmpMatrixDetails = _.filter(allKmpMatrixDetails, (x) => {
             if (x) {
               if (Object.keys(x)[0] != undefined) {
@@ -368,7 +362,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
             let companyObject = companiesList.filter(obj => obj.cin === item['CIN']);
             let datapointObject = datapointList.filter(obj => obj.code === item['DP Code']);
             let responseValue;
-            if (item['Response'] == 0 || item['Response'] == '0' ) {
+            if (item['Response'] == 0 || item['Response'] == '0') {
               responseValue = item['Response'];
             } else if (item['Response'] == "" || item['Response'] == " " || item['Response'] == undefined) {
               responseValue = "NA";
@@ -398,12 +392,12 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
           });
           var insertedCompanies = _.filter(companiesList, (item) =>
             _.some(structuredCompanyDetails, (obj) => item.cin === obj.cin));
-      
+
           let insertedCompanyIds = [];
           _.forEach(insertedCompanies, (company) => {
             insertedCompanyIds.push(company.id);
           });
-      
+
           let distinctObjectByYears = _.uniqBy(structuredStandaloneDetails, 'year');
           let distinctNicObjects = _.uniqBy(structuredCompanyDetails, 'nic');
           let distinctNics = [];
@@ -414,19 +408,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
           _.forEach(distinctObjectByYears, (obj) => {
             distinctYears.push(obj.year);
           });
-          const markExistingRecordsAsFalse = await StandaloneDatapoints.updateMany({
-            "companyId": { $in: insertedCompanyIds },
-            "year": { $in: distinctYears }
-          }, { $set: { status: false } }, {});
-          await StandaloneDatapoints.insertMany(structuredStandaloneDetails)
-            .then((err, result) => {
-              if (err) {
-                console.log('error', err);
-              } else {
-                //  console.log('result', result);
-              }
-            });
-      
+
           let boardMembersList = [];
           let inactiveBoardMembersList = [];
           let kmpMembersList = [];
@@ -466,7 +448,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
               boardMembersList.push(memberDetail);
               if (item['DP Code'] == 'BOIR018') {
                 if ((item[value].toString().toLowerCase() != 'n' || item[value].toString().toLowerCase() != 'no') && item[value].toString() != '' && item[value] != undefined && item[value] != null) {
-      
+
                   let cessaDate;
                   try {
                     cessaDate = getJsDateFromExcel(item[value]);
@@ -490,14 +472,14 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
               createdBy: userDetail
             }
           });
-      
+
           _.forEach(inactiveBoardMembersList, function (object) {
             let indexToUpdate = _.findIndex(boardMembersList, object);
             if (indexToUpdate >= 0) {
-              boardMembersList[indexToUpdate].memberStatus = false;        
+              boardMembersList[indexToUpdate].memberStatus = false;
             }
             let matchingMembers = boardMembersList.filter((obj) => {
-              if(obj.memberName == object.memberName && obj.year == object.year && obj.companyId == object.companyId){
+              if (obj.memberName == object.memberName && obj.year == object.year && obj.companyId == object.companyId) {
                 return obj;
               }
             });
@@ -510,7 +492,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
               }
             }
           });
-      
+
           const structuredKmpMatrixDetails = filteredKmpMatrixDetails.map(function (item) {
             let companyObject = companiesList.filter(obj => obj.cin === item['CIN']);
             let datapointObject = datapointList.filter(obj => obj.code === item['DP Code']);
@@ -547,7 +529,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
               };
               kmpMembersList.push(memberDetail);
             });
-      
+
             return {
               datapointId: datapointObject[0] ? datapointObject[0].id : null,
               companyId: companyObject[0] ? companyObject[0].id : null,
@@ -558,7 +540,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
               createdBy: userDetail
             }
           });
-      
+
           let dpToFind = await Datapoints.findOne({ code: "BOIP007" });
           let dpMapping = [{ "BOCR013": "MACR023" }, { "BOCR014": "MACR024" }, { "BOCR015": "MACR025" }, { "BOCR016": "MACR026" }, { "BOCR018": "MACR029" }, { "BODR005": "MASR008" }, { "BOIR021": "MASR009" }, { "BOSP003": "MASP002" }, { "BOSP004": "MASP003" }, { "BOSR009": "MASR007" }];
           let bmmDpsToFind = await Datapoints.find({ code: { $in: ["BOCR013", "BOCR014", "BOCR015", "BOCR016", "BOCR018", "BODR005", "BOIR021", "BOSP003", "BOSP004", "BOSR009"] } });
@@ -576,10 +558,10 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
                 if (executiveMembersList.length > 0) {
                   for (let executiveMemberIndex = 0; executiveMemberIndex < executiveMembersList.length; executiveMemberIndex++) {
                     const executiveMemberObject = executiveMembersList[executiveMemberIndex];
-      
+
                     for (let findIndex = 0; findIndex < bmmDpsToFind.length; findIndex++) {
                       const bmmDpObject = bmmDpsToFind[findIndex];
-                      let kmpDatapointCode = dpMapping.find((obj)=> obj[bmmDpObject.code]);
+                      let kmpDatapointCode = dpMapping.find((obj) => obj[bmmDpObject.code]);
                       let matchingKmpObject = kmpDpsToUpdate.find((obj) => obj.code == kmpDatapointCode[bmmDpObject.code]);
                       let responseToUpdate = _.filter(boardMembersList, function (obj) {
                         return obj.datapointId == bmmDpObject.id
@@ -607,34 +589,72 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
               }
             }
           }
-      
-          //Marking existing Data as False in BoardMemberMatrixDP 
-          await BoardMembersMatrixDataPoints.updateMany({
-            "companyId": { $in: insertedCompanyIds },
-            "year": { $in: distinctYears }
-          }, { $set: { status: false } }, {});
-          await BoardMembersMatrixDataPoints.insertMany(boardMembersList)
-            .then((err, result) => {
-              if (err) {
-                console.log('error', err);
-              } else {
-                // console.log('result', result);
-              }
-            });
-          await KmpMatrixDataPoints.updateMany({
-            "companyId": { $in: insertedCompanyIds },
-            "year": { $in: distinctYears }
-          }, { $set: { status: false } }, {});
-          await KmpMatrixDataPoints.insertMany(kmpMembersList)
-            .then((err, result) => {
-              if (err) {
-                console.log('error', err);
-              } else {
-                //  console.log('result', result);
-              }
-            });
-          // res.json({ message: "Files upload success", companies: structuredCompanyDetails, allStandaloneDetails: structuredStandaloneDetails, allBoardMemberMatrixDetails: boardMembersList, allKmpMatrixDetails: kmpMembersList, data: allFilesObject });
-          res.json({ message: "Files upload success", companies: insertedCompanies, nicList: distinctNics });
+
+          var actualDPList = _.concat(structuredStandaloneDetails, boardMembersList, kmpMembersList);
+          let missingDPList = [], expectedDPList = [];
+          let standaloneDatapointsList = await Datapoints.find({ relevantForIndia: "Yes", dataCollection: "Yes", functionId: { "$ne": '609bcceb1d64cd01eeda092c' } })
+          //actualDPlist, expectedDPlist(548) 
+          for (let expectedDPIndex = 0; expectedDPIndex < standaloneDatapointsList.length; expectedDPIndex++) {
+            expectedDPList.push(standaloneDatapointsList[expectedDPIndex].id)
+          }
+          for (let companyIdIndex = 0; companyIdIndex < insertedCompanies.length; companyIdIndex++) {
+            for (let year = 0; year < distinctYears.length; year++) {
+              let missingDPs = _.filter(expectedDPList, (expectedId) => !_.some(actualDPList, (obj) => expectedId == obj.datapointId && obj.year == distinctYears[year] && obj.companyId == insertedCompanies[companyIdIndex]._id));
+              missingDPList = _.concat(missingDPList, missingDPs)
+            }
+          }
+          console.log(missingDPList)
+          if (missingDPList.length == 0) {
+            const markExistingRecordsAsFalse = await StandaloneDatapoints.updateMany({
+              "companyId": { $in: insertedCompanyIds },
+              "year": { $in: distinctYears }
+            }, { $set: { status: false } }, {});
+            await StandaloneDatapoints.insertMany(structuredStandaloneDetails)
+              .then((err, result) => {
+                if (err) {
+                  console.log('error', err);
+                } else {
+                  //  console.log('result', result);
+                }
+              });
+            //Marking existing Data as False in BoardMemberMatrixDP 
+            await BoardMembersMatrixDataPoints.updateMany({
+              "companyId": { $in: insertedCompanyIds },
+              "year": { $in: distinctYears }
+            }, { $set: { status: false } }, {});
+            await BoardMembersMatrixDataPoints.insertMany(boardMembersList)
+              .then((err, result) => {
+                if (err) {
+                  console.log('error', err);
+                } else {
+                  // console.log('result', result);
+                }
+              });
+            await KmpMatrixDataPoints.updateMany({
+              "companyId": { $in: insertedCompanyIds },
+              "year": { $in: distinctYears }
+            }, { $set: { status: false } }, {});
+            await KmpMatrixDataPoints.insertMany(kmpMembersList)
+              .then((err, result) => {
+                if (err) {
+                  console.log('error', err);
+                } else {
+                  //  console.log('result', result);
+                }
+              });
+            res.json({ message: "Files upload success", companies: insertedCompanies, nicList: distinctNics });
+
+          } else {
+            let missingDPcodeNames = [];
+            for (let missingDPIndex = 0; missingDPIndex < missingDPList.length; missingDPIndex++) {
+              _.find(standaloneDatapointsList, (object) => {
+                if (object.id == missingDPList[missingDPIndex]) {
+                  missingDPcodeNames.push(object.code);
+                }
+              })
+            }
+            return res.status(400).json({ message: "Missing DP Codes", CompanyName: companyNameForMissedDPs, missingDatapoints: missingDPcodeNames });
+          }
         } else {
           return res.status(400).json({ message: "Some files are missing!, Please upload all files Environment, Social and Governance for a company" });
         }
@@ -646,7 +666,7 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
     return res.status(403).json({
       message: error.message ? error.message : 'Failed to upload controversy files',
       status: 403
-    });   
+    });
   }
 }
 
