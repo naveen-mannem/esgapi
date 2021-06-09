@@ -5,6 +5,9 @@ import { Role } from '../role'
 import { Employees } from '../employees'
 import { ClientRepresentatives } from '../client-representatives'
 import { CompanyRepresentatives } from '../company-representatives'
+import fileType from 'file-type'
+import * as fs from 'fs'
+
 
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>
   User.count(query)
@@ -30,6 +33,7 @@ export const getUsersByRole = ({ params, querymen: { query, select, cursor } }, 
       }))
     )
     .then(success(res))
+
     .catch(next)
 }
 
@@ -83,38 +87,26 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
   let bodyData = Buffer.from(body.onBoardingDetails, 'base64');
   let bodyDetails = bodyData.toString('ascii');
   let onBoardingDetails =JSON.parse(bodyDetails);
-  
+  //console.log('onBoardingDetails', onBoardingDetails);
   let roleDetails = await Role.find({ roleName: { $in: ["Employee", "Client Representative", "Company Representative"] } });
-  console.log(roleDetails);
-  let role, roleId, userObject;
-  if (roleDetails.length > 0) {
-    for (let index = 0; index < roleDetails.length; index++) {
-      if (roleDetails[index].roleName == "Employee" && onBoardingDetails.roleName == "Employee") {
-        role = roleDetails[index].roleName;
-        roleId = roleDetails[index].id;
-      } else if (roleDetails[index].roleName == "Client Representative" && onBoardingDetails.roleName == "Client Representative") {
-        role = roleDetails[index].roleName;
-        roleId = roleDetails[index].id;
-      } else if (roleDetails[index].roleName == "Company Representative" && onBoardingDetails.roleName == "Company Representative") {
-        role = roleDetails[index].roleName;
-        roleId = roleDetails[index].id;
-      }
-    }
-  }
+  let userObject;
   if (onBoardingDetails.roleName == "Employee") {
+    var roleObject = roleDetails.find((rec)=>rec.roleName === 'Employee')
     userObject = {
       email: onBoardingDetails.email ? onBoardingDetails.email : '',
       name: onBoardingDetails.firstName ? onBoardingDetails.firstName : '',
-      role: role ? role : '',
-      roleId: roleId ? roleId : '',
+      role: roleObject && roleObject.roleName ? roleObject.roleName : '',
+      roleId: roleObject && roleObject._id ? roleObject._id : '',
       password: onBoardingDetails.password ? onBoardingDetails.password : '',
       phoneNumber: onBoardingDetails.phoneNumber ? onBoardingDetails.phoneNumber : '',
       isUserApproved: false,
       status: true
     }
+    var pancardUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.pancardUrl, 'pan').catch((err)=>res.status(500).json({ message: "Failed to store pancard url" }));
+    var aadhaarUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.aadhaarUrl, 'aadhar').catch((err)=>res.status(500).json({ message: "Failed to store aadharcard url" }));
+    var cancelledChequeUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.cancelledChequeUrl, 'cancelledCheque').catch((err)=>res.status(500).json({ message: "Failed to store cancelledChequeUrl" }));
     await User.create(userObject)
     .then(async (response) => {
-      console.log('employee user response', response);
       if (response) {
         let userId = response.id;
         await Employees.create({
@@ -127,9 +119,9 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
           bankAccountNumber: onBoardingDetails.bankAccountNumber ? onBoardingDetails.bankAccountNumber : '',
           bankIFSCCode: onBoardingDetails.bankIFSCCode ? onBoardingDetails.bankIFSCCode : '',
           accountHolderName: onBoardingDetails.accountHolderName ? onBoardingDetails.accountHolderName : '',
-          pancardUrl: '',
-          aadhaarUrl: '',
-          cancelledChequeUrl: '',
+          pancardUrl: pancardUrl,
+          aadhaarUrl: aadhaarUrl,
+          cancelledChequeUrl: cancelledChequeUrl,
           status: true,
           createdBy: user
         }).then((resp) => {
@@ -156,16 +148,20 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
       }
     })
   } else if (onBoardingDetails.roleName == "Client Representative") {
+    var roleObject = roleDetails.find((rec)=>rec.roleName === 'Client Representative');
     userObject = {
       email: onBoardingDetails.email ? onBoardingDetails.email : '',
       name: onBoardingDetails.name ? onBoardingDetails.name : '',
-      role: role ? role : '',
-      roleId: roleId ? roleId : '',
+      role: roleObject && roleObject.roleName ? roleObject.roleName : '',
+      roleId: roleObject && roleObject._id ? roleObject._id : '',
       password: onBoardingDetails.password ? onBoardingDetails.password : '',
       phoneNumber: onBoardingDetails.phoneNumber ? onBoardingDetails.phoneNumber : '',
       isUserApproved: false,
       status: true
     }
+    console.log(userObject);
+    var authenticationLetterForClientUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.authenticationLetterForClientUrl, 'authenticationLetterForClient').catch((err)=>res.status(500).json({ message: "Failed to store authenticationLetterForClientUrl" }));
+    var companyIdForClient = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.companyIdForClient, 'companyIdForClient').catch((err)=>res.status(500).json({ message: "Failed to store companyIdForClient" }));
     await User.create(userObject)
     .then(async (response) => {
       if (response) {
@@ -177,8 +173,8 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
           password: onBoardingDetails.password ? onBoardingDetails.password : '',
           phoneNumber: onBoardingDetails.phoneNumber ? onBoardingDetails.phoneNumber : "",
           companyId: onBoardingDetails.companyId ? onBoardingDetails.companyId : "",
-          authenticationLetterForClientUrl: '',
-          companyIdForClient: '',
+          authenticationLetterForClientUrl: authenticationLetterForClientUrl,
+          companyIdForClient: companyIdForClient,
           status: true,
           createdBy: user
         });
@@ -196,20 +192,24 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
           message: 'email already registered'
         })
       } else {
+        console.log('error', err)
         next(err)
       }
     })
   } else if (onBoardingDetails.roleName == "Company Representative") {
+    var roleObject = roleDetails.find((rec)=>rec.roleName === 'Client Representative');
     userObject = {
       email: onBoardingDetails.email ? onBoardingDetails.email : '',
       name: onBoardingDetails.name ? onBoardingDetails.name : '',
-      role: role ? role : '',
-      roleId: roleId ? roleId : '',
+      role: roleObject && roleObject.roleName ? roleObject.roleName : '',
+      roleId: roleObject && roleObject._id ? roleObject._id : '',
       password: onBoardingDetails.password ? onBoardingDetails.password : '',
       phoneNumber: onBoardingDetails.phoneNumber ? onBoardingDetails.phoneNumber : '',
       isUserApproved: false,
       status: true
     }
+    var authenticationLetterForCompanyUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.authenticationLetterForCompanyUrl, 'authenticationLetterForCompany').catch((err)=>res.status(500).json({ message: "Failed to store authenticationLetterForCompany" }));
+    var companyIdForCompany = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.companyIdForCompany, 'companyIdForCompany').catch((err)=>res.status(500).json({ message: "Failed to store companyIdForCompany" }))
     await User.create(userObject)
     .then(async (response) => {
       if (response) {
@@ -221,10 +221,10 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
           password: onBoardingDetails.password ? onBoardingDetails.password : '',
           phoneNumber: onBoardingDetails.phoneNumber ? onBoardingDetails.phoneNumber : "",
           companiesList: onBoardingDetails.companiesList ? onBoardingDetails.companiesList : "",
-          authenticationLetterForCompanyUrl: '',
-          companyIdForCompany: '',
+          authenticationLetterForCompanyUrl: authenticationLetterForCompanyUrl,
+          companyIdForCompany: companyIdForCompany,
           status: true,
-          createdBy: user
+          createdBy: userp
         });
         return res.status(200).json({ message: "New Company Representative onboarded successfully!", _id: response.id, name: response.name, email: response.email });
       } else {
@@ -247,6 +247,29 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
     return res.status(500).json({ message: "Failed to onboard, invalid value for role or roleName" });
   }
 }
+
+function storeOnBoardingImagesInLocalStorage(onboardingBase64Image, folderName){
+  return new Promise(function(resolve, reject){
+    let base64Image = onboardingBase64Image.split(';base64,').pop();
+    fileType.fromBuffer((Buffer.from(base64Image, 'base64'))).then(function(res){
+      let fileName = folderName+'_'+Date.now()+'.'+res.ext;
+      var filePath = './uploads/'+folderName+'/'+fileName;
+      fs.writeFile(filePath, base64Image, {encoding: 'base64'}, function(err) {
+        if(err){
+          reject(err);
+        }else{
+          console.log('File created');
+          resolve(fileName);
+        }
+      });
+    }).catch(function(err){
+      console.log('err', err);
+      reject(err);
+    })
+  })
+}
+
+
 
 export const updateUserStatus = ({ bodymen: { body }, user }, res, next) =>{
   User.findById(body.userId)
