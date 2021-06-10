@@ -27,6 +27,7 @@ export const createBatch = async({ user, bodymen: { body } }, res, next) => {
     clientTaxonomy: body.taxonomy ? body.taxonomy.value : '',
     companiesList: companiesList,
     years: yearsList,
+    batchSLA: body.batchSLA,
     status: true
   }
   await Batches.create({ ...batchObject, createdBy: user })
@@ -55,6 +56,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>{
           let objectToPush = {
             _id: item.id,
             years: yearObjects,
+            batchSLA: item.batchSLA,
             batchName: item.batchName,
             taxonomy: { value: batch.clientTaxonomy.id, label: batch.clientTaxonomy.taxonomyName },
             companies: companyObjects,
@@ -91,6 +93,7 @@ export const show = ({ params }, res, next) =>
        _id: batch.id,
        batchName: batch.batchName,
        years: yearObjects,
+       batchSLA: batch.batchSLA,
        companies: companyObjects,
        taxonomy: { value: batch.clientTaxonomy.id, label: batch.clientTaxonomy.taxonomyName }
      }
@@ -137,6 +140,7 @@ export const updateBatch = async({ user, bodymen: { body }, params }, res, next)
         clientTaxonomy: body.taxonomy ? body.taxonomy.value : '',
         companiesList: companiesList,
         years: yearsList,
+        batchSLA: body.batchSLA,
         status: body.status
       }
       await Batches.update({_id: params.id}, { $set: batchObject })
