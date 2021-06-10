@@ -1,5 +1,6 @@
 import { success, notFound, authorOrAdmin } from '../../services/response/'
 import { Batches } from '.'
+import { Companies } from '../companies'
 
 export const create = ({ user, bodymen: { body } }, res, next) =>
   Batches.create({ ...body, createdBy: user })
@@ -31,9 +32,18 @@ export const createBatch = async({ user, bodymen: { body } }, res, next) => {
     status: true
   }
   await Batches.create({ ...batchObject, createdBy: user })
-  .then((batches) => batches.view(true))
-  .then(success(res, 201))
-  .catch(next)
+  .then(async(batch) => {
+    await Companies.updateMany({
+      "_id": { $in: companiesList }
+    }, { $set: { isAssignedToBatch: true } }, {});
+    return res.status(200).json(batch);
+  })
+  .catch((err) => {
+    /* istanbul ignore else */
+    res.status(400).json({
+      message: err.message ? err.message : 'Failed to create batch, invalid details'
+    })
+  })
 }
 
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>{
