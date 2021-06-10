@@ -58,7 +58,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>{
             years: yearObjects,
             batchSLA: item.batchSLA,
             batchName: item.batchName,
-            taxonomy: { value: batch.clientTaxonomy.id, label: batch.clientTaxonomy.taxonomyName },
+            taxonomy: { value: item.clientTaxonomy.id, label: item.clientTaxonomy.taxonomyName },
             companies: companyObjects,
             status: true
           }

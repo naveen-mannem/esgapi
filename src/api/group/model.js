@@ -10,13 +10,22 @@ const groupSchema = new Schema({
     type: String
   },
   groupAdmin: {
-    type: String
-  },
-  batchId: {
     type: Schema.ObjectId,
-    ref: 'Batches',
+    ref: 'User',
     required: true
   },
+  assignedQA: [{ 
+    type : Schema.ObjectId, 
+    ref: 'User' 
+  }],
+  assignedAnalyst: [{ 
+    type : Schema.ObjectId, 
+    ref: 'User' 
+  }],
+  batchList: [{ 
+    type : Schema.ObjectId, 
+    ref: 'Batches' 
+  }],
   status: {
     type: Boolean,
     default: true
@@ -36,8 +45,10 @@ groupSchema.methods = {
       id: this.id,
       createdBy: this.createdBy ? this.createdBy.view(full) : null,
       groupName: this.groupName,
-      groupAdmin: this.groupAdmin,
-      batchId: this.batchId ? this.batchId.view(full) : null,
+      groupAdmin: this.groupAdmin ? this.groupAdmin.view(full) : null,
+      assignedAnalyst: this.assignedAnalyst ? this.assignedAnalyst : [],
+      assignedQA: this.assignedQA ? this.assignedQA : [],
+      batchList: this.batchList ? this.batchList : [],
       status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
