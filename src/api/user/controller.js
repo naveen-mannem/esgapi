@@ -274,13 +274,16 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
 }
 
 async function storeOnBoardingImagesInLocalStorage(onboardingBase64Image, folderName){
+  console.log('in function storeOnBoardingImagesInLocalStorage')
   return new Promise(function(resolve, reject){
     let base64Image = onboardingBase64Image.split(';base64,').pop();
     fileType.fromBuffer((Buffer.from(base64Image, 'base64'))).then(function(res){
       let fileName = folderName+'_'+Date.now()+'.'+res.ext;
-      var filePath = __dirname+'./uploads/'+folderName+'/'+fileName;
+      var filePath ='../../uploads/'+folderName+'/'+fileName;
+      console.log('filePath', filePath);
       fs.writeFile(filePath, base64Image, {encoding: 'base64'}, function(err) {
         if(err){
+          console.log('error while storing file', err);
           reject(err);
         }else{
           console.log('File created');
