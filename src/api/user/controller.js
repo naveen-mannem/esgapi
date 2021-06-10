@@ -241,7 +241,7 @@ export const onBoardNewUser = async ({ bodymen: { body }, params, user }, res, n
                     authenticationLetterForCompanyUrl: authenticationLetterForCompanyUrl,
                     companyIdForCompany: companyIdForCompany,
                     status: true,
-                    createdBy: userp
+                    createdBy: user
                   });
                   return res.status(200).json({ message: "New Company Representative onboarded successfully!", _id: response.id, name: response.name, email: response.email });
                 } else {
