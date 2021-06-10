@@ -7,7 +7,7 @@ import { schema } from './model'
 export ClientTaxonomy, { schema } from './model'
 
 const router = new Router()
-const { taxonomyName, fields } = schema.tree
+const { taxonomyName, fields, status } = schema.tree
 
 /**
  * @api {post} /clientTaxonomies Create client taxonomy
@@ -67,6 +67,7 @@ router.get('/:id',
  * @apiParam {String} access_token user access token.
  * @apiParam taxonomyName Client taxonomy's taxonomyName.
  * @apiParam fields Client taxonomy's fields.
+ * @apiParam status Client taxonomy's status.
  * @apiSuccess {Object} clientTaxonomy Client taxonomy's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Client taxonomy not found.
@@ -74,7 +75,7 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ taxonomyName, fields }),
+  body({ taxonomyName, fields, status }),
   update)
 
 /**
