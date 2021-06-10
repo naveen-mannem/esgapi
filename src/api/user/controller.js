@@ -223,46 +223,51 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
       isUserApproved: false,
       status: true
     }
-    var authenticationLetterForCompanyUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.authenticationLetterForCompanyUrl, 'authenticationLetterForCompany')
-    .catch((err)=> {
-      return res.status(500).json({ message: "Failed to store authenticationLetterForCompany" })
-    });
-    var companyIdForCompany = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.companyIdForCompany, 'companyIdForCompany')
+    await storeOnBoardingImagesInLocalStorage(onBoardingDetails.authenticationLetterForCompanyUrl, 'authenticationLetterForCompany')
+    .then(async(authenticationLetterForCompanyUrl) => {
+      
+      await storeOnBoardingImagesInLocalStorage(onBoardingDetails.companyIdForCompany, 'companyIdForCompany')
+      .then(async(companyIdForCompany) => {
+        await User.create(userObject)
+        .then(async (response) => {
+          if (response) {
+            let userId = response.id;
+            await CompanyRepresentatives.create({
+              userId: userId,
+              name: onBoardingDetails.name ? onBoardingDetails.name : '',
+              email: onBoardingDetails.email ? onBoardingDetails.email : '',
+              password: onBoardingDetails.password ? onBoardingDetails.password : '',
+              phoneNumber: onBoardingDetails.phoneNumber ? onBoardingDetails.phoneNumber : "",
+              companiesList: onBoardingDetails.companiesList ? onBoardingDetails.companiesList : "",
+              authenticationLetterForCompanyUrl: authenticationLetterForCompanyUrl,
+              companyIdForCompany: companyIdForCompany,
+              status: true,
+              createdBy: userp
+            });
+            return res.status(200).json({ message: "New Company Representative onboarded successfully!", _id: response.id, name: response.name, email: response.email });
+          } else {
+            return res.status(500).json({ message: "Failed to onboard company representative" });
+          }
+        })
+        .catch((err) => {
+          /* istanbul ignore else */
+          if (err.name === 'MongoError' && err.code === 11000) {
+            res.status(409).json({
+              valid: false,
+              param: 'email',
+              message: 'email already registered'
+            })
+          } else {
+            next(err)
+          }
+        })
+      })
+      .catch((err)=> {
+        return res.status(500).json({ message: "Failed to store authenticationLetterForCompany" })
+      });
+    })
     .catch((err)=>{
       return res.status(500).json({ message: "Failed to store companyIdForCompany" })
-    })
-    await User.create(userObject)
-    .then(async (response) => {
-      if (response) {
-        let userId = response.id;
-        await CompanyRepresentatives.create({
-          userId: userId,
-          name: onBoardingDetails.name ? onBoardingDetails.name : '',
-          email: onBoardingDetails.email ? onBoardingDetails.email : '',
-          password: onBoardingDetails.password ? onBoardingDetails.password : '',
-          phoneNumber: onBoardingDetails.phoneNumber ? onBoardingDetails.phoneNumber : "",
-          companiesList: onBoardingDetails.companiesList ? onBoardingDetails.companiesList : "",
-          authenticationLetterForCompanyUrl: authenticationLetterForCompanyUrl,
-          companyIdForCompany: companyIdForCompany,
-          status: true,
-          createdBy: userp
-        });
-        return res.status(200).json({ message: "New Company Representative onboarded successfully!", _id: response.id, name: response.name, email: response.email });
-      } else {
-        return res.status(500).json({ message: "Failed to onboard company representative" });
-      }
-    })
-    .catch((err) => {
-      /* istanbul ignore else */
-      if (err.name === 'MongoError' && err.code === 11000) {
-        res.status(409).json({
-          valid: false,
-          param: 'email',
-          message: 'email already registered'
-        })
-      } else {
-        next(err)
-      }
     })
   } else {
     return res.status(500).json({ message: "Failed to onboard, invalid value for role or roleName" });
@@ -270,21 +275,23 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
 }
 
 async function storeOnBoardingImagesInLocalStorage(onboardingBase64Image, folderName){
-  let base64Image = onboardingBase64Image.split(';base64,').pop();
-  fileType.fromBuffer((Buffer.from(base64Image, 'base64'))).then(function(res){
-    let fileName = folderName+'_'+Date.now()+'.'+res.ext;
-    var filePath = './uploads/'+folderName+'/'+fileName;
-    fs.writeFile(filePath, base64Image, {encoding: 'base64'}, function(err) {
-      if(err){
-        return err;
-      } else {
-        console.log('File created');
-        return fileName;
-      }
-    });
-  }).catch(function(err){
-    console.log('err', err);
-    return err;
+  return new Promise(function(resolve, reject){
+    let base64Image = onboardingBase64Image.split(';base64,').pop();
+    fileType.fromBuffer((Buffer.from(base64Image, 'base64'))).then(function(res){
+      let fileName = folderName+'_'+Date.now()+'.'+res.ext;
+      var filePath = './uploads/'+folderName+'/'+fileName;
+      fs.writeFile(filePath, base64Image, {encoding: 'base64'}, function(err) {
+        if(err){
+          reject(err);
+        }else{
+          console.log('File created');
+          resolve(fileName);
+        }
+      });
+    }).catch(function(err){
+      console.log('err', err);
+      reject(err);
+    })
   })
 }
 
