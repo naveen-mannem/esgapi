@@ -55,6 +55,12 @@ const standaloneDatapointsSchema = new Schema({
   isSubmitted: {
     type: Boolean
   },
+  standaradDeviation: {
+    type: String
+  },
+  average: {
+    type: String
+  },
   status: {
     type: Boolean,
     default: true
@@ -84,6 +90,8 @@ standaloneDatapointsSchema.methods = {
       submittedBy: this.submittedBy,
       submittedDate: this.submittedDate,
       activeStatus: this.activeStatus,
+      standaradDeviation:this.standaradDeviation,
+      average:this.average,
       lastModifiedDate: this.lastModifiedDate,
       modifiedBy: this.modifiedBy,
       isSubmitted: this.isSubmitted,

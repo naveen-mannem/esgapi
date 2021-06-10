@@ -38,6 +38,12 @@ const derivedDatapointsSchema = new Schema({
   year: {
     type: String
   },
+  standaradDeviation: {
+    type: String
+  },
+  average: {
+    type: String
+  },
   fiscalYearEndDate: {
     type: String,
     default: ''
@@ -72,6 +78,8 @@ derivedDatapointsSchema.methods = {
       activeStatus: this.activeStatus,
       dpStatus: this.dpStatus,
       year: this.year,
+      standaradDeviation:this.standaradDeviation,
+      average:this.average,
       fiscalYearEndDate: this.fiscalYearEndDate,
       lastModifiedDate: this.lastModifiedDate,
       status: this.status,
