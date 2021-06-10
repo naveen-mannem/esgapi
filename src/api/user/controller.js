@@ -7,7 +7,7 @@ import { ClientRepresentatives } from '../client-representatives'
 import { CompanyRepresentatives } from '../company-representatives'
 import fileType from 'file-type'
 import * as fs from 'fs'
-
+import path from 'path'
 
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>
   User.count(query)
@@ -279,9 +279,9 @@ async function storeOnBoardingImagesInLocalStorage(onboardingBase64Image, folder
     let base64Image = onboardingBase64Image.split(';base64,').pop();
     fileType.fromBuffer((Buffer.from(base64Image, 'base64'))).then(function(res){
       let fileName = folderName+'_'+Date.now()+'.'+res.ext;
-      var filePath ='../../uploads/'+folderName+'/'+fileName;
-      console.log('filePath', filePath);
       console.log('__dirname', __dirname);
+      var filePath = path.join(__dirname, '../../../uploads/')+folderName+'/'+fileName;
+      console.log('filePath', filePath);
       fs.writeFile(filePath, base64Image, {encoding: 'base64'}, function(err) {
         if(err){
           console.log('error while storing file', err);
