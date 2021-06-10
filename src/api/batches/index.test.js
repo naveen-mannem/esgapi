@@ -20,11 +20,13 @@ beforeEach(async () => {
 test('POST /batches 201 (user)', async () => {
   const { status, body } = await request(app())
     .post(`${apiRoot}`)
-    .send({ access_token: userSession, batchName: 'test', batchSLA: 'test', status: 'test' })
+    .send({ access_token: userSession, clientTaxonomy: 'test', batchName: 'test', years: 'test', companies: 'test', status: 'test' })
   expect(status).toBe(201)
   expect(typeof body).toEqual('object')
+  expect(body.clientTaxonomy).toEqual('test')
   expect(body.batchName).toEqual('test')
-  expect(body.batchSLA).toEqual('test')
+  expect(body.years).toEqual('test')
+  expect(body.companies).toEqual('test')
   expect(body.status).toEqual('test')
   expect(typeof body.createdBy).toEqual('object')
 })
@@ -77,12 +79,14 @@ test('GET /batches/:id 404 (user)', async () => {
 test('PUT /batches/:id 200 (user)', async () => {
   const { status, body } = await request(app())
     .put(`${apiRoot}/${batches.id}`)
-    .send({ access_token: userSession, batchName: 'test', batchSLA: 'test', status: 'test' })
+    .send({ access_token: userSession, clientTaxonomy: 'test', batchName: 'test', years: 'test', companies: 'test', status: 'test' })
   expect(status).toBe(200)
   expect(typeof body).toEqual('object')
   expect(body.id).toEqual(batches.id)
+  expect(body.clientTaxonomy).toEqual('test')
   expect(body.batchName).toEqual('test')
-  expect(body.batchSLA).toEqual('test')
+  expect(body.years).toEqual('test')
+  expect(body.companies).toEqual('test')
   expect(body.status).toEqual('test')
   expect(typeof body.createdBy).toEqual('object')
 })
@@ -90,7 +94,7 @@ test('PUT /batches/:id 200 (user)', async () => {
 test('PUT /batches/:id 401 (user) - another user', async () => {
   const { status } = await request(app())
     .put(`${apiRoot}/${batches.id}`)
-    .send({ access_token: anotherSession, batchName: 'test', batchSLA: 'test', status: 'test' })
+    .send({ access_token: anotherSession, clientTaxonomy: 'test', batchName: 'test', years: 'test', companies: 'test', status: 'test' })
   expect(status).toBe(401)
 })
 
@@ -103,7 +107,7 @@ test('PUT /batches/:id 401', async () => {
 test('PUT /batches/:id 404 (user)', async () => {
   const { status } = await request(app())
     .put(apiRoot + '/123456789098765432123456')
-    .send({ access_token: anotherSession, batchName: 'test', batchSLA: 'test', status: 'test' })
+    .send({ access_token: anotherSession, clientTaxonomy: 'test', batchName: 'test', years: 'test', companies: 'test', status: 'test' })
   expect(status).toBe(404)
 })
 
