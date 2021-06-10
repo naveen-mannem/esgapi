@@ -225,8 +225,6 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
     }
     await storeOnBoardingImagesInLocalStorage(onBoardingDetails.authenticationLetterForCompanyUrl, 'authenticationLetterForCompany')
     .then(async(authenticationLetterForCompanyUrl) => {
-      console.log('authenticationLetterForCompanyUrl', authenticationLetterForCompanyUrl);
-      
       await storeOnBoardingImagesInLocalStorage(onBoardingDetails.companyIdForCompany, 'companyIdForCompany')
       .then(async(companyIdForCompany) => {
         await User.create(userObject)
@@ -268,7 +266,7 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
       });
     })
     .catch((err)=>{
-      return res.status(500).json({ message: "Failed to store companyIdForCompany", error: err.message })
+      return res.status(500).json({ message: "Failed to store companyIdForCompany" })
     })
   } else {
     return res.status(500).json({ message: "Failed to onboard, invalid value for role or roleName" });
@@ -280,7 +278,7 @@ async function storeOnBoardingImagesInLocalStorage(onboardingBase64Image, folder
     let base64Image = onboardingBase64Image.split(';base64,').pop();
     fileType.fromBuffer((Buffer.from(base64Image, 'base64'))).then(function(res){
       let fileName = folderName+'_'+Date.now()+'.'+res.ext;
-      var filePath = './uploads/'+folderName+'/'+fileName;
+      var filePath = __dirname+'./uploads/'+folderName+'/'+fileName;
       fs.writeFile(filePath, base64Image, {encoding: 'base64'}, function(err) {
         if(err){
           reject(err);
