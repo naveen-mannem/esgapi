@@ -223,11 +223,10 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
       isUserApproved: false,
       status: true
     }
-    storeOnBoardingImagesInLocalStorage(onBoardingDetails.authenticationLetterForCompanyUrl, 'authenticationLetterForCompany')
-    .then((authenticationLetterForCompanyUrl) => {
-      console.log('authenticationLetterForCompanyUrl', authenticationLetterForCompanyUrl);
-      storeOnBoardingImagesInLocalStorage(onBoardingDetails.companyIdForCompany, 'companyIdForCompany')
-      .then((companyIdForCompany) => {
+    await storeOnBoardingImagesInLocalStorage(onBoardingDetails.authenticationLetterForCompanyUrl, 'authenticationLetterForCompany')
+    .then(async(authenticationLetterForCompanyUrl) => {
+      await storeOnBoardingImagesInLocalStorage(onBoardingDetails.companyIdForCompany, 'companyIdForCompany')
+      .then(async(companyIdForCompany) => {
         await User.create(userObject)
         .then(async (response) => {
           if (response) {
@@ -267,7 +266,7 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
       });
     })
     .catch((err)=>{
-      return res.status(500).json({ message: "Failed to store companyIdForCompany", error: err.message })
+      return res.status(500).json({ message: "Failed to store companyIdForCompany" })
     })
   } else {
     return res.status(500).json({ message: "Failed to onboard, invalid value for role or roleName" });
