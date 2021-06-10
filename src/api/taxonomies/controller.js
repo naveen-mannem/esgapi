@@ -9,7 +9,7 @@ export const create = ({ user, bodymen: { body } }, res, next) =>
 
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>
   Taxonomies.count(query)
-    .then(count => Taxonomies.find(query, select, cursor)
+    .then(count => Taxonomies.find(query)
       .populate('createdBy')
       .then((taxonomies) => ({
         count,

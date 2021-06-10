@@ -10,7 +10,7 @@ export const create = ({ user, bodymen: { body } }, res, next) =>
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>
   ClientTaxonomy.count(query)
     .then(count => ClientTaxonomy.find(query, select, cursor)
-      .populate('createdBy').populate('fields.fieldName')
+      .populate('createdBy').populate('fields')
       .then((clientTaxonomies) => ({
         count,
         rows: clientTaxonomies.map((clientTaxonomy) => clientTaxonomy.view())
@@ -21,7 +21,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
 
 export const show = ({ params }, res, next) =>
   ClientTaxonomy.findById(params.id)
-    .populate('createdBy').populate('fields.fieldName')
+    .populate('createdBy').populate('fields')
     .then(notFound(res))
     .then((clientTaxonomy) => clientTaxonomy ? clientTaxonomy.view() : null)
     .then(success(res))

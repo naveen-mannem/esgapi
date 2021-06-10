@@ -2,12 +2,13 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { token } from '../../services/passport'
-import { create, index, show, update, destroy } from './controller'
+import { create, index, show, update, destroy, createBatch, updateBatch } from './controller'
 import { schema } from './model'
 export Batches, { schema } from './model'
 
 const router = new Router()
-const { batchName, batchSLA, status,companyId } = schema.tree
+const { batchName, years, status, companiesList, clientTaxonomy } = schema.tree
+const companies = [], taxonomy = {};
 
 /**
  * @api {post} /batches Create batches
@@ -15,8 +16,10 @@ const { batchName, batchSLA, status,companyId } = schema.tree
  * @apiGroup Batches
  * @apiPermission user
  * @apiParam {String} access_token user access token.
+ * @apiParam clientTaxonomy Batches's clientTaxonomy.
  * @apiParam batchName Batches's batchName.
- * @apiParam batchSLA Batches's batchSLA.
+ * @apiParam years Batches's years.
+ * @apiParam companiesList Batches's companiesList.
  * @apiSuccess {Object} batches Batches's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Batches not found.
@@ -24,8 +27,28 @@ const { batchName, batchSLA, status,companyId } = schema.tree
  */
 router.post('/',
   token({ required: true }),
-  body({ batchName, batchSLA ,companyId}),
+  body({ batchName, years, companiesList, clientTaxonomy }),
   create)
+
+/**
+ * @api {post} /batches/create Create batches from UI
+ * @apiName CreateBatchesFromUI
+ * @apiGroup Batches
+ * @apiPermission user
+ * @apiParam {String} access_token user access token.
+ * @apiParam taxonomy Batches's taxonomy.
+ * @apiParam batchName Batches's batchName.
+ * @apiParam years Batches's years.
+ * @apiParam companies Batches's companies.
+ * @apiSuccess {Object} batches Batches's data.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ * @apiError 404 Batches not found.
+ * @apiError 401 user access only.
+ */
+router.post('/create',
+  token({ required: true }),
+  body({ batchName, years, companies, taxonomy }),
+  createBatch)
 
 /**
  * @api {get} /batches Retrieve batches
@@ -65,8 +88,10 @@ router.get('/:id',
  * @apiGroup Batches
  * @apiPermission user
  * @apiParam {String} access_token user access token.
+ * @apiParam clientTaxonomy Batches's clientTaxonomy.
  * @apiParam batchName Batches's batchName.
- * @apiParam batchSLA Batches's batchSLA.
+ * @apiParam years Batches's years.
+ * @apiParam companiesList Batches's companiesList.
  * @apiParam status Batches's status.
  * @apiSuccess {Object} batches Batches's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
@@ -75,8 +100,29 @@ router.get('/:id',
  */
 router.put('/:id',
   token({ required: true }),
-  body({ batchName, batchSLA, status ,companyId}),
+  body({ batchName, years, status, companiesList, clientTaxonomy }),
   update)
+
+/**
+ * @api {put} /batches/update/:id Update batch from UI
+ * @apiName UpdateBatchesFromUI
+ * @apiGroup Batches
+ * @apiPermission user
+ * @apiParam {String} access_token user access token.
+ * @apiParam taxonomy Batches's taxonomy.
+ * @apiParam batchName Batches's batchName.
+ * @apiParam years Batches's years.
+ * @apiParam companies Batches's companies.
+ * @apiParam status Batches's status.
+ * @apiSuccess {Object} batches Batches's data.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ * @apiError 404 Batches not found.
+ * @apiError 401 user access only.
+ */
+router.put('/update/:id',
+  token({ required: true }),
+  body({ batchName, years, companies, taxonomy, status }),
+  updateBatch)
 
 /**
  * @api {delete} /batches/:id Delete batches
