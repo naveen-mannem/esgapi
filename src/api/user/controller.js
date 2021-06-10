@@ -223,12 +223,11 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
       isUserApproved: false,
       status: true
     }
-    await storeOnBoardingImagesInLocalStorage(onBoardingDetails.authenticationLetterForCompanyUrl, 'authenticationLetterForCompany')
-    .then(async(authenticationLetterForCompanyUrl) => {
+    storeOnBoardingImagesInLocalStorage(onBoardingDetails.authenticationLetterForCompanyUrl, 'authenticationLetterForCompany')
+    .then((authenticationLetterForCompanyUrl) => {
       console.log('authenticationLetterForCompanyUrl', authenticationLetterForCompanyUrl);
-      
-      await storeOnBoardingImagesInLocalStorage(onBoardingDetails.companyIdForCompany, 'companyIdForCompany')
-      .then(async(companyIdForCompany) => {
+      storeOnBoardingImagesInLocalStorage(onBoardingDetails.companyIdForCompany, 'companyIdForCompany')
+      .then((companyIdForCompany) => {
         await User.create(userObject)
         .then(async (response) => {
           if (response) {
@@ -280,7 +279,7 @@ async function storeOnBoardingImagesInLocalStorage(onboardingBase64Image, folder
     let base64Image = onboardingBase64Image.split(';base64,').pop();
     fileType.fromBuffer((Buffer.from(base64Image, 'base64'))).then(function(res){
       let fileName = folderName+'_'+Date.now()+'.'+res.ext;
-      var filePath = './uploads/'+folderName+'/'+fileName;
+      var filePath = __dirname+'./uploads/'+folderName+'/'+fileName;
       fs.writeFile(filePath, base64Image, {encoding: 'base64'}, function(err) {
         if(err){
           reject(err);
