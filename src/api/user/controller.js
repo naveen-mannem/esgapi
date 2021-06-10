@@ -281,6 +281,7 @@ async function storeOnBoardingImagesInLocalStorage(onboardingBase64Image, folder
       let fileName = folderName+'_'+Date.now()+'.'+res.ext;
       var filePath ='../../uploads/'+folderName+'/'+fileName;
       console.log('filePath', filePath);
+      console.log('__dirname', __dirname);
       fs.writeFile(filePath, base64Image, {encoding: 'base64'}, function(err) {
         if(err){
           console.log('error while storing file', err);
