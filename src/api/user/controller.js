@@ -102,9 +102,9 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
       isUserApproved: false,
       status: true
     }
-    var pancardUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.pancardUrl, 'pan').catch((err)=>res.status(500).json({ message: "Failed to store pancard url" }));
-    var aadhaarUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.aadhaarUrl, 'aadhar').catch((err)=>res.status(500).json({ message: "Failed to store aadharcard url" }));
-    var cancelledChequeUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.cancelledChequeUrl, 'cancelledCheque').catch((err)=>res.status(500).json({ message: "Failed to store cancelledChequeUrl" }));
+    var pancardUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.pancardUrl, 'pan').catch((err)=>{return res.status(500).json({ message: "Failed to store pancard url" })});
+    var aadhaarUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.aadhaarUrl, 'aadhar').catch((err)=>{return res.status(500).json({ message: "Failed to store aadharcard url" })});
+    var cancelledChequeUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.cancelledChequeUrl, 'cancelledCheque').catch((err)=>{return res.status(500).json({ message: "Failed to store cancelledChequeUrl" })});
     await User.create(userObject)
     .then(async (response) => {
       if (response) {
@@ -160,8 +160,8 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
       status: true
     }
     console.log(userObject);
-    var authenticationLetterForClientUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.authenticationLetterForClientUrl, 'authenticationLetterForClient').catch((err)=>res.status(500).json({ message: "Failed to store authenticationLetterForClientUrl" }));
-    var companyIdForClient = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.companyIdForClient, 'companyIdForClient').catch((err)=>res.status(500).json({ message: "Failed to store companyIdForClient" }));
+    var authenticationLetterForClientUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.authenticationLetterForClientUrl, 'authenticationLetterForClient').catch((err)=>{return res.status(500).json({ message: "Failed to store authenticationLetterForClientUrl" })});
+    var companyIdForClient = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.companyIdForClient, 'companyIdForClient').catch((err)=>{return res.status(500).json({ message: "Failed to store companyIdForClient" })});
     await User.create(userObject)
     .then(async (response) => {
       if (response) {
@@ -208,8 +208,8 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
       isUserApproved: false,
       status: true
     }
-    var authenticationLetterForCompanyUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.authenticationLetterForCompanyUrl, 'authenticationLetterForCompany').catch((err)=>res.status(500).json({ message: "Failed to store authenticationLetterForCompany" }));
-    var companyIdForCompany = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.companyIdForCompany, 'companyIdForCompany').catch((err)=>res.status(500).json({ message: "Failed to store companyIdForCompany" }))
+    var authenticationLetterForCompanyUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.authenticationLetterForCompanyUrl, 'authenticationLetterForCompany').catch((err)=> {return res.status(500).json({ message: "Failed to store authenticationLetterForCompany" })});
+    var companyIdForCompany = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.companyIdForCompany, 'companyIdForCompany').catch((err)=>{return res.status(500).json({ message: "Failed to store companyIdForCompany" })})
     await User.create(userObject)
     .then(async (response) => {
       if (response) {
