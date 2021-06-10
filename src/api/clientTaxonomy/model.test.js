@@ -5,7 +5,7 @@ let user, clientTaxonomy
 
 beforeEach(async () => {
   user = await User.create({ email: 'a@a.com', password: '123456' })
-  clientTaxonomy = await ClientTaxonomy.create({ createdBy: user, taxonomyName: 'test', fields: 'test' })
+  clientTaxonomy = await ClientTaxonomy.create({ createdBy: user, taxonomyName: 'test', fields: 'test', status: 'test' })
 })
 
 describe('view', () => {
@@ -17,6 +17,7 @@ describe('view', () => {
     expect(view.createdBy.id).toBe(user.id)
     expect(view.taxonomyName).toBe(clientTaxonomy.taxonomyName)
     expect(view.fields).toBe(clientTaxonomy.fields)
+    expect(view.status).toBe(clientTaxonomy.status)
     expect(view.createdAt).toBeTruthy()
     expect(view.updatedAt).toBeTruthy()
   })
@@ -29,6 +30,7 @@ describe('view', () => {
     expect(view.createdBy.id).toBe(user.id)
     expect(view.taxonomyName).toBe(clientTaxonomy.taxonomyName)
     expect(view.fields).toBe(clientTaxonomy.fields)
+    expect(view.status).toBe(clientTaxonomy.status)
     expect(view.createdAt).toBeTruthy()
     expect(view.updatedAt).toBeTruthy()
   })

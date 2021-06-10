@@ -6,17 +6,24 @@ const batchesSchema = new Schema({
     ref: 'User',
     required: true
   },
+  clientTaxonomy: {
+    type: Schema.ObjectId,
+    ref: 'ClientTaxonomy',
+    required: true
+  },
   batchName: {
     type: String,
     unique : true
   },
-  batchSLA: {
+  years: {
     type: []
   },
-  companyId:[{ companyName:{
-    type: Schema.Types.ObjectId, 
-    ref: 'Companies'
-  }  
+  batchSLA: {
+    type: Date
+  },
+  companiesList:[{ 
+    type : Schema.ObjectId, 
+    ref: 'Companies' 
   }],
   status: {
     type: Boolean,
@@ -37,8 +44,10 @@ batchesSchema.methods = {
       id: this.id,
       createdBy: this.createdBy ? this.createdBy.view(full) : null,
       batchName: this.batchName,
-      batchSLA: this.batchSLA,
-      companies: this.companyId ,
+      years: this.years,
+      batchSLA: this.batchSLA ? this.batchSLA : '',
+      companiesList: this.companiesList ? this.companiesList : [],
+      clientTaxonomy: this.clientTaxonomy ? this.clientTaxonomy.view(full) : null,
       status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt

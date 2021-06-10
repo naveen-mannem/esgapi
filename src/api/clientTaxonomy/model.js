@@ -9,11 +9,15 @@ const clientTaxonomySchema = new Schema({
   taxonomyName: {
     type: String
   },
-  fields:[{fieldName:{
+  fields:[{
     type: Schema.Types.ObjectId,
-    ref: 'MasterTaxonomy',
+    ref: 'Taxonomies',
     required: true
-  }}]
+  }],
+  status: {
+    type: Boolean,
+    default: true
+  }
 }, {
   timestamps: true,
   toJSON: {
@@ -29,7 +33,8 @@ clientTaxonomySchema.methods = {
       id: this.id,
       createdBy: this.createdBy.view(full),
       taxonomyName: this.taxonomyName,
-      fields: this.fields,
+      fields: this.fields ? this.fields : [],
+      status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }

@@ -7,9 +7,9 @@ export const create = ({ user, bodymen: { body } }, res, next) =>
     .then(success(res, 201))
     .catch(next)
 
-export const index = ({ querymen: { query, select, cursor } }, res, next) =>
+export const index = ({ querymen: { query, select, cursor } }, res, next) =>{
   Companies.count(query)
-    .then(count => Companies.find(query, select, cursor)
+    .then(count => Companies.find(query)
       .populate('createdBy')
       .then((companies) => ({
         count,
@@ -18,6 +18,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
     )
     .then(success(res))
     .catch(next)
+}
 
 export const getAllNic = ({ querymen: { query, select, cursor } }, res, next) =>
   Companies.distinct('nic')
