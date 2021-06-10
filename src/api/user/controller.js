@@ -12,7 +12,7 @@ import path from 'path'
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>
   User.count(query)
     .then(count => User.find(query, select, cursor)
-    .populate('roleId')
+      .populate('roleId')
       .then(users => ({
         rows: users.map((user) => user.view()),
         count
@@ -26,7 +26,7 @@ export const getUsersByRole = ({ params, querymen: { query, select, cursor } }, 
   findQuery.role = params.role ? params.role : '';
   User.count(findQuery)
     .then(count => User.find(findQuery, select, cursor)
-    .populate('roleId')
+      .populate('roleId')
       .then(users => ({
         rows: users.map((user) => user.view()),
         count
@@ -41,7 +41,7 @@ export const getUsersApprovals = ({ params, querymen: { query, select, cursor },
   query.isUserApproved = params.isUserApproved;
   User.count(query)
     .then(count => User.find(query, select, cursor)
-    .populate('roleId')
+      .populate('roleId')
       .then(users => ({
         count,
         rows: users.map((user) => user.view())
@@ -53,7 +53,7 @@ export const getUsersApprovals = ({ params, querymen: { query, select, cursor },
 
 export const show = ({ params }, res, next) =>
   User.findById(params.id)
-  .populate('roleId')
+    .populate('roleId')
     .then(notFound(res))
     .then((user) => user ? user.view() : null)
     .then(success(res))
@@ -82,16 +82,16 @@ export const create = ({ bodymen: { body } }, res, next) =>
       }
     })
 
-export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, next ) => {
-  
+export const onBoardNewUser = async ({ bodymen: { body }, params, user }, res, next) => {
+
   let bodyData = Buffer.from(body.onBoardingDetails, 'base64');
   let bodyDetails = bodyData.toString('ascii');
-  let onBoardingDetails =JSON.parse(bodyDetails);
+  let onBoardingDetails = JSON.parse(bodyDetails);
   //console.log('onBoardingDetails', onBoardingDetails);
   let roleDetails = await Role.find({ roleName: { $in: ["Employee", "Client Representative", "Company Representative"] } });
   let userObject;
   if (onBoardingDetails.roleName == "Employee") {
-    var roleObject = roleDetails.find((rec)=>rec.roleName === 'Employee')
+    var roleObject = roleDetails.find((rec) => rec.roleName === 'Employee')
     userObject = {
       email: onBoardingDetails.email ? onBoardingDetails.email : '',
       name: onBoardingDetails.firstName ? onBoardingDetails.firstName : '',
@@ -102,62 +102,62 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
       isUserApproved: false,
       status: true
     }
-    var pancardUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.pancardUrl, 'pan')
-    .catch((err)=>{
+    await storeOnBoardingImagesInLocalStorage(onBoardingDetails.pancardUrl, 'pan').then(async (pancardUrl) => {
+      await storeOnBoardingImagesInLocalStorage(onBoardingDetails.aadhaarUrl, 'aadhar').then(async (aadhaarUrl) => {
+        await storeOnBoardingImagesInLocalStorage(onBoardingDetails.cancelledChequeUrl, 'cancelledCheque').then(async (cancelledChequeUrl) => {
+          await User.create(userObject)
+            .then(async (response) => {
+              if (response) {
+                let userId = response.id;
+                await Employees.create({
+                  userId: userId,
+                  firstName: onBoardingDetails.firstName ? onBoardingDetails.firstName : '',
+                  middleName: onBoardingDetails.middleName ? onBoardingDetails.middleName : '',
+                  lastName: onBoardingDetails.lastName ? onBoardingDetails.lastName : '',
+                  panNumber: onBoardingDetails.panNumber ? onBoardingDetails.panNumber : '',
+                  aadhaarNumber: onBoardingDetails.aadhaarNumber ? onBoardingDetails.aadhaarNumber : '',
+                  bankAccountNumber: onBoardingDetails.bankAccountNumber ? onBoardingDetails.bankAccountNumber : '',
+                  bankIFSCCode: onBoardingDetails.bankIFSCCode ? onBoardingDetails.bankIFSCCode : '',
+                  accountHolderName: onBoardingDetails.accountHolderName ? onBoardingDetails.accountHolderName : '',
+                  pancardUrl: pancardUrl,
+                  aadhaarUrl: aadhaarUrl,
+                  cancelledChequeUrl: cancelledChequeUrl,
+                  status: true,
+                  createdBy: user
+                }).then((resp) => {
+                  if (resp) {
+                    return res.status(200).json({ message: "New Employee onboarded successfully!", _id: response.id, name: response.name, email: response.email });
+                  } else {
+                    return res.status(500).json({ message: "Failed to onboard employee" });
+                  }
+                });
+              } else {
+                return res.status(500).json({ message: "Failed to onboard employee" });
+              }
+            })
+            .catch((err) => {
+              /* istanbul ignore else */
+              if (err.name === 'MongoError' && err.code === 11000) {
+                res.status(409).json({
+                  valid: false,
+                  param: 'email',
+                  message: 'email already registered'
+                })
+              } else {
+                next(err)
+              }
+            })
+        }).catch((err) => {
+          return res.status(500).json({ message: "Failed to store cancelledChequeUrl" })
+        });
+      }).catch((err) => {
+        return res.status(500).json({ message: "Failed to store aadharcard url" })
+      });
+    }).catch((err) => {
       return res.status(500).json({ message: "Failed to store pancard url" })
     });
-    var aadhaarUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.aadhaarUrl, 'aadhar')
-    .catch((err)=>{
-      return res.status(500).json({ message: "Failed to store aadharcard url" })
-    });
-    var cancelledChequeUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.cancelledChequeUrl, 'cancelledCheque')
-    .catch((err)=>{
-      return res.status(500).json({ message: "Failed to store cancelledChequeUrl" })
-    });
-    await User.create(userObject)
-    .then(async (response) => {
-      if (response) {
-        let userId = response.id;
-        await Employees.create({
-          userId: userId,
-          firstName: onBoardingDetails.firstName ? onBoardingDetails.firstName : '',
-          middleName: onBoardingDetails.middleName ? onBoardingDetails.middleName : '',
-          lastName: onBoardingDetails.lastName ? onBoardingDetails.lastName : '',
-          panNumber: onBoardingDetails.panNumber ? onBoardingDetails.panNumber : '',
-          aadhaarNumber: onBoardingDetails.aadhaarNumber ? onBoardingDetails.aadhaarNumber : '',
-          bankAccountNumber: onBoardingDetails.bankAccountNumber ? onBoardingDetails.bankAccountNumber : '',
-          bankIFSCCode: onBoardingDetails.bankIFSCCode ? onBoardingDetails.bankIFSCCode : '',
-          accountHolderName: onBoardingDetails.accountHolderName ? onBoardingDetails.accountHolderName : '',
-          pancardUrl: pancardUrl,
-          aadhaarUrl: aadhaarUrl,
-          cancelledChequeUrl: cancelledChequeUrl,
-          status: true,
-          createdBy: user
-        }).then((resp) => {
-          if (resp) {
-            return res.status(200).json({ message: "New Employee onboarded successfully!", _id: response.id, name: response.name, email: response.email });
-          } else {
-            return res.status(500).json({ message: "Failed to onboard employee" });
-          }
-        });
-      } else {
-        return res.status(500).json({ message: "Failed to onboard employee" });
-      }
-    })
-    .catch((err) => {
-      /* istanbul ignore else */
-      if (err.name === 'MongoError' && err.code === 11000) {
-        res.status(409).json({
-          valid: false,
-          param: 'email',
-          message: 'email already registered'
-        })
-      } else {
-        next(err)
-      }
-    })
   } else if (onBoardingDetails.roleName == "Client Representative") {
-    var roleObject = roleDetails.find((rec)=>rec.roleName === 'Client Representative');
+    var roleObject = roleDetails.find((rec) => rec.roleName === 'Client Representative');
     userObject = {
       email: onBoardingDetails.email ? onBoardingDetails.email : '',
       name: onBoardingDetails.name ? onBoardingDetails.name : '',
@@ -169,50 +169,50 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
       status: true
     }
     console.log(userObject);
-    var authenticationLetterForClientUrl = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.authenticationLetterForClientUrl, 'authenticationLetterForClient')
-    .catch((err)=>{
+    await storeOnBoardingImagesInLocalStorage(onBoardingDetails.authenticationLetterForClientUrl, 'authenticationLetterForClient').then(async (authenticationLetterForClientUrl) => {
+      await storeOnBoardingImagesInLocalStorage(onBoardingDetails.companyIdForClient, 'companyIdForClient').then(async (companyIdForClient) => {
+        await User.create(userObject)
+          .then(async (response) => {
+            if (response) {
+              let userId = response.id;
+              await ClientRepresentatives.create({
+                userId: userId,
+                name: onBoardingDetails.name ? onBoardingDetails.name : '',
+                email: onBoardingDetails.email ? onBoardingDetails.email : '',
+                password: onBoardingDetails.password ? onBoardingDetails.password : '',
+                phoneNumber: onBoardingDetails.phoneNumber ? onBoardingDetails.phoneNumber : "",
+                companyId: onBoardingDetails.companyId ? onBoardingDetails.companyId : "",
+                authenticationLetterForClientUrl: authenticationLetterForClientUrl,
+                companyIdForClient: companyIdForClient,
+                status: true,
+                createdBy: user
+              });
+              return res.status(200).json({ message: "New Client Representative onboarded successfully!", _id: response.id, name: response.name, email: response.email });
+            } else {
+              return res.status(500).json({ message: "Failed to onboard client representative" });
+            }
+          })
+          .catch((err) => {
+            /* istanbul ignore else */
+            if (err.name === 'MongoError' && err.code === 11000) {
+              res.status(409).json({
+                valid: false,
+                param: 'email',
+                message: 'email already registered'
+              })
+            } else {
+              console.log('error', err)
+              next(err)
+            }
+          })
+      }).catch((err) => {
+        return res.status(500).json({ message: "Failed to store companyIdForClient" })
+      });
+    }).catch((err) => {
       return res.status(500).json({ message: "Failed to store authenticationLetterForClientUrl" })
     });
-    var companyIdForClient = await storeOnBoardingImagesInLocalStorage(onBoardingDetails.companyIdForClient, 'companyIdForClient')
-    .catch((err)=>{
-      return res.status(500).json({ message: "Failed to store companyIdForClient" })
-    });
-    await User.create(userObject)
-    .then(async (response) => {
-      if (response) {
-        let userId = response.id;
-        await ClientRepresentatives.create({
-          userId: userId,
-          name: onBoardingDetails.name ? onBoardingDetails.name : '',
-          email: onBoardingDetails.email ? onBoardingDetails.email : '',
-          password: onBoardingDetails.password ? onBoardingDetails.password : '',
-          phoneNumber: onBoardingDetails.phoneNumber ? onBoardingDetails.phoneNumber : "",
-          companyId: onBoardingDetails.companyId ? onBoardingDetails.companyId : "",
-          authenticationLetterForClientUrl: authenticationLetterForClientUrl,
-          companyIdForClient: companyIdForClient,
-          status: true,
-          createdBy: user
-        });
-        return res.status(200).json({ message: "New Client Representative onboarded successfully!", _id: response.id, name: response.name, email: response.email });
-      } else {
-        return res.status(500).json({ message: "Failed to onboard client representative" });
-      }
-    })
-    .catch((err) => {
-      /* istanbul ignore else */
-      if (err.name === 'MongoError' && err.code === 11000) {
-        res.status(409).json({
-          valid: false,
-          param: 'email',
-          message: 'email already registered'
-        })
-      } else {
-        console.log('error', err)
-        next(err)
-      }
-    })
   } else if (onBoardingDetails.roleName == "Company Representative") {
-    var roleObject = roleDetails.find((rec)=>rec.roleName === 'Client Representative');
+    var roleObject = roleDetails.find((rec) => rec.roleName === 'Client Representative');
     userObject = {
       email: onBoardingDetails.email ? onBoardingDetails.email : '',
       name: onBoardingDetails.name ? onBoardingDetails.name : '',
@@ -224,74 +224,74 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
       status: true
     }
     await storeOnBoardingImagesInLocalStorage(onBoardingDetails.authenticationLetterForCompanyUrl, 'authenticationLetterForCompany')
-    .then(async(authenticationLetterForCompanyUrl) => {
-      await storeOnBoardingImagesInLocalStorage(onBoardingDetails.companyIdForCompany, 'companyIdForCompany')
-      .then(async(companyIdForCompany) => {
-        await User.create(userObject)
-        .then(async (response) => {
-          if (response) {
-            let userId = response.id;
-            await CompanyRepresentatives.create({
-              userId: userId,
-              name: onBoardingDetails.name ? onBoardingDetails.name : '',
-              email: onBoardingDetails.email ? onBoardingDetails.email : '',
-              password: onBoardingDetails.password ? onBoardingDetails.password : '',
-              phoneNumber: onBoardingDetails.phoneNumber ? onBoardingDetails.phoneNumber : "",
-              companiesList: onBoardingDetails.companiesList ? onBoardingDetails.companiesList : "",
-              authenticationLetterForCompanyUrl: authenticationLetterForCompanyUrl,
-              companyIdForCompany: companyIdForCompany,
-              status: true,
-              createdBy: userp
-            });
-            return res.status(200).json({ message: "New Company Representative onboarded successfully!", _id: response.id, name: response.name, email: response.email });
-          } else {
-            return res.status(500).json({ message: "Failed to onboard company representative" });
-          }
-        })
-        .catch((err) => {
-          /* istanbul ignore else */
-          if (err.name === 'MongoError' && err.code === 11000) {
-            res.status(409).json({
-              valid: false,
-              param: 'email',
-              message: 'email already registered'
-            })
-          } else {
-            next(err)
-          }
-        })
+      .then(async (authenticationLetterForCompanyUrl) => {
+        await storeOnBoardingImagesInLocalStorage(onBoardingDetails.companyIdForCompany, 'companyIdForCompany')
+          .then(async (companyIdForCompany) => {
+            await User.create(userObject)
+              .then(async (response) => {
+                if (response) {
+                  let userId = response.id;
+                  await CompanyRepresentatives.create({
+                    userId: userId,
+                    name: onBoardingDetails.name ? onBoardingDetails.name : '',
+                    email: onBoardingDetails.email ? onBoardingDetails.email : '',
+                    password: onBoardingDetails.password ? onBoardingDetails.password : '',
+                    phoneNumber: onBoardingDetails.phoneNumber ? onBoardingDetails.phoneNumber : "",
+                    companiesList: onBoardingDetails.companiesList ? onBoardingDetails.companiesList : "",
+                    authenticationLetterForCompanyUrl: authenticationLetterForCompanyUrl,
+                    companyIdForCompany: companyIdForCompany,
+                    status: true,
+                    createdBy: userp
+                  });
+                  return res.status(200).json({ message: "New Company Representative onboarded successfully!", _id: response.id, name: response.name, email: response.email });
+                } else {
+                  return res.status(500).json({ message: "Failed to onboard company representative" });
+                }
+              })
+              .catch((err) => {
+                /* istanbul ignore else */
+                if (err.name === 'MongoError' && err.code === 11000) {
+                  res.status(409).json({
+                    valid: false,
+                    param: 'email',
+                    message: 'email already registered'
+                  })
+                } else {
+                  next(err)
+                }
+              })
+          })
+          .catch((err) => {
+            return res.status(500).json({ message: "Failed to store authenticationLetterForCompany" })
+          });
       })
-      .catch((err)=> {
-        return res.status(500).json({ message: "Failed to store authenticationLetterForCompany" })
-      });
-    })
-    .catch((err)=>{
-      return res.status(500).json({ message: "Failed to store companyIdForCompany" })
-    })
+      .catch((err) => {
+        return res.status(500).json({ message: "Failed to store companyIdForCompany" })
+      })
   } else {
     return res.status(500).json({ message: "Failed to onboard, invalid value for role or roleName" });
   }
 }
 
-async function storeOnBoardingImagesInLocalStorage(onboardingBase64Image, folderName){
+async function storeOnBoardingImagesInLocalStorage(onboardingBase64Image, folderName) {
   console.log('in function storeOnBoardingImagesInLocalStorage')
-  return new Promise(function(resolve, reject){
+  return new Promise(function (resolve, reject) {
     let base64Image = onboardingBase64Image.split(';base64,').pop();
-    fileType.fromBuffer((Buffer.from(base64Image, 'base64'))).then(function(res){
-      let fileName = folderName+'_'+Date.now()+'.'+res.ext;
+    fileType.fromBuffer((Buffer.from(base64Image, 'base64'))).then(function (res) {
+      let fileName = folderName + '_' + Date.now() + '.' + res.ext;
       console.log('__dirname', __dirname);
-      var filePath = path.join(__dirname, '../../../uploads/')+folderName+'/'+fileName;
+      var filePath = path.join(__dirname, '../../../uploads/') + folderName + '/' + fileName;
       console.log('filePath', filePath);
-      fs.writeFile(filePath, base64Image, {encoding: 'base64'}, function(err) {
-        if(err){
+      fs.writeFile(filePath, base64Image, { encoding: 'base64' }, function (err) {
+        if (err) {
           console.log('error while storing file', err);
           reject(err);
-        }else{
+        } else {
           console.log('File created');
           resolve(fileName);
         }
       });
-    }).catch(function(err){
+    }).catch(function (err) {
       console.log('err', err);
       reject(err);
     })
@@ -300,29 +300,29 @@ async function storeOnBoardingImagesInLocalStorage(onboardingBase64Image, folder
 
 
 
-export const updateUserStatus = ({ bodymen: { body }, user }, res, next) =>{
+export const updateUserStatus = ({ bodymen: { body }, user }, res, next) => {
   User.findById(body.userId)
-  .populate('roleId')
-  .then((result) => {
-    if (result) {
-      User.updateOne({ _id: body.userId }, { $set: { isUserApproved: body.isUserApproved ? body.isUserApproved : false, comments: body.comments ? body.comments : '' } })
-      .then((updatedObject) => {
-        if (updatedObject) {
-          return res.status(200).json({ message: "User status updated" });
-        } else {
-          return res.status(500).json({ message: "Failed to update user status!" });
-        }
-      })
-    } else {
-      return res.status(400).json({ message: "Invalid UserId" });
-    }
-  })
+    .populate('roleId')
+    .then((result) => {
+      if (result) {
+        User.updateOne({ _id: body.userId }, { $set: { isUserApproved: body.isUserApproved ? body.isUserApproved : false, comments: body.comments ? body.comments : '' } })
+          .then((updatedObject) => {
+            if (updatedObject) {
+              return res.status(200).json({ message: "User status updated" });
+            } else {
+              return res.status(500).json({ message: "Failed to update user status!" });
+            }
+          })
+      } else {
+        return res.status(400).json({ message: "Invalid UserId" });
+      }
+    })
 
 }
 
 export const update = ({ bodymen: { body }, params, user }, res, next) =>
   User.findById(params.id === 'me' ? user.id : params.id)
-  .populate('roleId')
+    .populate('roleId')
     .then(notFound(res))
     .then((result) => {
       if (!result) return null
@@ -371,96 +371,106 @@ export const destroy = ({ params }, res, next) =>
     .catch(next)
 
 
-export const onBoardingEmpolyee=({ bodymen: { body }, params, user }, res, next)=>{
-
- 
-var details = Buffer.from(body.onboardingdetails, 'base64'); 
-
- let onboardDetails = details.toString('ascii');
- 
- let parse=JSON.parse(onboardDetails);
- 
- User.findOne({email:parse.email,password:parse.password}).then(data=>{if(!data){
-   new User({
-    firstName:parse.firstName,
-    middleName:parse.middleName,
-    lastName:parse.lastName,
-    email:parse.email,
-    phoneNumber:parse.phoneNumber,
-    PANCard:parse.PANCard,
-    adharCard:parse.adharCard,
-    bankAccountNumber:parse.bankAccountNumber,
-    bankIFSCCode:parse.bankIFSCCode,
-    nameOfTheAccountHolder:parse.nameOfTheAccountHolder,
-    password:parse.password,
-    pancardUpload:body.pancard,
-    aadharUpload:body.aadhar,
-    cancelledchequeUpload:body.cancelledcheque,
-    roleId:'60a2440d356d366605b04524'
-   }).save()
- } else{res.json({status:200,message:'Employee Already Exist'})}}).then(res.json({
-  status:200,
-  message:"employee Added Successfully"
-})).catch(next)
- 
-}
-
-export const onBoardingClientRep=({ bodymen: { body }, params, user }, res, next)=>{
-  var details = Buffer.from(body.onboardingdetails, 'base64'); 
-
- let onboardDetails = details.toString('ascii');
- 
- let parse=JSON.parse(onboardDetails);
-
- User.findOne({email:parse.email,password:parse.password}).then(data=>{
-   if(!data){
-     new User({
-      name:parse.name,
-      email:parse.email,
-      phoneNumber:parse.phoneNumber,
-      companyName:parse.companyName,
-      password:parse.password,
-      roleId:'60a243f0356d366605b04522',
-      authendicationLetter:parse.authenticationletterforclient,
-      companyIdCard:parse.companyidforclient,
-     }).save()
-
-   }else{res.json({status:200,
-  message:"Client Rep Already Exist"})}
- }).then(res.json({
-  status:200,
-  message:"Client Rep Added Successfully"
-})).catch(next)
-
-}
+export const onBoardingEmpolyee = ({ bodymen: { body }, params, user }, res, next) => {
 
 
-export const onBoardingCompanyRep=({ bodymen: { body }, params, user }, res, next)=>{
-  var details = Buffer.from(body.onboardingdetails, 'base64'); 
+  var details = Buffer.from(body.onboardingdetails, 'base64');
 
   let onboardDetails = details.toString('ascii');
-  
-  let parse=JSON.parse(onboardDetails);
- 
-  User.findOne({email:parse.email,password:parse.password}).then(data=>{
-    if(!data){
+
+  let parse = JSON.parse(onboardDetails);
+
+  User.findOne({ email: parse.email, password: parse.password }).then(data => {
+    if (!data) {
       new User({
-       name:parse.name,
-       email:parse.email,
-       phoneNumber:parse.phoneNumber,
-       companyName:parse.companyName,
-       password:parse.password,
-       roleId:'60a243e1356d366605b04521',
-       authendicationLetter:body.authenticationletterforcompany,
-       companyIdCard:body.companyidforcompany
+        firstName: parse.firstName,
+        middleName: parse.middleName,
+        lastName: parse.lastName,
+        email: parse.email,
+        phoneNumber: parse.phoneNumber,
+        PANCard: parse.PANCard,
+        adharCard: parse.adharCard,
+        bankAccountNumber: parse.bankAccountNumber,
+        bankIFSCCode: parse.bankIFSCCode,
+        nameOfTheAccountHolder: parse.nameOfTheAccountHolder,
+        password: parse.password,
+        pancardUpload: body.pancard,
+        aadharUpload: body.aadhar,
+        cancelledchequeUpload: body.cancelledcheque,
+        roleId: '60a2440d356d366605b04524'
       }).save()
- 
-    }else{res.json({status:200,
-    message:'Company Rep Already Exist'})}
+    } else { res.json({ status: 200, message: 'Employee Already Exist' }) }
   }).then(res.json({
-    status:200,
-    message:"Company Rep Added Successfully"
-  })).catch(next) 
+    status: 200,
+    message: "employee Added Successfully"
+  })).catch(next)
+
+}
+
+export const onBoardingClientRep = ({ bodymen: { body }, params, user }, res, next) => {
+  var details = Buffer.from(body.onboardingdetails, 'base64');
+
+  let onboardDetails = details.toString('ascii');
+
+  let parse = JSON.parse(onboardDetails);
+
+  User.findOne({ email: parse.email, password: parse.password }).then(data => {
+    if (!data) {
+      new User({
+        name: parse.name,
+        email: parse.email,
+        phoneNumber: parse.phoneNumber,
+        companyName: parse.companyName,
+        password: parse.password,
+        roleId: '60a243f0356d366605b04522',
+        authendicationLetter: parse.authenticationletterforclient,
+        companyIdCard: parse.companyidforclient,
+      }).save()
+
+    } else {
+      res.json({
+        status: 200,
+        message: "Client Rep Already Exist"
+      })
+    }
+  }).then(res.json({
+    status: 200,
+    message: "Client Rep Added Successfully"
+  })).catch(next)
+
+}
+
+
+export const onBoardingCompanyRep = ({ bodymen: { body }, params, user }, res, next) => {
+  var details = Buffer.from(body.onboardingdetails, 'base64');
+
+  let onboardDetails = details.toString('ascii');
+
+  let parse = JSON.parse(onboardDetails);
+
+  User.findOne({ email: parse.email, password: parse.password }).then(data => {
+    if (!data) {
+      new User({
+        name: parse.name,
+        email: parse.email,
+        phoneNumber: parse.phoneNumber,
+        companyName: parse.companyName,
+        password: parse.password,
+        roleId: '60a243e1356d366605b04521',
+        authendicationLetter: body.authenticationletterforcompany,
+        companyIdCard: body.companyidforcompany
+      }).save()
+
+    } else {
+      res.json({
+        status: 200,
+        message: 'Company Rep Already Exist'
+      })
+    }
+  }).then(res.json({
+    status: 200,
+    message: "Company Rep Added Successfully"
+  })).catch(next)
 
 }
 
