@@ -20,6 +20,19 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>{
     .catch(next)
 }
 
+export const getAllUnAssignedCompanies = ({ querymen: { query, select, cursor } }, res, next) =>{
+  Companies.count({isAssignedToBatch: false})
+    .then(count => Companies.find({isAssignedToBatch: false})
+      .populate('createdBy')
+      .then((companies) => ({
+        count,
+        rows: companies.map((companies) => companies.view())
+      }))
+    )
+    .then(success(res))
+    .catch(next)
+}
+
 export const getAllNic = ({ querymen: { query, select, cursor } }, res, next) =>
   Companies.distinct('nic')
     .populate('createdBy')
