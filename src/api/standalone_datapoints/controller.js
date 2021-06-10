@@ -382,6 +382,8 @@ export const uploadCompanyESGFiles = async (req, res, next) => {
               taskId: null,
               submittedBy: '',
               submittedDate: '',
+              standaradDeviation:'',
+              average:'',
               activeStatus: '',
               lastModifiedDate: '',
               modifiedBy: '',

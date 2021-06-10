@@ -2,14 +2,14 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { token } from '../../services/passport'
-import { create, index, show, update, destroy, percentileCalculation} from './controller'
+import { create, index, show, update, destroy, percentileCalculation, mockPercentileCalculation} from './controller'
 import { schema } from './model'
 import { get } from 'mongoose'
 export PolarityRules, { schema } from './model'
 
 const router = new Router()
 const { polarityName, polarityValue, condition, datapointId, status } = schema.tree
-
+const companyId = '', standardDeviation = '', average = '', response = '';
 /**
  * @api {post} /polarity_rules Create polarity rules
  * @apiName CreatePolarityRules
@@ -30,6 +30,27 @@ router.post('/',
   token({ required: true }),
   body({ polarityName, polarityValue, condition, datapointId }),
   create)
+
+  /**
+   * @api {post} /mock_percentileCalculation Retrieve mock percentile calculation
+   * @apiName Mock Percentile Calculation
+   * @apiGroup PolarityRules
+   * @apiPermission user
+   * @apiParam {String} access_token user access token.
+   * @apiParam companyId Polarity rules's companyId.
+   * @apiParam standardDeviation Polarity rules's standardDeviation.
+   * @apiParam average Polarity rules's average.
+   * @apiParam datapointId Polarity rules's datapointId.
+   * @apiParam response Polarity rules's response.
+   * @apiSuccess {Object} polarityRules Polarity rules's data.
+   * @apiError {Object} 400 Some parameters may contain invalid values.
+   * @apiError 404 Polarity rules not found.
+   * @apiError 401 user access only.
+   */
+  router.post('/mock_percentileCalculation',
+    token({ required: true }),
+    body({ companyId, standardDeviation, average, datapointId,response}),
+    mockPercentileCalculation)
 
 /**
  * @api {get} /polarity_rules Retrieve polarity rules
