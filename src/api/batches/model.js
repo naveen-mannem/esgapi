@@ -18,6 +18,9 @@ const batchesSchema = new Schema({
   years: {
     type: []
   },
+  batchSLA: {
+    type: Date
+  },
   companiesList:[{ 
     type : Schema.ObjectId, 
     ref: 'Companies' 
@@ -42,6 +45,7 @@ batchesSchema.methods = {
       createdBy: this.createdBy ? this.createdBy.view(full) : null,
       batchName: this.batchName,
       years: this.years,
+      batchSLA: this.batchSLA ? this.batchSLA : '',
       companiesList: this.companiesList ? this.companiesList : [],
       clientTaxonomy: this.clientTaxonomy ? this.clientTaxonomy.view(full) : null,
       status: this.status,
