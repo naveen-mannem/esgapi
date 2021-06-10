@@ -57,6 +57,7 @@
     "cors": "^2.8.5",
     "excel-date-to-js": "^1.0.6",
     "express": "^4.17.1",
+    "file-type": "^16.5.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
