@@ -248,7 +248,7 @@ export const onBoardNewUser = async({ bodymen: { body }, params, user }, res, ne
   }
 }
 
-function storeOnBoardingImagesInLocalStorage(onboardingBase64Image, folderName){
+async function storeOnBoardingImagesInLocalStorage(onboardingBase64Image, folderName){
   return new Promise(function(resolve, reject){
     let base64Image = onboardingBase64Image.split(';base64,').pop();
     fileType.fromBuffer((Buffer.from(base64Image, 'base64'))).then(function(res){
