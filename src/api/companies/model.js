@@ -33,6 +33,10 @@ const companiesSchema = new Schema({
   socialQAName: {
     type: String
   },
+  isAssignedToBatch: {
+    type: Boolean,
+    default: false
+  },
   status: {
     type: Boolean,
     default: true
@@ -61,6 +65,7 @@ companiesSchema.methods = {
       socialAnalystName: this.socialAnalystName,
       socialQAName: this.socialQAName,
       status: this.status,
+      isAssignedToBatch: this.isAssignedToBatch ? this.isAssignedToBatch : false,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }
