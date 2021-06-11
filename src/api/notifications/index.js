@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { token } from '../../services/passport'
-import { create, index, show, update, destroy } from './controller'
+import { create, index, show, update, destroy, getMyNotifications } from './controller'
 import { schema } from './model'
 export Notifications, { schema } from './model'
 
@@ -45,6 +45,23 @@ router.get('/',
   token({ required: true }),
   query(),
   index)
+
+/**
+ * @api {get} /notifications/my-notifications/:notifyToUser Retrieve My notifications
+ * @apiName RetrieveMyNotifications
+ * @apiGroup Notifications
+ * @apiPermission user
+ * @apiParam {String} access_token user access token.
+ * @apiUse listParams
+ * @apiSuccess {Number} count Total amount of notifications.
+ * @apiSuccess {Object[]} rows List of notifications.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ * @apiError 401 user access only.
+ */
+router.get('/my-notifications/:notifyToUser',
+  token({ required: true }),
+  query(),
+  getMyNotifications)
 
 /**
  * @api {get} /notifications/:id Retrieve notifications

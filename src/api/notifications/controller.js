@@ -19,6 +19,18 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
     .then(success(res))
     .catch(next)
 
+export const getMyNotifications = ({ params, querymen: { query, select, cursor } }, res, next) =>
+  Notifications.count({ notifyToUser: params.notifyToUser ? params.notifyToUser : null })
+    .then(count => Notifications.find({ notifyToUser: params.notifyToUser ? params.notifyToUser : null }, select, cursor)
+      .populate('notifyToUser')
+      .then((notifications) => ({
+        count,
+        rows: notifications.map((notifications) => notifications.view())
+      }))
+    )
+    .then(success(res))
+    .catch(next)
+
 export const show = ({ params }, res, next) =>
   Notifications.findById(params.id)
   .populate('notifyToUser')
