@@ -78,6 +78,30 @@ const datapointsSchema = new Schema({
   status: {
     type: Boolean,
     default: true
+  },
+  clientTaxonomyId: {
+    type: Schema.ObjectId,
+    ref: 'ClientTaxonomy',
+    required: true
+  },
+  validationRule: {
+    type: String
+  },
+  dataType: {
+    type: String
+  },
+  dependentCodes: {
+    type: Array
+  },
+  hasDependentCode: {
+     type: Boolean,
+     default: false
+  },
+  validationTypes: {
+    type: Array
+  },
+  percentileThresholdValue: {
+    type: String
   }
 }, {
   timestamps: true,
@@ -88,7 +112,7 @@ const datapointsSchema = new Schema({
 })
 
 datapointsSchema.methods = {
-  view (full) {
+  view(full) {
     const view = {
       // simple view
       id: this.id,
@@ -112,6 +136,12 @@ datapointsSchema.methods = {
       finalUnit: this.finalUnit,
       keyIssueId: this.keyIssueId ? this.keyIssueId.view(full) : null,
       functionId: this.functionId ? this.functionId.view(full) : null,
+      clientTaxonomyId: this.clientTaxonomyId ? this.clientTaxonomyId.view(full) : null,
+      validationRule:this.validationRule,
+      dataType: this.dataType,
+      dependentCodes: this.dependentCodes,
+      validationTypes: this.validationTypes,
+      percentileThresholdValue: this.percentileThresholdValue,
       dpType: this.dpType,
       dpStatus: this.dpStatus,
       status: this.status,
