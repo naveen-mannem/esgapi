@@ -181,7 +181,7 @@ export const onBoardNewUser = async ({ bodymen: { body }, params, user }, res, n
                 email: onBoardingDetails.email ? onBoardingDetails.email : '',
                 password: onBoardingDetails.password ? onBoardingDetails.password : '',
                 phoneNumber: onBoardingDetails.phoneNumber ? onBoardingDetails.phoneNumber : "",
-                companyId: onBoardingDetails.companyId ? onBoardingDetails.companyId : "",
+                CompanyName: onBoardingDetails.CompanyName ? onBoardingDetails.CompanyName : "",
                 authenticationLetterForClientUrl: authenticationLetterForClientUrl,
                 companyIdForClient: companyIdForClient,
                 status: true,
