@@ -91,6 +91,38 @@ export const update = ({ user, bodymen: { body }, params }, res, next) =>
     .then(success(res))
     .catch(next)
 
+export const updateClientTaxonomy = async({ user, bodymen: { body }, params }, res, next) => {
+  ClientTaxonomy.findById(params.id)
+    .populate('createdBy')
+    .then(notFound(res))
+    .then(authorOrAdmin(res, user, 'createdBy'))
+    .then(async(clientTaxonomy) => {
+      let fields = [];
+      if (body.headers && body.headers.length > 0) {
+        for (let index = 0; index < body.headers.length; index++) {
+          const masterTaxonomy = body.headers[index].value;
+          fields.push(masterTaxonomy);
+        }
+      }
+      let clientTaxonomyObject = {
+        taxonomyName: body.taxonomyName ? body.taxonomyName : '',
+        fields: fields,
+        status: true
+      }
+      await ClientTaxonomy.update({_id: params.id}, { $set: clientTaxonomyObject })
+      .then((err, result) => {
+        if (err) {
+          console.log('error', err);
+          return err;
+        } else {
+          return ({ message: "Client Taxonomy updated successfuly!", data: clientTaxonomyObject });
+        }
+      })
+    })
+    .then(success(res))
+    .catch(next)
+}
+
 export const destroy = ({ user, params }, res, next) =>
   ClientTaxonomy.findById(params.id)
     .then(notFound(res))

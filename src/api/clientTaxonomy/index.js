@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { token } from '../../services/passport'
-import { create, index, show, update, destroy, createClientTaxonomy } from './controller'
+import { create, index, show, update, destroy, createClientTaxonomy, updateClientTaxonomy } from './controller'
 import { schema } from './model'
 export ClientTaxonomy, { schema } from './model'
 
@@ -96,6 +96,25 @@ router.put('/:id',
   token({ required: true }),
   body({ taxonomyName, fields, status }),
   update)
+
+/**
+ * @api {put} /clientTaxonomies/update/:id Update client taxonomy from UI
+ * @apiName UpdateClientTaxonomyFromUI
+ * @apiGroup ClientTaxonomy
+ * @apiPermission user
+ * @apiParam {String} access_token user access token.
+ * @apiParam taxonomyName Client taxonomy's taxonomyName.
+ * @apiParam fields Client taxonomy's fields.
+ * @apiParam status Client taxonomy's status.
+ * @apiSuccess {Object} clientTaxonomy Client taxonomy's data.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ * @apiError 404 Client taxonomy not found.
+ * @apiError 401 user access only.
+ */
+router.put('/update/:id',
+  token({ required: true }),
+  body({ taxonomyName, headers, status }),
+  updateClientTaxonomy)
 
 /**
  * @api {delete} /clientTaxonomies/:id Delete client taxonomy
