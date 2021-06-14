@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { token } from '../../services/passport'
-import { create, index, show, update, destroy, mock_Type8Validation } from './controller'
+import { create, index, show, update, destroy, type8Validation } from './controller'
 import { schema } from './model'
 export Validations, { schema } from './model'
 
@@ -32,15 +32,14 @@ router.post('/',
   body({ datapointId, validationRule, rule, dependantCode, condition, criteria, validationAlert }),
   create)
 /**
- * @api {post} /validations/type8Validation Create validations
- * @apiName CreateValidations
+ * @api {post} /validations/type8 Type8 Validations
+ * @apiName Type8Validations
  * @apiGroup Validations
  * @apiPermission user
  * @apiParam {String} access_token user access token.
  * @apiParam datapointId Validations's datapointId.
  * @apiParam companyId Validations's companyId.
  * @apiParam clientTaxonomyId Validations's clientTaxonomyId.
- * @apiParam dependantCode Validations's dependantCode.
  * @apiParam currentYear Validations's currentYear.
  * @apiParam previousYear Validations's previousYear.
  * @apiParam response Validations's response.
@@ -49,10 +48,10 @@ router.post('/',
  * @apiError 404 Validations not found.
  * @apiError 401 user access only.
  */
- router.post('/type8Validation',
+ router.post('/type8',
  token({ required: true }),
  body({ datapointId, companyId, clientTaxonomyId, currentYear, previousYear, response}),
- mock_Type8Validation)
+ type8Validation)
 /**
  * @api {get} /validations Retrieve validations
  * @apiName RetrieveValidations
