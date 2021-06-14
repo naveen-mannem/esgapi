@@ -2,13 +2,13 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { token } from '../../services/passport'
-import { create, index, show, update, destroy } from './controller'
+import { create, index, show, update, destroy, mock_Type8Validation } from './controller'
 import { schema } from './model'
 export Validations, { schema } from './model'
 
 const router = new Router()
 const { datapointId, validationRule, rule, dependantCode, condition, criteria, validationAlert, status } = schema.tree
-
+const companyId = '', clientTaxonomyId = '', currentYear = '', previousYear = '', response = '';
 /**
  * @api {post} /validations Create validations
  * @apiName CreateValidations
@@ -31,7 +31,28 @@ router.post('/',
   token({ required: true }),
   body({ datapointId, validationRule, rule, dependantCode, condition, criteria, validationAlert }),
   create)
-
+/**
+ * @api {post} /validations/type8Validation Create validations
+ * @apiName CreateValidations
+ * @apiGroup Validations
+ * @apiPermission user
+ * @apiParam {String} access_token user access token.
+ * @apiParam datapointId Validations's datapointId.
+ * @apiParam companyId Validations's companyId.
+ * @apiParam clientTaxonomyId Validations's clientTaxonomyId.
+ * @apiParam dependantCode Validations's dependantCode.
+ * @apiParam currentYear Validations's currentYear.
+ * @apiParam previousYear Validations's previousYear.
+ * @apiParam response Validations's response.
+ * @apiSuccess {Object} validations Validations's data.
+ * @apiError {Object} 400 Some parameters may contain invalid values.
+ * @apiError 404 Validations not found.
+ * @apiError 401 user access only.
+ */
+ router.post('/type8Validation',
+ token({ required: true }),
+ body({ datapointId, companyId, clientTaxonomyId, currentYear, previousYear, response}),
+ mock_Type8Validation)
 /**
  * @api {get} /validations Retrieve validations
  * @apiName RetrieveValidations
