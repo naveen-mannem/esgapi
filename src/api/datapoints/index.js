@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
 import { token } from '../../services/passport'
-import { create, index, show, update, destroy, includePolarityFromJson, includeCategoryIdsFromJson } from './controller'
+import { create, index, show, update, destroy, includePolarityFromJson, includeCategoryIdsFromJson, includeExtraKeysFromJson } from './controller'
 import { schema } from './model'
 export Datapoints, { schema } from './model'
 
@@ -63,6 +63,22 @@ router.get('/',
   index)
 
 /**
+* @api {get} /datapoints/addExtraKeys/:clientTaxonomyId Add extraKeys for datapoints
+* @apiName AddExtraKeysForAllDatapoints
+* @apiGroup Datapoints
+* @apiPermission user
+* @apiParam {String} access_token user access token.
+* @apiSuccess {Object} datapoints Datapoints's data.
+* @apiError {Object} 400 Some parameters may contain invalid values.
+* @apiError 404 Datapoints not found.
+* @apiError 401 user access only.
+*/
+
+router.get('/addExtraKeys/:clientTaxonomyId',
+  token({ required: true }),
+  includeExtraKeysFromJson)
+
+/**
  * @api {get} /datapoints/:id Retrieve datapoints
  * @apiName RetrieveDatapoints
  * @apiGroup Datapoints
@@ -88,9 +104,9 @@ router.get('/:id',
  * @apiError 404 Datapoints not found.
  * @apiError 401 user access only.
  */
- router.get('/import-from-json/polarity',
- token({ required: true }),
- includePolarityFromJson)
+router.get('/import-from-json/polarity',
+  token({ required: true }),
+  includePolarityFromJson)
 
 /**
 * @api {get} /datapoints/import-from-json/categoryId Add categoryId for datapoints
@@ -104,8 +120,9 @@ router.get('/:id',
 * @apiError 401 user access only.
 */
 router.get('/import-from-json/categoryId',
-token({ required: true }),
-includeCategoryIdsFromJson)
+  token({ required: true }),
+  includeCategoryIdsFromJson)
+
 
 /**
  * @api {put} /datapoints/:id Update datapoints
@@ -158,5 +175,6 @@ router.put('/:id',
 router.delete('/:id',
   token({ required: true }),
   destroy)
+
 
 export default router
