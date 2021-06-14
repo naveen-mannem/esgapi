@@ -94,14 +94,29 @@ const datapointsSchema = new Schema({
     type: Array
   },
   hasDependentCode: {
-     type: Boolean,
-     default: false
+    type: Boolean,
+    default: false
   },
   validationTypes: {
     type: Array
   },
   percentileThresholdValue: {
     type: String
+  },
+  parameters: {
+    type: String
+  },
+  methodName: {
+    type: String
+  },
+  checkCondition: {
+    type: String
+  },
+  criteria: {
+    type: String
+  },
+  collectionOrderNumber: {
+    type: Number
   }
 }, {
   timestamps: true,
@@ -137,7 +152,7 @@ datapointsSchema.methods = {
       keyIssueId: this.keyIssueId ? this.keyIssueId.view(full) : null,
       functionId: this.functionId ? this.functionId.view(full) : null,
       clientTaxonomyId: this.clientTaxonomyId ? this.clientTaxonomyId.view(full) : null,
-      validationRule:this.validationRule,
+      validationRule: this.validationRule,
       dataType: this.dataType,
       dependentCodes: this.dependentCodes,
       validationTypes: this.validationTypes,

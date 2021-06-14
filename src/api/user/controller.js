@@ -181,7 +181,7 @@ export const onBoardNewUser = async ({ bodymen: { body }, params, user }, res, n
                 email: onBoardingDetails.email ? onBoardingDetails.email : '',
                 password: onBoardingDetails.password ? onBoardingDetails.password : '',
                 phoneNumber: onBoardingDetails.phoneNumber ? onBoardingDetails.phoneNumber : "",
-                companyId: onBoardingDetails.companyId ? onBoardingDetails.companyId : "",
+                CompanyName: onBoardingDetails.CompanyName ? onBoardingDetails.CompanyName : "",
                 authenticationLetterForClientUrl: authenticationLetterForClientUrl,
                 companyIdForClient: companyIdForClient,
                 status: true,
@@ -268,6 +268,10 @@ export const onBoardNewUser = async ({ bodymen: { body }, params, user }, res, n
       .catch((err) => {
         return res.status(500).json({ message: "Failed to store companyIdForCompany" })
       })
+  } else if(onBoardingDetails.roleName == "Analyst") {
+//TODO
+  } else if(onBoardingDetails.roleName == "QA") {
+//TODO
   } else {
     return res.status(500).json({ message: "Failed to onboard, invalid value for role or roleName" });
   }
@@ -318,6 +322,11 @@ export const updateUserStatus = ({ bodymen: { body }, user }, res, next) => {
       }
     })
 
+}
+
+export const updateUserRoles = ({ bodymen: { body }, user }, res, next) => {
+  console.log('updateUserRoles');
+  User.find({ isUserApproved: true, isRoleAssigned: true });//Separate New API to return only approved and role assigned users
 }
 
 export const update = ({ bodymen: { body }, params, user }, res, next) =>
