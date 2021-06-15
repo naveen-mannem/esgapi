@@ -57,7 +57,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>{
         batches.forEach(item => {
           let yearObjects = [];
           item.years.forEach(obj => {
-            yearObjects.push({value: obj.value, label: obj.value});
+            yearObjects.push({value: obj, label: obj});
           })
           let companyObjects = [];
           if (item.companiesList.length > 0) {
@@ -95,7 +95,7 @@ export const show = ({ params }, res, next) =>
     .then((batch) => {
       let yearObjects = [];
       batch.years.forEach(obj => {
-        yearObjects.push({value: obj.value, label: obj.value});
+        yearObjects.push({value: obj, label: obj});
       })
       let companyObjects = [];
       if (batch.companiesList.length > 0) {
