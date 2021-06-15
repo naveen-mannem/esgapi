@@ -14,9 +14,8 @@ const clientRepresentativesSchema = new Schema({
   name: {
     type: String
   },
-  companyId: {
-    type: Schema.ObjectId,
-    ref: 'Companies',
+  CompanyName: {
+    type: String,
     required: true
   },
   authenticationLetterForClientUrl: {
@@ -38,14 +37,14 @@ const clientRepresentativesSchema = new Schema({
 })
 
 clientRepresentativesSchema.methods = {
-  view (full) {
+  view(full) {
     const view = {
       // simple view
       id: this.id,
       createdBy: this.createdBy.view(full),
       userId: this.userId ? this.userId.view(full) : null,
       name: this.name,
-      companyId: this.companyId ? this.companyId.view(full) : null,
+      CompanyName: this.CompanyName ? this.CompanyName : null,
       authenticationLetterForClientUrl: this.authenticationLetterForClientUrl,
       companyIdForClient: this.companyIdForClient,
       status: this.status,

@@ -2,6 +2,7 @@ import _ from 'lodash'
 import * as fs from 'fs'
 import { success, notFound, authorOrAdmin } from '../../services/response/'
 import { Datapoints } from '.'
+import { StandaloneDatapoints } from '../standalone_datapoints'
 
 export const create = ({ user, bodymen: { body } }, res, next) =>
   Datapoints.create({ ...body, updatedBy: user })
@@ -35,40 +36,91 @@ export const show = ({ params }, res, next) =>
     .then(success(res))
     .catch(next)
 
-export const includePolarityFromJson = async(req, res, next) => {
- fs.readFile(__dirname+'/datapoints-master-values.json', async(err, data) => {
-   if (err) throw err;
-   let datapointsList = JSON.parse(data);
-   let allDatapoints = await Datapoints.find({});
-   for (let index = 0; index < allDatapoints.length; index++) {
-     const element = allDatapoints[index];
-     console.log(element.code);
-     let foundObject = datapointsList.find(obj => obj.code == element.code);
-     console.log('foundObject', foundObject);
-     await Datapoints.updateOne({_id: element.id}, {$set: { polarity: foundObject.polarity ? foundObject.polarity : '' }});
-     if (index == allDatapoints.length-1) {
-       return res.status(200).json({ message: "Polarity value added!" });
-     }
-   }
- })
+export const includePolarityFromJson = async (req, res, next) => {
+  fs.readFile(__dirname + '/datapoints-master-values.json', async (err, data) => {
+    if (err) throw err;
+    let datapointsList = JSON.parse(data);
+    let allDatapoints = await Datapoints.find({});
+    for (let index = 0; index < allDatapoints.length; index++) {
+      const element = allDatapoints[index];
+      console.log(element.code);
+      let foundObject = datapointsList.find(obj => obj.code == element.code);
+      console.log('foundObject', foundObject);
+      await Datapoints.updateOne({ _id: element.id }, { $set: { polarity: foundObject.polarity ? foundObject.polarity : '' } });
+      if (index == allDatapoints.length - 1) {
+        return res.status(200).json({ message: "Polarity value added!" });
+      }
+    }
+  })
 }
 
-export const includeCategoryIdsFromJson = async(req, res, next) => {
- fs.readFile(__dirname+'/dpcodes-categoryIds.json', async(err, data) => {
-   if (err) throw err;
-   let datapointsList = JSON.parse(data);
-   let allDatapoints = await Datapoints.find({});
-   for (let index = 0; index < allDatapoints.length; index++) {
-     const element = allDatapoints[index];
-     console.log(element.code);
-     let foundObject = datapointsList.find(obj => obj.code == element.code);
-     console.log('foundObject', foundObject);
-     await Datapoints.updateOne({_id: element.id}, {$set: { categoryId: foundObject.categoryId ? foundObject.categoryId : null }});
-     if (index == allDatapoints.length-1) {
-       return res.status(200).json({ message: "CategoryId value added!" });
-     }
-   }
- })
+export const includeCategoryIdsFromJson = async (req, res, next) => {
+  fs.readFile(__dirname + '/dpcodes-categoryIds.json', async (err, data) => {
+    if (err) throw err;
+    let datapointsList = JSON.parse(data);
+    let allDatapoints = await Datapoints.find({});
+    for (let index = 0; index < allDatapoints.length; index++) {
+      const element = allDatapoints[index];
+      console.log(element.code);
+      let foundObject = datapointsList.find(obj => obj.code == element.code);
+      console.log('foundObject', foundObject);
+      await Datapoints.updateOne({ _id: element.id }, { $set: { categoryId: foundObject.categoryId ? foundObject.categoryId : null } });
+      if (index == allDatapoints.length - 1) {
+        return res.status(200).json({ message: "CategoryId value added!" });
+      }
+    }
+  })
+}
+
+export const includeExtraKeysFromJson = async (req, res, next) => {
+  var clientTaxonomyId = req.params.clientTaxonomyId;
+  fs.readFile(__dirname + '/extra.json', async (err, data) => {
+    if (err) throw err;
+    let datapointsList = JSON.parse(data);
+    console.log('datapointsList', datapointsList.length)
+    for (let index = 0; index < datapointsList.length; index++) {
+      var obj = {
+        "clientTaxonomyId": clientTaxonomyId,
+        "validationRule": datapointsList[index].validationRule,
+        "dataType": datapointsList[index].dataType,
+        "dependentCodes": datapointsList[index].dependentCodes ? JSON.parse(datapointsList[index].dependentCodes) : [],
+        "hasDependentCode": datapointsList[index].hasDependentCode,
+        "validationTypes": datapointsList[index].validationTypes ? JSON.parse(datapointsList[index].validationTypes) : [],
+        "percentileThresholdValue": datapointsList[index].percentileThresholdValue,
+        "DPCODE": datapointsList[index].DPCODE,
+        "parameters": datapointsList[index].parameters,
+        "methodName": datapointsList[index].methodName,
+        "checkCondition": datapointsList[index].checkCondition,
+        "criteria": datapointsList[index].criteria,
+        "collectionOrderNumber": datapointsList[index].collectionOrderNumber,
+      }
+      console.log('obj', obj, index + 1);
+      await Datapoints.updateOne({ _id: datapointsList[index]._id }, { $set: obj });
+    }
+    res.status(200).json({ message: "extra cloums added" });
+  })
+}
+
+export const getCategorywiseDatapoints = async(req, res, next) => {
+  let categoryDatapoints = await Datapoints.find({clientTaxonomyId: req.params.clientTaxonomyId, categoryId: req.params.categoryId, status: true}).sort({ collectionOrderNumber: 1 });
+  let dpDetailsList = [];
+  for (let index = 0; index < categoryDatapoints.length; index++) {
+    let dpObject = categoryDatapoints[index];
+    let datapointHistory = [];
+    // let histories = await StandaloneDatapoints.find({datapointId: dpObject.id, clientTaxonomyId: req.params.clientTaxonomyId, categoryId: req.params.categoryId, year: { $ne: "2020-2021" }, status: true}).populate('createdBy')
+    let histories = await StandaloneDatapoints.find({companyId: req.params.companyId, datapointId: dpObject.id, year: { $ne: req.params.year }, status: true}).populate('createdBy')
+    .populate('companyId')
+    .populate('taskId')
+    .populate('datapointId');
+    if (histories.length > 0) {
+      for (let hIndex = 0; hIndex < histories.length; hIndex++) {
+        const object = histories[hIndex];
+        datapointHistory.push({ year: object.year, response: object.response, performanceResponse: object.performanceResult, sourceUrl: object.sourceUrl ? object.sourceUrl : '', standardDeviation: object.standaradDeviation ? object.standaradDeviation : '', average: object.average ? object.average : '' });
+      }      
+    }
+    dpDetailsList.push({ dpObject, datapointHistory: datapointHistory });
+  }
+  return res.json({count: dpDetailsList.length, rows: dpDetailsList});
 }
 
 export const update = ({ user, bodymen: { body }, params }, res, next) =>
